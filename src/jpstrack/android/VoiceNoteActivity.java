@@ -53,6 +53,7 @@ public class VoiceNoteActivity extends Activity implements OnClickListener {
 		recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
 		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 		try {
+			soundDir.mkdirs();
 			soundFile = File.createTempFile("SOUNDFILE", ".mp3", soundDir);
 		} catch (IOException e) {
 			Log.e(PROG_NAME, "Could not save file");
