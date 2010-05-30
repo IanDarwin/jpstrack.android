@@ -5,6 +5,11 @@
     <string name="dir_title">Data Directory</string>
     <string name="dir_summary">Location to save GPX files, images, notations, etc.</string>
     
+    <string name="last_known_location_">Last known location =</string>
+    <string name="preferred_provider_is">Preferred provider is: </string>
+    <string name="cannot_get_gps_service">CANNOT GET GPS SERVICE</string>
+    <string name="provider_found">Provider found: </string>
+    
     <string name="latitude_text">Latitude</string>
     <string name="longitude_text">Longitude</string>
     

@@ -1,5 +1,6 @@
 package jpstrack.android;
 
+import java.io.File;
 import java.util.List;
 
 import jpstrack.fileio.GPSFileSaver;
@@ -34,7 +35,9 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	private String preferred;
 	private EditText latOutput, longOutput;
 	private GPSFileSaver trackerIO;
-
+	
+	final String TEMP_HARDCODED_DIR = "/sdcard/jpstrack";	// xxx
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -44,26 +47,28 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 		
 		mgr = (LocationManager) getSystemService(LOCATION_SERVICE); 
 		for (String prov : mgr.getAllProviders()) {
-			log("Provider present: " + prov);
+			log(getString(R.string.provider_found) + prov);
 		}
 
+		new File(TEMP_HARDCODED_DIR).mkdirs();
+		
 		Criteria criteria = new Criteria();
 		criteria.setAccuracy(Criteria.ACCURACY_FINE);
 		List<String> providers = mgr.getProviders(criteria, true);
 		if (providers == null || providers.size() == 0) {
-			log("CANNOT GET GPS SERVICE");
+			log(getString(R.string.cannot_get_gps_service));
 			return;
 		}
  		preferred = providers.get(0);			// first == preferred
-		log("Preferred provider is: " + preferred);
+		log(getString(R.string.preferred_provider_is) + preferred);
 
 		final Location lastKnownLocation = mgr.getLastKnownLocation(preferred);
 		if (lastKnownLocation != null) {
-			printLocation("Last known location =", lastKnownLocation); 
+			printLocation(getString(R.string.last_known_location_), lastKnownLocation); 
 		}
 		
 		// I/O Helper
-		trackerIO = new GPSFileSaver("/sdcard/jpstrack", "201005271313.gpx");
+		trackerIO = new GPSFileSaver(TEMP_HARDCODED_DIR, "201005271313.gpx");
 		
 		// THE GUI
 		latOutput = (EditText) findViewById(R.id.lat_output);
