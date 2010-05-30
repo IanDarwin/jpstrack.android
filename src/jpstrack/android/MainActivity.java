@@ -2,6 +2,8 @@ package jpstrack.android;
 
 import java.util.List;
 
+import jpstrack.fileio.GPSFileSaver;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.location.Criteria;
@@ -31,6 +33,7 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	private TextView output;
 	private String preferred;
 	private EditText latOutput, longOutput;
+	private GPSFileSaver trackerIO;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -59,6 +62,9 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 			printLocation("Last known location =", lastKnownLocation); 
 		}
 		
+		// I/O Helper
+		trackerIO = new GPSFileSaver("/sdcard/jpstrack", "201005271313.gpx");
+		
 		// THE GUI
 		latOutput = (EditText) findViewById(R.id.lat_output);
 		latOutput.setEnabled(false);
@@ -79,21 +85,52 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 		View takePictureButton = findViewById(R.id.takepicture_button);
 		takePictureButton.setEnabled(false);
 	}
+	
+    @Override
+    protected void onResume() {
+            super.onResume();
+            mgr.requestLocationUpdates(preferred, MIN_SECONDS * 1000, MIN_METRES, this);
+    }
+
+    /** Called by Android when we get paused; turn off
+     * getting GPS updates in hopes this will save battery
+     * life. Better probably to power off the GPS, but then,
+     * what if some other App is using it...?
+     */
+    @Override
+    protected void onPause() {
+            super.onPause();
+            mgr.removeUpdates(this);
+    }
+    
+    boolean paused;
+    
+	/** From LocationListener, called when the location changes, obviously */
+	@Override
+	public void onLocationChanged(Location location) {
+		printLocation("Current Location", location);
+		double latitude = location.getLatitude();
+		double longitude = location.getLongitude();
+		latOutput.setText(Double.toString(latitude));
+		longOutput.setText(Double.toString(longitude));
+		if (!paused) {
+			trackerIO.write(location.getTime(), latitude, longitude);
+		}
+	}
 
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.start_button:
 			log("Starting File Updates");
-			mgr.requestLocationUpdates(preferred, MIN_SECONDS * 1000, MIN_METRES, this);
+			trackerIO.startFile();
 			break;
 		case R.id.pause_button:
-			log("Pausing File Updates");
-			mgr.removeUpdates(this); // XXX
+			paused = !true;
 			break;
 		case R.id.stop_button:
-			log("Stoping File Updates");
-			mgr.removeUpdates(this);
+			log("Stopping File Updates");
+			trackerIO.endFile();
 			break;
 		case R.id.voicenote_button:
 			log("Starting Voice Recording");
@@ -121,14 +158,6 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 			return true;
 		}
 		return false;
-	}
-
-	/** From LocationListener, called when the location changes, obviously */
-	@Override
-	public void onLocationChanged(Location location) {
-		printLocation("Current Location", location);
-		latOutput.setText(Double.toString(location.getLatitude()));
-		longOutput.setText(Double.toString(location.getLongitude()));
 	}
 
 	/** From LocationListener, providing very bad news... */
