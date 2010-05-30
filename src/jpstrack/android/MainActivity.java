@@ -97,7 +97,7 @@ public class Main extends Activity implements LocationListener, OnClickListener 
             mgr.requestLocationUpdates(preferred, MIN_SECONDS * 1000, MIN_METRES, this);
     }
 
-    /** Called by Android when we get paused; turn off
+    /** Called by Android when we get saving; turn off
      * getting GPS updates in hopes this will save battery
      * life. Better probably to power off the GPS, but then,
      * what if some other App is using it...?
@@ -108,17 +108,20 @@ public class Main extends Activity implements LocationListener, OnClickListener 
             mgr.removeUpdates(this);
     }
     
-    boolean paused;
+    boolean saving = false, paused = false;
     
 	/** From LocationListener, called when the location changes, obviously */
 	@Override
 	public void onLocationChanged(Location location) {
+		if (location == null) {
+			log("Got NULL Location from provider!");
+		}
 		printLocation("Current Location", location);
 		double latitude = location.getLatitude();
 		double longitude = location.getLongitude();
 		latOutput.setText(Double.toString(latitude));
 		longOutput.setText(Double.toString(longitude));
-		if (!paused) {
+		if (saving && !paused) {
 			trackerIO.write(location.getTime(), latitude, longitude);
 		}
 	}
@@ -129,12 +132,14 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 		case R.id.start_button:
 			log("Starting File Updates");
 			trackerIO.startFile();
+			saving = true;
 			break;
 		case R.id.pause_button:
-			paused = !true;
+			paused = !paused;
 			break;
 		case R.id.stop_button:
 			log("Stopping File Updates");
+			saving = false;
 			trackerIO.endFile();
 			break;
 		case R.id.voicenote_button:
