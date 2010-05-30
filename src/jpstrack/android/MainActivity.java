@@ -70,22 +70,34 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 		fileNameLabel.setText("YYYYMMDDHHMM.gpx");	// xxx from Prefs or Model??
 		View stopButton = findViewById(R.id.stop_button);
 		stopButton.setOnClickListener(this);
-		// textNoteButton
-		// voiceNoteButton
-		// takePictureButton
-
+		
+		// third row - note Buttons
+		View textNoteButton = findViewById(R.id.textnote_button);
+		textNoteButton.setEnabled(false);
+		View voiceNoteButton = findViewById(R.id.voicenote_button);
+		voiceNoteButton.setOnClickListener(this);
+		View takePictureButton = findViewById(R.id.takepicture_button);
+		takePictureButton.setEnabled(false);
 	}
 
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.start_button:
-			log("Start");
+			log("Starting File Updates");
 			mgr.requestLocationUpdates(preferred, MIN_SECONDS * 1000, MIN_METRES, this);
 			break;
+		case R.id.pause_button:
+			log("Pausing File Updates");
+			mgr.removeUpdates(this); // XXX
+			break;
 		case R.id.stop_button:
-			log("Stop");
+			log("Stoping File Updates");
 			mgr.removeUpdates(this);
+			break;
+		case R.id.voicenote_button:
+			log("Starting Voice Recording");
+			startActivity(new Intent(this, VoiceNoteActivity.class));
 			break;
 		default:
 			log("Unexpected Click from " + v.getId());

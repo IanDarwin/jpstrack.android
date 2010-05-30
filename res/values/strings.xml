@@ -16,6 +16,11 @@
     <string name="textnote_button_label">Text Note</string>
     <string name="takepicture_button_label">Take Picture</string>
 
+	<!-- Voicenote -->
+	<string name="voicenote_name">VoiceNote Recording</string>
+	<string name="voicenote_discard_button_label">Discard VoiceNote</string>
+	<string name="voicenote_save_button_label">Save VoiceNote</string>
+	
     <!-- Menu -->
     <string name="settings_label">Settings...</string>
     <string name="settings_name">JPSTrack Settings</string>
