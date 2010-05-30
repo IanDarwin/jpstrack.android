@@ -19,7 +19,7 @@ public class SettingsActivity extends PreferenceActivity {
 	}
 	
 	public static String getDirectory(Context context) {
-		return PreferenceManager.getDefaultSharedPreferences(context).getString(OPTION_DIR, "/sdcard/)");
+		return PreferenceManager.getDefaultSharedPreferences(context).getString(OPTION_DIR, "/sdcard/jpstrack");
 	}
 
 }
