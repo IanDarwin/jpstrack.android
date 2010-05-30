@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.EditText;
 import android.widget.TextView;
 
 public class Main extends Activity implements LocationListener, OnClickListener { 
@@ -29,6 +30,7 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	private LocationManager mgr;
 	private TextView output;
 	private String preferred;
+	private EditText latOutput, longOutput;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -58,29 +60,35 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 		}
 		
 		// THE GUI
-		View latOutput = findViewById(R.id.lat_output);
-		View lonOutput = findViewById(R.id.lon_output);
+		latOutput = (EditText) findViewById(R.id.lat_output);
+		latOutput.setClickable(false);
+		longOutput = (EditText) findViewById(R.id.lon_output);
+		longOutput.setClickable(false);
 		View startButton = findViewById(R.id.start_button);
 		startButton.setOnClickListener(this);
-		View fileNameLabel = findViewById(R.id.filename_label);
+		TextView fileNameLabel = (TextView) findViewById(R.id.filename_label);
+		fileNameLabel.setText("YYYYMMDDHHMM.gpx");	// xxx from Prefs or Model??
 		View stopButton = findViewById(R.id.stop_button);
 		stopButton.setOnClickListener(this);
 		// textNoteButton
 		// voiceNoteButton
 		// takePictureButton
 
-
 	}
 
 	@Override
 	public void onClick(View v) {
-		log("onclick");
 		switch (v.getId()) {
 		case R.id.start_button:
 			log("Start");
+			mgr.requestLocationUpdates(preferred, MIN_SECONDS * 1000, MIN_METRES, this);
 			break;
 		case R.id.stop_button:
 			log("Stop");
+			mgr.removeUpdates(this);
+			break;
+		default:
+			log("Unexpected Click from " + v.getId());
 			break;
 		}
 	}
@@ -103,27 +111,12 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 		return false;
 	}
 
-	@Override
-	protected void onResume() {
-		super.onResume();
-		mgr.requestLocationUpdates(preferred, MIN_SECONDS * 1000, MIN_METRES, this);
-	}
-
-	/** Called by Android when we get paused; turn off
-	 * getting GPS updates in hopes this will save battery
-	 * life. Better probably to power off the GPS, but then,
-	 * what if some other App is using it...?
-	 */
-	@Override
-	protected void onPause() {
-		super.onPause();
-		mgr.removeUpdates(this);
-	}
-
 	/** From LocationListener, called when the location changes, obviously */
 	@Override
 	public void onLocationChanged(Location location) {
 		printLocation("Current Location", location);
+		latOutput.setText(Double.toString(location.getLatitude()));
+		longOutput.setText(Double.toString(location.getLongitude()));
 	}
 
 	/** From LocationListener, providing very bad news... */

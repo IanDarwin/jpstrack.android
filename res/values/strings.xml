@@ -4,6 +4,12 @@
     <string name="app_name">JPSTrack</string>
     <string name="dir_title">Data Directory</string>
     <string name="dir_summary">Location to save GPX files, images, notations, etc.</string>
+    
+    <string name="latitude_text">Latitude</string>
+    <string name="longitude_text">Longitude</string>
+    
+    <string name="start_button_text">Start</string>
+    <string name="stop_button_text">Stop</string>
 
     <!-- Menu -->
     <string name="settings_label">Settings...</string>
@@ -18,5 +24,7 @@
     <a href="http://www.openstreetmap.org/">OpenStreetMap.org</a>,
     the free, editable map of the world.
     </string>
+    
+    
     
 </resources>
