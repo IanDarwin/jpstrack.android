@@ -61,9 +61,9 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 		
 		// THE GUI
 		latOutput = (EditText) findViewById(R.id.lat_output);
-		latOutput.setClickable(false);
+		latOutput.setEnabled(false);
 		longOutput = (EditText) findViewById(R.id.lon_output);
-		longOutput.setClickable(false);
+		longOutput.setEnabled(false);
 		View startButton = findViewById(R.id.start_button);
 		startButton.setOnClickListener(this);
 		TextView fileNameLabel = (TextView) findViewById(R.id.filename_label);
