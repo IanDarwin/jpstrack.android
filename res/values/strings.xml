@@ -8,8 +8,13 @@
     <string name="latitude_text">Latitude</string>
     <string name="longitude_text">Longitude</string>
     
-    <string name="start_button_text">Start</string>
-    <string name="stop_button_text">Stop</string>
+    <string name="start_button_label">Start</string>
+    <string name="pause_button_label">Pause</string>
+    <string name="stop_button_label">Stop</string>
+    
+    <string name="voicenote_button_label">Voice Note</string>
+    <string name="textnote_button_label">Text Note</string>
+    <string name="takepicture_button_label">Take Picture</string>
 
     <!-- Menu -->
     <string name="settings_label">Settings...</string>
