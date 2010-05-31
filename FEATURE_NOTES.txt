@@ -1,0 +1,21 @@
+This program collects data for inclusion into OpenStreetMap,
+the free, editable map of the world. This is NOT a Navigation
+application (there are many of those in the Market already).
+It is different from the "Vespucci" app in that, unlike Vespucci,
+it does NOT try to be an OSM editor. In the author's experience,
+current Android devices do not have the I/O capability to do this
+job well. I recommend uploading the files (from /sdcard/jpstrack)
+to a desktop PC and runnnig the JOSM editor or even using the
+web-based editor on the OSM site.
+
+The program collects data once you press the Start button, and
+goes until you PAUSE or SAVE. PAUSE can be resumed with the 
+RESUME button. The SAVE button ends a run and closes the file.
+
+There is also voice notes, text notes, and pictures (the latter not
+yet implemented). All are saved, along with the GPX files, in 
+/sdcard/jpstrack.
+
+This is very early release software, please see the Release Notes
+before you decide it's buggy; we know about most of the bugs that
+are in this version and will fix them as we have time...

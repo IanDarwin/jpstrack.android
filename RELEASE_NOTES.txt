@@ -1,0 +1,22 @@
+This is a late Alpha/Early Beta release. Note the following:
+
+- Do NOT use the application with the USB connected in debug mode;
+  there are several places where it will NPE crash if the /sdcard
+  is not available.
+
+- the Take Picture button isn't implemented yet.
+
+- Changing the directory to save in has a UI under Settings,
+  but is ignored at present.
+
+- The menu icons are borked, but the text is OK.
+
+- The About box has no OK button. Use the back-arrow button.
+
+- There are no language-translation files yet so the program 
+  only works in English.
+
+- Sound files are saved as standard MP3's, but the CODEC used
+  is not always available on the desktop.
+
+If you find any new ways to crash it, please email.
