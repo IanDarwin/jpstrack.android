@@ -8,7 +8,7 @@
 	<EditText
 		android:id="@+id/textnote_text"
 		android:layout_width="fill_parent"
-		android:layout_height="200sp" />
+		android:layout_height="150sp" />
 
 	<!-- Bottom row for Discard and Save Button -->
 	<LinearLayout
