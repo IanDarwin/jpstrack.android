@@ -1,6 +1,7 @@
 This is a late Alpha/Early Beta release. Note the following:
 
-- Do NOT use the application with the USB connected in debug mode;
+- Do NOT use the application with the USB connected because this
+  disables Android Apps's access to the /sdcard folder, and 
   there are several places where it will NPE crash if the /sdcard
   is not available.
 
@@ -20,3 +21,5 @@ This is a late Alpha/Early Beta release. Note the following:
   is not always available on the desktop.
 
 If you find any new ways to crash it, please email.
+
+$Id$

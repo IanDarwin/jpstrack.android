@@ -19,3 +19,5 @@ yet implemented). All are saved, along with the GPX files, in
 This is very early release software, please see the Release Notes
 before you decide it's buggy; we know about most of the bugs that
 are in this version and will fix them as we have time...
+
+$Id$
