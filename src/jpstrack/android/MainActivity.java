@@ -3,6 +3,7 @@ package jpstrack.android;
 import java.io.File;
 import java.util.List;
 
+import jpstrack.fileio.FileNameUtils;
 import jpstrack.fileio.GPSFileSaver;
 import android.app.Activity;
 import android.content.Intent;
@@ -20,57 +21,57 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class Main extends Activity implements LocationListener, OnClickListener { 
+public class Main extends Activity implements LocationListener, OnClickListener {
 
 	private static final int MIN_METRES = 1;
 	private static final int MIN_SECONDS = 5;
-	private static final String[] PROVIDER_STATUS_VALUES = { 
-		"out of service",
-		"down temporarily", 
-		"available"
-	};
+	private static final String[] PROVIDER_STATUS_VALUES = { "out of service",
+			"down temporarily", "available" };
 
 	private LocationManager mgr;
 	private TextView output;
 	private String preferred;
 	private TextView latOutput, longOutput;
+	private TextView fileNameLabel;
 	private GPSFileSaver trackerIO;
 	private View startButton, pauseButton, stopButton;
 	private boolean saving, paused;
-    
 
-	
-	public static final String TEMP_HARDCODED_DIR = "/sdcard/jpstrack";	// xxx
-	
+	public static final String TEMP_HARDCODED_DIR = "/sdcard/jpstrack"; // xxx
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		
-		saving = false; paused = false;
+
+		saving = false;
+		paused = false;
 
 		output = (TextView) findViewById(R.id.output);
-		
-		mgr = (LocationManager) getSystemService(LOCATION_SERVICE); 
+
+		mgr = (LocationManager) getSystemService(LOCATION_SERVICE);
 		for (String prov : mgr.getAllProviders()) {
 			log(getString(R.string.provider_found) + prov);
 		}
 
 		new File(TEMP_HARDCODED_DIR).mkdirs();
-		
+
+		// GPS setup
 		Criteria criteria = new Criteria();
 		criteria.setAccuracy(Criteria.ACCURACY_FINE);
 		List<String> providers = mgr.getProviders(criteria, true);
 		if (providers == null || providers.size() == 0) {
 			log(getString(R.string.cannot_get_gps_service));
+			Toast.makeText(this, "Could not open GPS service",
+					Toast.LENGTH_LONG).show();
 			return;
 		}
- 		preferred = providers.get(0);			// first == preferred
+		preferred = providers.get(0); // first == preferred
 		log(getString(R.string.preferred_provider_is) + preferred);
-		
+
 		// I/O Helper
-		trackerIO = new GPSFileSaver(TEMP_HARDCODED_DIR, "201005271313.gpx");
-		
+		trackerIO = new GPSFileSaver(TEMP_HARDCODED_DIR, FileNameUtils.getNextFilename());
+
 		// THE GUI
 		latOutput = (TextView) findViewById(R.id.lat_output);
 		latOutput.setTextSize(24f);
@@ -84,9 +85,9 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 		stopButton = findViewById(R.id.stop_button);
 		stopButton.setOnClickListener(this);
 		stopButton.setEnabled(false);
-		TextView fileNameLabel = (TextView) findViewById(R.id.filename_label);
-		fileNameLabel.setText("YYYYMMDDHHMM.gpx");	// xxx from Prefs or Model??
-		
+		fileNameLabel = (TextView) findViewById(R.id.filename_label);
+		fileNameLabel.setText(FileNameUtils.getDefaultFilenameFormatWithExt());
+
 		// third row - note Buttons
 		View textNoteButton = findViewById(R.id.textnote_button);
 		textNoteButton.setEnabled(false);
@@ -94,37 +95,41 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 		voiceNoteButton.setOnClickListener(this);
 		View takePictureButton = findViewById(R.id.takepicture_button);
 		takePictureButton.setEnabled(false);
-		
+
 		final Location lastKnownLocation = mgr.getLastKnownLocation(preferred);
 		onLocationChanged(lastKnownLocation);
 
 	}
-	
-    @Override
-    protected void onResume() {
-            super.onResume();
-            mgr.requestLocationUpdates(preferred, MIN_SECONDS * 1000, MIN_METRES, this);
-    }
 
-    /** Called by Android when we get saving; turn off
-     * getting GPS updates in hopes this will save battery
-     * life. Better probably to power off the GPS, but then,
-     * what if some other App is using it...?
-     */
-    @Override
-    protected void onPause() {
-            super.onPause();
-            mgr.removeUpdates(this);
-    }
-    
- 	/** From LocationListener, called when the location changes, obviously */
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (preferred != null) {
+			mgr.requestLocationUpdates(preferred, MIN_SECONDS * 1000,
+					MIN_METRES, this);
+		}
+	}
+
+	/**
+	 * Called by Android when we get paused; turn off getting GPS updates in
+	 * hopes this will save battery life.
+	 */
+	@Override
+	protected void onPause() {
+		super.onPause();
+		if (preferred != null) {
+			mgr.removeUpdates(this);
+		}
+	}
+
+	/** From LocationListener, called when the location changes, obviously */
 	@Override
 	public void onLocationChanged(Location location) {
 		if (location == null) {
 			log("Got NULL Location from provider!");
 			return;
 		}
-		log("Current location[" + location.getLatitude() + "," + location.getLongitude() + "]");
+		log("Current location: " + location.getLatitude() + "," + location.getLongitude());
 		double latitude = location.getLatitude();
 		double longitude = location.getLongitude();
 		latOutput.setText(Double.toString(latitude));
@@ -138,31 +143,39 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.start_button:
+			if (preferred == null) {
+				Toast.makeText(this, "GPS not started", Toast.LENGTH_LONG).show(); // XXX LAME LAME LAME - move startup here.
+				return;
+			}
 			startButton.setEnabled(false);
 			try {
-				trackerIO.startFile();
+				File f = trackerIO.startFile();
+				fileNameLabel.setText(f.getName());
 				log("Starting File Updates");
 			} catch (RuntimeException e) {
 				Toast.makeText(this, "Could not save: " + e, Toast.LENGTH_LONG).show();
 				startButton.setEnabled(true);
 				return;
 			}
-			saving = true; paused = false;
+			saving = true;
+			paused = false;
 			pauseButton.setEnabled(true);
 			stopButton.setEnabled(true);
 			break;
 		case R.id.pause_button:
 			paused = !paused;
-			((Button)pauseButton).setText(paused ? 
-					R.string.pause_button_resume_label : 
+			((Button) pauseButton).setText(paused ? 
+					R.string.pause_button_resume_label :
 					R.string.pause_button_label);
 			break;
 		case R.id.stop_button:
 			log("Stopping File Updates");
 			pauseButton.setEnabled(false);
 			stopButton.setEnabled(false);
-			saving = false; paused = false;
+			saving = false;
+			paused = false;
 			trackerIO.endFile();
+			fileNameLabel.setText(FileNameUtils.getDefaultFilenameFormatWithExt());
 			startButton.setEnabled(true);
 			break;
 		case R.id.voicenote_button:
