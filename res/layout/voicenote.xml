@@ -8,7 +8,7 @@
 	<TextView
 	 		android:id="@+id/output"
 	 		android:layout_width="fill_parent"
-	 		android:layout_height="fill_parent" />
+	 		android:layout_height="wrap_content" />
 
 	<!-- A row for Stop Button -->
 	<LinearLayout

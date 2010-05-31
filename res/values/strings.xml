@@ -15,6 +15,7 @@
     
     <string name="start_button_label">Start</string>
     <string name="pause_button_label">Pause</string>
+    <string name="pause_button_resume_label">Resume</string>
     <string name="stop_button_label">Stop</string>
     
     <string name="voicenote_button_label">Voice Note</string>

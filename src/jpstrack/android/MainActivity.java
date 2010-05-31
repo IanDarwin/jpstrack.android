@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.List;
 
 import jpstrack.fileio.GPSFileSaver;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.location.Criteria;
@@ -17,7 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.EditText;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,16 +26,19 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	private static final int MIN_SECONDS = 5;
 	private static final String[] PROVIDER_STATUS_VALUES = { 
 		"out of service",
-		"temporarily unavailable", 
+		"down temporarily", 
 		"available"
 	};
 
 	private LocationManager mgr;
 	private TextView output;
 	private String preferred;
-	private EditText latOutput, longOutput;
+	private TextView latOutput, longOutput;
 	private GPSFileSaver trackerIO;
 	private View startButton, pauseButton, stopButton;
+	private boolean saving, paused;
+    
+
 	
 	public static final String TEMP_HARDCODED_DIR = "/sdcard/jpstrack";	// xxx
 	
@@ -44,6 +46,8 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		
+		saving = false; paused = false;
 
 		output = (TextView) findViewById(R.id.output);
 		
@@ -63,20 +67,15 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 		}
  		preferred = providers.get(0);			// first == preferred
 		log(getString(R.string.preferred_provider_is) + preferred);
-
-		final Location lastKnownLocation = mgr.getLastKnownLocation(preferred);
-		if (lastKnownLocation != null) {
-			printLocation(getString(R.string.last_known_location_), lastKnownLocation); 
-		}
 		
 		// I/O Helper
 		trackerIO = new GPSFileSaver(TEMP_HARDCODED_DIR, "201005271313.gpx");
 		
 		// THE GUI
-		latOutput = (EditText) findViewById(R.id.lat_output);
-		latOutput.setEnabled(false);
-		longOutput = (EditText) findViewById(R.id.lon_output);
-		longOutput.setEnabled(false);
+		latOutput = (TextView) findViewById(R.id.lat_output);
+		latOutput.setTextSize(24f);
+		longOutput = (TextView) findViewById(R.id.lon_output);
+		longOutput.setTextSize(24f);
 		startButton = findViewById(R.id.start_button);
 		startButton.setOnClickListener(this);
 		pauseButton = findViewById(R.id.pause_button);
@@ -95,6 +94,10 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 		voiceNoteButton.setOnClickListener(this);
 		View takePictureButton = findViewById(R.id.takepicture_button);
 		takePictureButton.setEnabled(false);
+		
+		final Location lastKnownLocation = mgr.getLastKnownLocation(preferred);
+		onLocationChanged(lastKnownLocation);
+
 	}
 	
     @Override
@@ -114,15 +117,14 @@ public class Main extends Activity implements LocationListener, OnClickListener 
             mgr.removeUpdates(this);
     }
     
-    boolean saving = false, paused = false;
-    
-	/** From LocationListener, called when the location changes, obviously */
+ 	/** From LocationListener, called when the location changes, obviously */
 	@Override
 	public void onLocationChanged(Location location) {
 		if (location == null) {
 			log("Got NULL Location from provider!");
+			return;
 		}
-		printLocation("Current Location", location);
+		log("Current location[" + location.getLatitude() + "," + location.getLongitude() + "]");
 		double latitude = location.getLatitude();
 		double longitude = location.getLongitude();
 		latOutput.setText(Double.toString(latitude));
@@ -151,6 +153,9 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 			break;
 		case R.id.pause_button:
 			paused = !paused;
+			((Button)pauseButton).setText(paused ? 
+					R.string.pause_button_resume_label : 
+					R.string.pause_button_label);
 			break;
 		case R.id.stop_button:
 			log("Stopping File Updates");
@@ -216,13 +221,6 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 
 	private void log(String string) {
 		output.append(string + "\n");
-	}
-
-	private void printLocation(String type, Location location) {
-		if (location == null)
-			log("Location[unknown]");
-		else
-			log(type + " " + "[" + location.getLatitude() + "," + location.getLongitude() + "]");
 	}
 
 }
