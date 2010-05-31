@@ -1,7 +1,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 	<item android:id="@+id/settings"
 		android_title="@string/settings_name"
-		android:alphabeticShortcut="@string/settings_accel"/>
+		android:alphabeticShortcut="@string/settings_accel"
+		android:icon="@drawable/menu_settings"/>/>
 	<item android:id="@+id/about"
-		android_title="@string/about_name"/>
+		android_title="@string/about_name"
+		android:icon="@drawable/menu_about"/>
 </menu>
