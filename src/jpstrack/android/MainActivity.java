@@ -25,8 +25,10 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 
 	private static final int MIN_METRES = 1;
 	private static final int MIN_SECONDS = 5;
-	private static final String[] PROVIDER_STATUS_VALUES = { "out of service",
-			"down temporarily", "available" };
+	private static final String[] PROVIDER_STATUS_VALUES = { 
+		"out of service",
+		"down temporarily", 
+		"available" };
 
 	private LocationManager mgr;
 	private TextView output;
@@ -74,9 +76,7 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 
 		// THE GUI
 		latOutput = (TextView) findViewById(R.id.lat_output);
-		latOutput.setTextSize(24f);
 		longOutput = (TextView) findViewById(R.id.lon_output);
-		longOutput.setTextSize(24f);
 		startButton = findViewById(R.id.start_button);
 		startButton.setOnClickListener(this);
 		pauseButton = findViewById(R.id.pause_button);
