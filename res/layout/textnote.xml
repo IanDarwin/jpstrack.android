@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:text="@string/textnote_frame_label"
 	android:orientation="vertical"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent">
 
 	<!-- Big TextView for Editing -->
-	<TextView
+	<EditText
 		android:id="@+id/textnote_text"
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent" />
 
-	<!-- A row for Discard and Save Button -->
+	<!-- Bottom row for Discard and Save Button -->
 	<LinearLayout
 		android:orientation="horizontal"
 		android:layout_width="fill_parent"
