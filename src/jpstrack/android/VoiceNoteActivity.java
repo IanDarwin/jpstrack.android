@@ -1,10 +1,8 @@
 package jpstrack.android;
 
 import java.io.File;
-import java.io.IOException;
 
 import jpstrack.fileio.FileNameUtils;
-
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -16,21 +14,20 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Toast;
 
 public class VoiceNoteActivity extends Activity implements OnClickListener {
 	private static final String PROG_NAME = "VoiceNote";
 	MediaRecorder recorder  = new MediaRecorder();
-	String dirName;
-	File soundDir;
-	File soundFile;
+	private File soundDir;
+	private File soundFile;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.voicenote);
-		// dirName = SettingsActivity.getDirectory(this); // XXX
-		dirName = Main.TEMP_HARDCODED_DIR; // XXX
-		soundDir = new File(dirName);
+		soundDir = Main.getDataDir();
+
 		// Create a View with Pause, Save and Discard buttons, 
 		View saveButton = findViewById(R.id.voicenote_save_button);
 		saveButton.setOnClickListener(this);
@@ -45,6 +42,7 @@ public class VoiceNoteActivity extends Activity implements OnClickListener {
 		switch(source) {
 		case R.id.voicenote_save_button:
 			saveRecording();
+			Toast.makeText(this, "Saved voice note into " + soundFile, Toast.LENGTH_SHORT).show();
 			break;
 		case R.id.voicenote_discard_button:
 			discardRecording();
@@ -61,20 +59,16 @@ public class VoiceNoteActivity extends Activity implements OnClickListener {
 		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 		try {
 			soundDir.mkdirs();
-			soundFile = File.createTempFile(FileNameUtils.getNextFilename(), ".mp3", soundDir);
-		} catch (IOException e) {
+			soundFile = new File(soundDir, FileNameUtils.getNextFilename(".mp3"));
+			soundFile.createNewFile();
+			recorder.setOutputFile(soundFile.getAbsolutePath());
+			recorder.prepare();
+			recorder.start();
+		} catch (Exception e) {
 			Log.e(PROG_NAME, "Could not save file:" + e);
 			this.finish();
 			throw new RuntimeException("Could not start: " + e);
 		}
-
-		recorder.setOutputFile(soundFile.getAbsolutePath());
-		try {
-			recorder.prepare();
-		} catch (IOException e) {
-			Log.e(PROG_NAME, "Could not prepare audio file");
-		}
-		recorder.start();
 	}
 	
 	protected void discardRecording() {
