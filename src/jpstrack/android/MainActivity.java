@@ -90,7 +90,7 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 
 		// third row - note Buttons
 		View textNoteButton = findViewById(R.id.textnote_button);
-		textNoteButton.setEnabled(false);
+		textNoteButton.setOnClickListener(this);
 		View voiceNoteButton = findViewById(R.id.voicenote_button);
 		voiceNoteButton.setOnClickListener(this);
 		View takePictureButton = findViewById(R.id.takepicture_button);
@@ -184,6 +184,14 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 				startActivity(new Intent(this, VoiceNoteActivity.class));
 			} catch (Exception e) {
 				Toast.makeText(this, "Could not create note: " + e, Toast.LENGTH_LONG).show();
+			}
+			break;
+		case R.id.textnote_button:
+			log("Starting Text Entry");
+			try {
+				startActivity(new Intent(this, TextNoteActivity.class));
+			} catch (Exception e) {
+				Toast.makeText(this, "Could not create text note: " + e, Toast.LENGTH_LONG).show();
 			}
 			break;
 		default:

@@ -26,7 +26,13 @@
 	<string name="voicenote_name">VoiceNote Recording</string>
 	<string name="voicenote_discard_button_label">Discard VoiceNote</string>
 	<string name="voicenote_save_button_label">Save VoiceNote</string>
-	
+
+	<!-- textnote -->
+	<string name="textnote_frame_label">TextNote Creation</string>
+	<string name="textnote_name">TextNote Creation</string>
+	<string name="textnote_discard_button_label">Discard Text</string>
+	<string name="textnote_save_button_label">Save Text</string>
+
     <!-- Menu -->
     <string name="settings_label">Settings...</string>
     <string name="settings_name">JPSTrack Settings</string>
