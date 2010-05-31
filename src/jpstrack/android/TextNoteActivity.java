@@ -20,7 +20,7 @@ public class TextNoteActivity extends Activity implements OnClickListener {
 		View saver = findViewById(R.id.textnote_save_button);
 		saver.setOnClickListener(this);
 		View killer = findViewById(R.id.textnote_discard_button);
-		saver.setOnClickListener(this);
+		killer.setOnClickListener(this);
 	}
 	
 	@Override
