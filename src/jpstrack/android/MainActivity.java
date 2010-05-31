@@ -161,14 +161,13 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 			}
 			saving = true;
 			paused = false;
+			syncPauseButtonToState();
 			pauseButton.setEnabled(true);
 			stopButton.setEnabled(true);
 			break;
 		case R.id.pause_button:
 			paused = !paused;
-			((Button) pauseButton).setText(paused ? 
-					R.string.pause_button_resume_label :
-					R.string.pause_button_label);
+			syncPauseButtonToState();
 			break;
 		case R.id.stop_button:
 			log("Stopping File Updates");
@@ -200,6 +199,12 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 			log("Unexpected Click from " + v.getId());
 			break;
 		}
+	}
+
+	private void syncPauseButtonToState() {
+		((Button) pauseButton).setText(paused ? 
+				R.string.pause_button_resume_label :
+				R.string.pause_button_label);
 	}
 
 	@Override
