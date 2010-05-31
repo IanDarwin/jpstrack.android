@@ -3,6 +3,8 @@ package jpstrack.android;
 import java.io.File;
 import java.io.IOException;
 
+import jpstrack.fileio.FileNameUtils;
+
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -59,7 +61,7 @@ public class VoiceNoteActivity extends Activity implements OnClickListener {
 		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 		try {
 			soundDir.mkdirs();
-			soundFile = File.createTempFile("SOUNDFILE", ".mp3", soundDir);
+			soundFile = File.createTempFile(FileNameUtils.getNextFilename(), ".mp3", soundDir);
 		} catch (IOException e) {
 			Log.e(PROG_NAME, "Could not save file:" + e);
 			this.finish();
