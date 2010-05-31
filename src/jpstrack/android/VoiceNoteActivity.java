@@ -18,16 +18,21 @@ import android.view.View.OnClickListener;
 public class VoiceNoteActivity extends Activity implements OnClickListener {
 	private static final String PROG_NAME = "VoiceNote";
 	MediaRecorder recorder  = new MediaRecorder();
-	File soundDir = new File(SettingsActivity.getDirectory(this));
-	File soundFile = null;
+	String dirName;
+	File soundDir;
+	File soundFile;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.voicenote);
+		// dirName = SettingsActivity.getDirectory(this); // XXX
+		dirName = Main.TEMP_HARDCODED_DIR; // XXX
+		soundDir = new File(dirName);
 		// Create a View with Pause, Save and Discard buttons, 
 		View saveButton = findViewById(R.id.voicenote_save_button);
 		saveButton.setOnClickListener(this);
-		View discardButton = findViewById(R.id.voicenote_save_button);
+		View discardButton = findViewById(R.id.voicenote_discard_button);
 		discardButton.setOnClickListener(this);
 		startRecording();	// Start immediately - already pressed Voice Note button
 	}
@@ -36,11 +41,11 @@ public class VoiceNoteActivity extends Activity implements OnClickListener {
 	public void onClick(View v) {
 		int source = v.getId();
 		switch(source) {
-		case R.id.voicenote_discard_button:
-			discardRecording();
-			break;
 		case R.id.voicenote_save_button:
 			saveRecording();
+			break;
+		case R.id.voicenote_discard_button:
+			discardRecording();
 			break;
 		default:
 			Log.e(PROG_NAME, "Unexpected click");
@@ -56,8 +61,9 @@ public class VoiceNoteActivity extends Activity implements OnClickListener {
 			soundDir.mkdirs();
 			soundFile = File.createTempFile("SOUNDFILE", ".mp3", soundDir);
 		} catch (IOException e) {
-			Log.e(PROG_NAME, "Could not save file");
-			return;
+			Log.e(PROG_NAME, "Could not save file:" + e);
+			this.finish();
+			throw new RuntimeException("Could not start: " + e);
 		}
 
 		recorder.setOutputFile(soundFile.getAbsolutePath());
