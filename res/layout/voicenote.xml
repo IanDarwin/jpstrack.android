@@ -10,7 +10,7 @@
 	 		android:layout_width="fill_parent"
 	 		android:layout_height="wrap_content" />
 
-	<!-- A row for Stop Button -->
+	<!-- A row for Save and Discard Buttons -->
 	<LinearLayout
 		android:orientation="horizontal"
 		android:layout_width="fill_parent"
