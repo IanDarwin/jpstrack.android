@@ -31,6 +31,7 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 		"available" };
 
 	private LocationManager mgr;
+	private static File dataDir;
 	private TextView output;
 	private String preferred;
 	private TextView latOutput, longOutput;
@@ -56,7 +57,8 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 			log(getString(R.string.provider_found) + prov);
 		}
 
-		new File(TEMP_HARDCODED_DIR).mkdirs();
+		dataDir = new File(TEMP_HARDCODED_DIR);
+		dataDir.mkdirs();
 
 		// GPS setup
 		Criteria criteria = new Criteria();
@@ -238,6 +240,10 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	public void onStatusChanged(String provider, int status, Bundle extras) {
 		String mesg = String.format("Provider %s status %s", provider, PROVIDER_STATUS_VALUES[status]);
 		log(mesg);
+	}
+	
+	public static File getDataDir() {
+		return dataDir;
 	}
 
 	private void log(String string) {
