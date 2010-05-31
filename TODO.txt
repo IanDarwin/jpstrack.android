@@ -1,0 +1,8 @@
+jpstrack.android
+
+Fix all the things noted in the RELEASE_NOTES file.
+
+Reorganize to get service in onResume if not running
+Get Preferences working, remove hard-coded directory path.
+take picture
+Stay running / Run as service?
