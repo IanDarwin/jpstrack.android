@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class TextNoteActivity extends Activity implements OnClickListener {
 
@@ -46,6 +47,7 @@ public class TextNoteActivity extends Activity implements OnClickListener {
 			PrintWriter out = new PrintWriter(f);
 			out.print(tv.getText().toString());
 			out.close();
+			Toast.makeText(this, "Saved text note into " + f, Toast.LENGTH_SHORT).show();
 		} catch (IOException e) {
 			throw new RuntimeException("Can't create text file " + f);
 		}
