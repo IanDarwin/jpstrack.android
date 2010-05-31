@@ -5,7 +5,7 @@ It is different from the "Vespucci" app in that, unlike Vespucci,
 it does NOT try to be an OSM editor. In the author's experience,
 current Android devices do not have the I/O capability to do this
 job well. I recommend uploading the files (from /sdcard/jpstrack)
-to a desktop PC and runnnig the JOSM editor or even using the
+to a desktop PC and running the JOSM editor or even using the
 web-based editor on the OSM site.
 
 The program collects data once you press the Start button, and
