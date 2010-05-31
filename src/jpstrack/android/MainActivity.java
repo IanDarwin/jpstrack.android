@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class Main extends Activity implements LocationListener, OnClickListener { 
 
@@ -35,8 +36,9 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	private String preferred;
 	private EditText latOutput, longOutput;
 	private GPSFileSaver trackerIO;
+	private View startButton, pauseButton, stopButton;
 	
-	final String TEMP_HARDCODED_DIR = "/sdcard/jpstrack";	// xxx
+	public static final String TEMP_HARDCODED_DIR = "/sdcard/jpstrack";	// xxx
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -75,12 +77,16 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 		latOutput.setEnabled(false);
 		longOutput = (EditText) findViewById(R.id.lon_output);
 		longOutput.setEnabled(false);
-		View startButton = findViewById(R.id.start_button);
+		startButton = findViewById(R.id.start_button);
 		startButton.setOnClickListener(this);
+		pauseButton = findViewById(R.id.pause_button);
+		pauseButton.setOnClickListener(this);
+		pauseButton.setEnabled(false);
+		stopButton = findViewById(R.id.stop_button);
+		stopButton.setOnClickListener(this);
+		stopButton.setEnabled(false);
 		TextView fileNameLabel = (TextView) findViewById(R.id.filename_label);
 		fileNameLabel.setText("YYYYMMDDHHMM.gpx");	// xxx from Prefs or Model??
-		View stopButton = findViewById(R.id.stop_button);
-		stopButton.setOnClickListener(this);
 		
 		// third row - note Buttons
 		View textNoteButton = findViewById(R.id.textnote_button);
@@ -130,21 +136,37 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.start_button:
-			log("Starting File Updates");
-			trackerIO.startFile();
-			saving = true;
+			startButton.setEnabled(false);
+			try {
+				trackerIO.startFile();
+				log("Starting File Updates");
+			} catch (RuntimeException e) {
+				Toast.makeText(this, "Could not save: " + e, Toast.LENGTH_LONG).show();
+				startButton.setEnabled(true);
+				return;
+			}
+			saving = true; paused = false;
+			pauseButton.setEnabled(true);
+			stopButton.setEnabled(true);
 			break;
 		case R.id.pause_button:
 			paused = !paused;
 			break;
 		case R.id.stop_button:
 			log("Stopping File Updates");
-			saving = false;
+			pauseButton.setEnabled(false);
+			stopButton.setEnabled(false);
+			saving = false; paused = false;
 			trackerIO.endFile();
+			startButton.setEnabled(true);
 			break;
 		case R.id.voicenote_button:
 			log("Starting Voice Recording");
-			startActivity(new Intent(this, VoiceNoteActivity.class));
+			try {
+				startActivity(new Intent(this, VoiceNoteActivity.class));
+			} catch (Exception e) {
+				Toast.makeText(this, "Could not create note: " + e, Toast.LENGTH_LONG).show();
+			}
 			break;
 		default:
 			log("Unexpected Click from " + v.getId());
