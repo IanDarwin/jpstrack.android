@@ -188,6 +188,9 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 		case R.id.settings:
 			startActivity(new Intent(this, SettingsActivity.class));
 			return true;
+		case R.id.about:
+			startActivity(new Intent(this, AboutActivity.class));
+			return true;
 		}
 		return false;
 	}
