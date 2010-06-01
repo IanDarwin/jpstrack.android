@@ -1,5 +1,7 @@
 jpstrack.android
 
+Try to export an Ant build.xml
+
 Fix all the things noted in the RELEASE_NOTES file.
 
 Dialog if sdcard in use, like Audible uses. --> Recipe on Dialogs
