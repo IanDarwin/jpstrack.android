@@ -2,11 +2,14 @@ package jpstrack.android;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.hardware.Camera;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.View.OnClickListener;
 
 public class CameraNote extends Activity implements SurfaceHolder.Callback, OnClickListener {
+
+	private Camera cam;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -17,7 +20,14 @@ public class CameraNote extends Activity implements SurfaceHolder.Callback, OnCl
 	@Override
 	public void onClick(View v) {
 		int id = v.getId();
-		// TODO Auto-generated method stub
+		switch(id) {
+		// case R.id.cameranote_takepicture_button:
+		//	cam.takePicture(...);
+		//	savePictureToDisk();
+		//	break;
+		default:
+			break;
+		}
 	}
 
 	@Override
