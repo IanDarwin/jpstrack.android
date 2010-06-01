@@ -3,6 +3,18 @@ jpstrack.android
 Fix all the things noted in the RELEASE_NOTES file.
 
 Reorganize to get service in onResume if not running
-Get Preferences working, remove hard-coded directory path.
-take picture
+
+SETTINGS
+	Get / Preferences working, remove hard-coded directory path.
+	Add "seconds interval" and "min dist"
+
+Visual - GPS up/down
+
+Finish "take picture" note
+
 Stay running / Run as service?
+
+Externalize rest of strings.
+	Do _es translation
+
+When ALL ELSE is done, look at My Tracks which is now open source.
