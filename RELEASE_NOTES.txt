@@ -5,6 +5,8 @@ This is a late Alpha/Early Beta release. Note the following:
   there are several places where it will NPE crash if the /sdcard
   is not available.
 
+- DO power up the GPS before you start the App!
+
 - the Take Picture button isn't implemented yet.
 
 - Changing the directory to save in has a UI under Settings,
@@ -20,6 +22,12 @@ This is a late Alpha/Early Beta release. Note the following:
 - Sound files are saved as standard MP3's, but the CODEC used
   is not always available on the desktop.
 
+- The footprint 'tracks' on the icon look more like missiles
+  than the intended footprints. Somebody with a bit more
+  artist-foo should work on them.
+
 If you find any new ways to crash it, please email.
+
+http://www.darwinsys.com/contact.jsp
 
 $Id$
