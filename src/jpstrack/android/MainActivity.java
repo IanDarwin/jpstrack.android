@@ -131,7 +131,7 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 			log("Got NULL Location from provider!");
 			return;
 		}
-		log("Current location: " + location.getLatitude() + "," + location.getLongitude());
+		log("Location: " + location.getLatitude() + "," + location.getLongitude());
 		double latitude = location.getLatitude();
 		double longitude = location.getLongitude();
 		latOutput.setText(Double.toString(latitude));
