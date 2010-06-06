@@ -21,7 +21,7 @@
 		<activity android:name=".SettingsActivity" android:label="@string/settings_name"/>
 		<activity android:name=".VoiceNoteActivity" android:label="@string/voicenote_name"/>
 		<activity android:name=".TextNoteActivity" android:label="@string/textnote_name"/>
-		<activity android:name=".CamearNoteActivity" android:label="@string/textnote_name"/>
+		<activity android:name=".CameraNoteActivity" android:label="@string/textnote_name"/>
 		<activity android:name=".AboutActivity" android:label="@string/about_name"
 			android:theme="@android:style/Theme.Dialog"/>
 	</application>

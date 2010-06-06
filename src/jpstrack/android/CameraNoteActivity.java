@@ -7,7 +7,7 @@ import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.View.OnClickListener;
 
-public class CameraNote extends Activity implements SurfaceHolder.Callback, OnClickListener {
+public class CameraNoteActivity extends Activity implements SurfaceHolder.Callback, OnClickListener {
 
 	private Camera cam;
 	
