@@ -14,6 +14,8 @@ SETTINGS
 
 Visual - GPS up/down
 
+Version# and Done button in About screen.
+
 Finish "take picture" note
 
 Stay running / Run as service?
