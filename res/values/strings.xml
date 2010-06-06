@@ -42,12 +42,7 @@
     <!--  About box -->
     <string name="about_name">About JPSTrack</string>
     <string name="about_shortname">About</string>
-    <string name="about_text">JPSTrack captures a sequence or "track" of GPS co-ordinates
-    and saves them to the external memory in a form that can be opened by the JOSM editor
-    or similar tools to allow you to convert them for inclusion into 
-    <a href="http://www.openstreetmap.org/">OpenStreetMap.org</a>,
-    the free, editable map of the world.
-    </string>
+    <string name="about_text">JPSTrack 0.0. See http://www.darwinsys.com/jpstrack/</string>
     <string name="about_done_button_label">OK</string>
     
 </resources>
