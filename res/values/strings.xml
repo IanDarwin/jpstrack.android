@@ -48,7 +48,6 @@
     <a href="http://www.openstreetmap.org/">OpenStreetMap.org</a>,
     the free, editable map of the world.
     </string>
-    
-    
+    <string name="about_done_button_label">OK</string>
     
 </resources>
