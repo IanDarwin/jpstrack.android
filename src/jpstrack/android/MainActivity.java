@@ -83,9 +83,6 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 		View takePictureButton = findViewById(R.id.takepicture_button);
 		takePictureButton.setEnabled(false);
 
-		final Location lastKnownLocation = mgr.getLastKnownLocation(preferred);
-		onLocationChanged(lastKnownLocation);
-
 	}
 	
 	void initGPS() {
@@ -106,7 +103,9 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 		}
 		preferred = providers.get(0); // first == preferred
 		Log.i(LOG_TAG, getString(R.string.preferred_provider_is) + preferred);
-
+		
+		final Location lastKnownLocation = mgr.getLastKnownLocation(preferred);
+		onLocationChanged(lastKnownLocation);
 	}
 
 	@Override
