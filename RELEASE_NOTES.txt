@@ -5,8 +5,6 @@ This is a late Alpha/Early Beta release. Note the following:
   there are several places where it will NPE crash if the /sdcard
   is not available.
 
-- DO power up the GPS before you start the App!
-
 - the Take Picture button isn't implemented yet.
 
 - Changing the directory to save in has a UI under Settings,
