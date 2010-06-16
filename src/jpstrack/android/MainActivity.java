@@ -12,6 +12,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 
 public class Main extends Activity implements LocationListener, OnClickListener {
 
+	private static final String LOG_TAG = "jpstrack";
 	private static final int MIN_METRES = 1;
 	private static final int MIN_SECONDS = 5;
 	private static final String[] PROVIDER_STATUS_VALUES = { 
@@ -52,26 +54,9 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 
 		output = (TextView) findViewById(R.id.output);
 
-		mgr = (LocationManager) getSystemService(LOCATION_SERVICE);
-		for (String prov : mgr.getAllProviders()) {
-			log(getString(R.string.provider_found) + prov);
-		}
-
 		dataDir = new File(TEMP_HARDCODED_DIR);
 		dataDir.mkdirs();
 
-		// GPS setup
-		Criteria criteria = new Criteria();
-		criteria.setAccuracy(Criteria.ACCURACY_FINE);
-		List<String> providers = mgr.getProviders(criteria, true);
-		if (providers == null || providers.size() == 0) {
-			log(getString(R.string.cannot_get_gps_service));
-			Toast.makeText(this, "Could not open GPS service",
-					Toast.LENGTH_LONG).show();
-			return;
-		}
-		preferred = providers.get(0); // first == preferred
-		log(getString(R.string.preferred_provider_is) + preferred);
 
 		// I/O Helper
 		trackerIO = new GPSFileSaver(TEMP_HARDCODED_DIR, FileNameUtils.getNextFilename());
@@ -102,10 +87,32 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 		onLocationChanged(lastKnownLocation);
 
 	}
+	
+	void initGPS() {
+		// GPS setup
+		mgr = (LocationManager) getSystemService(LOCATION_SERVICE);
+		for (String prov : mgr.getAllProviders()) {
+			Log.i(LOG_TAG, getString(R.string.provider_found) + prov);
+		}
+		
+		Criteria criteria = new Criteria();
+		criteria.setAccuracy(Criteria.ACCURACY_FINE);
+		List<String> providers = mgr.getProviders(criteria, true);
+		if (providers == null || providers.size() == 0) {
+			Log.e(LOG_TAG, getString(R.string.cannot_get_gps_service));
+			Toast.makeText(this, "Could not open GPS service",
+					Toast.LENGTH_LONG).show();
+			return;
+		}
+		preferred = providers.get(0); // first == preferred
+		Log.i(LOG_TAG, getString(R.string.preferred_provider_is) + preferred);
+
+	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
+		initGPS();
 		if (preferred != null) {
 			mgr.requestLocationUpdates(preferred, MIN_SECONDS * 1000,
 					MIN_METRES, this);
@@ -128,10 +135,10 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	@Override
 	public void onLocationChanged(Location location) {
 		if (location == null) {
-			log("Got NULL Location from provider!");
+			Log.e(LOG_TAG, "Got NULL Location from provider!");
 			return;
 		}
-		log("Location: " + location.getLatitude() + "," + location.getLongitude());
+		logToScreen("Location: " + location.getLatitude() + "," + location.getLongitude());
 		double latitude = location.getLatitude();
 		double longitude = location.getLongitude();
 		latOutput.setText(Double.toString(latitude));
@@ -153,7 +160,7 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 			try {
 				File f = trackerIO.startFile();
 				fileNameLabel.setText(f.getName());
-				log("Starting File Updates");
+				logToScreen("Starting File Updates");
 			} catch (RuntimeException e) {
 				Toast.makeText(this, "Could not save: " + e, Toast.LENGTH_LONG).show();
 				startButton.setEnabled(true);
@@ -170,7 +177,7 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 			syncPauseButtonToState();
 			break;
 		case R.id.stop_button:
-			log("Stopping File Updates");
+			logToScreen("Stopping File Updates");
 			pauseButton.setEnabled(false);
 			stopButton.setEnabled(false);
 			saving = false;
@@ -180,7 +187,7 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 			startButton.setEnabled(true);
 			break;
 		case R.id.voicenote_button:
-			log("Starting Voice Recording");
+			logToScreen("Starting Voice Recording");
 			try {
 				startActivity(new Intent(this, VoiceNoteActivity.class));
 			} catch (Exception e) {
@@ -188,7 +195,7 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 			}
 			break;
 		case R.id.textnote_button:
-			log("Starting Text Entry");
+			logToScreen("Starting Text Entry");
 			try {
 				startActivity(new Intent(this, TextNoteActivity.class));
 			} catch (Exception e) {
@@ -196,7 +203,7 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 			}
 			break;
 		default:
-			log("Unexpected Click from " + v.getId());
+			logToScreen("Unexpected Click from " + v.getId());
 			break;
 		}
 	}
@@ -231,27 +238,27 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	/** From LocationListener, providing very bad news... */
 	@Override
 	public void onProviderDisabled(String provider) {
-		log("Provider disabled: " + provider);
+		logToScreen("Provider disabled: " + provider);
 	}
 
 	/** From LocationListener, things are looking up! */
 	@Override
 	public void onProviderEnabled(String provider) {
-		log("Provider enabled: " + provider);
+		logToScreen("Provider enabled: " + provider);
 	}
 
 	/** From LocationListener, something changed. */
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
 		String mesg = String.format("Provider %s status %s", provider, PROVIDER_STATUS_VALUES[status]);
-		log(mesg);
+		logToScreen(mesg);
 	}
 	
 	public static File getDataDir() {
 		return dataDir;
 	}
 
-	private void log(String string) {
+	private void logToScreen(String string) {
 		output.append(string + "\n");
 	}
 
