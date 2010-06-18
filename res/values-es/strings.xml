@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!-- Main stuff -->
+	<!-- Very crude start at /es translation - apologias para mis errores!! -->
+    <string name="app_name">JPSTrack</string>
+    <string name="dir_title">Data Directory</string>
+    <string name="dir_summary">Locacion para filas GPX, imagenes, notaciones, &amp;c.</string>
+    
+    <string name="last_known_location_">Last known location =</string>
+    <string name="preferred_provider_is">Provedador preferida esta: </string>
+    <string name="cannot_get_gps_service">No funcione la servicia GPS</string>
+    <string name="provider_found">Provedador encontraba: </string>
+    
+    <string name="latitude_text">Latitude</string>
+    <string name="longitude_text">Longitude</string>
+    
+    <string name="start_button_label">Empezar</string>
+    <string name="pause_button_label">Pause</string>
+    <string name="pause_button_resume_label">Resume</string>
+    <string name="stop_button_label">Pare</string>
+    
+    <string name="voicenote_button_label">Nota vocal</string>
+    <string name="textnote_button_label">Nota textual</string>
+    <string name="takepicture_button_label">Tome foto</string>
+
+	<!-- Voicenote -->
+	<string name="voicenote_name">VoiceNote Recording</string>
+	<string name="voicenote_discard_button_label">Discard VoiceNote</string>
+	<string name="voicenote_save_button_label">Save VoiceNote</string>
+
+	<!-- textnote -->
+	<string name="textnote_frame_label">TextNote Creation</string>
+	<string name="textnote_name">TextNote Creation</string>
+	<string name="textnote_discard_button_label">Discard Text</string>
+	<string name="textnote_save_button_label">Save Text</string>
+
+    <!-- Menu -->
+    <string name="settings_label">Preferencias...</string>
+    <string name="settings_name">Preferencias JPSTrack</string>
+    <string name="settings_shortname">Preferencias</string>
+    <string name="settings_accel">s</string>
+
+    <!--  About box -->
+    <string name="about_name">Sobre JPSTrack</string>
+    <string name="about_shortname">Sobre</string>
+    <string name="about_text">JPSTrack 0.0. Veanse http://www.darwinsys.com/jpstrack/</string>
+    <string name="about_done_button_label">OK</string>
+    
+</resources>
+
