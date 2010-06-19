@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.widget.Toast;
 
 public class CameraNoteActivity extends Activity {
@@ -12,8 +13,7 @@ public class CameraNoteActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		// Use an Intent to get the Camera app going.
-		
-		Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 		startActivityForResult(intent, 0);
 	}
 	
