@@ -81,8 +81,7 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 		View voiceNoteButton = findViewById(R.id.voicenote_button);
 		voiceNoteButton.setOnClickListener(this);
 		View takePictureButton = findViewById(R.id.takepicture_button);
-		takePictureButton.setEnabled(false);
-
+		takePictureButton.setOnClickListener(this);
 	}
 	
 	void initGPS() {
@@ -199,6 +198,14 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 				startActivity(new Intent(this, TextNoteActivity.class));
 			} catch (Exception e) {
 				Toast.makeText(this, "Could not create text note: " + e, Toast.LENGTH_LONG).show();
+			}
+			break;
+		case R.id.takepicture_button:
+			logToScreen("Starting Camera Activity");
+			try {
+				startActivity(new Intent(this, CameraNoteActivity.class));
+			} catch (Exception e) {
+				Toast.makeText(this, "Could not start picture acitivity: " + e, Toast.LENGTH_LONG).show();
 			}
 			break;
 		default:

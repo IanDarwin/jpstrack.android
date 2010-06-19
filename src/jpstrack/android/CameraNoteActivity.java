@@ -1,52 +1,42 @@
 package jpstrack.android;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.hardware.Camera;
-import android.view.SurfaceHolder;
-import android.view.View;
-import android.view.View.OnClickListener;
+import android.widget.Toast;
 
-public class CameraNoteActivity extends Activity implements SurfaceHolder.Callback, OnClickListener {
+public class CameraNoteActivity extends Activity {
 
-	private Camera cam;
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// TODO Auto-generated method stub
+		// Use an Intent to get the Camera app going.
+		
+		Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+		startActivityForResult(intent, 0);
 	}
 	
 	@Override
-	public void onClick(View v) {
-		int id = v.getId();
-		switch(id) {
-		// case R.id.cameranote_takepicture_button:
-		//	cam.takePicture(...);
-		//	savePictureToDisk();
-		//	break;
-		default:
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch(requestCode) {
+		case 0: // take picture
+			switch(resultCode) {
+			case Activity.RESULT_OK:
+				Bitmap ret = (Bitmap) data.getExtras().get("data");
+				Toast.makeText(this, "Bitmap returned is " + ret.getWidth() + "x" + ret.getHeight(), Toast.LENGTH_LONG).show();
+				break;
+			case Activity.RESULT_CANCELED:
+				//  no blather required!
+				break;
+			default:
+				Toast.makeText(this, "Unexpected resultCode: " + resultCode, Toast.LENGTH_LONG).show();
+			}
 			break;
+		default:
+				Toast.makeText(this, "UNEXPECTED ACTIVITY COMPLETION", Toast.LENGTH_LONG).show();
 		}
-	}
-
-	@Override
-	public void surfaceChanged(SurfaceHolder holder, int format, int width,
-			int height) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void surfaceCreated(SurfaceHolder holder) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void surfaceDestroyed(SurfaceHolder holder) {
-		// TODO Auto-generated method stub
-		
+		finish();	// back to main app
 	}
 
 }
