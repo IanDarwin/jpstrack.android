@@ -156,6 +156,8 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 			}
 			startButton.setEnabled(false);
 			try {
+				// New filename each time we start recording.
+				trackerIO.setFileName(FileNameUtils.getNextFilename());
 				File f = trackerIO.startFile();
 				fileNameLabel.setText(f.getName());
 				logToScreen("Starting File Updates");
