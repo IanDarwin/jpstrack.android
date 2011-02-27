@@ -25,5 +25,5 @@
 		<activity android:name=".AboutActivity" android:label="@string/about_name"
 			android:theme="@android:style/Theme.Dialog"/>
 	</application>
-	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="3" />
+	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="7" />
 </manifest> 
