@@ -5,6 +5,7 @@ import java.io.File;
 import jpstrack.fileio.FileNameUtils;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -45,7 +46,7 @@ public class CameraNoteActivity extends Activity {
 					boolean edit = false;
 					if (edit) {
 						try {
-							Uri imageToEditUri = new URL(imageFile.getAbsoluteFile());
+							Uri imageToEditUri = Uri.fromFile(imageFile);
 							String imageToEditMimeType = "image/*";
 							Intent launchEditor = new Intent();
 							launchEditor.setAction(Intent.ACTION_EDIT);
@@ -56,7 +57,7 @@ public class CameraNoteActivity extends Activity {
 						catch (ActivityNotFoundException e)
 						{
 							new AlertDialog.Builder(this).setTitle("Can't Edit").setMessage(
-							"You need a graphics editor e.g. Photoshop Express 1.1").show()
+							"You need a graphics editor e.g. Photoshop Express 1.1").show();
 						}
 					}
 				else {
@@ -74,21 +75,21 @@ public class CameraNoteActivity extends Activity {
 			break;
 
 		// OK, the user asked to edit, and the edit is completed.
-		case ACTION_EDIT_PICTURE:
-			switch(resultCode) {
-			case Activity.RESULT_OK:
-				if (imageFile.exists()) {
-					Toast.makeText(this, "Bitmap saved as " + data.getData(), Toast.LENGTH_LONG).show();
-				}
-				break;
-			case Activity.RESULT_CANCELED:
-				//  no blather required!
-				break;
-			default:
-				Toast.makeText(this, "Unexpected resultCode: " + resultCode, Toast.LENGTH_LONG).show();
-				break;
-			}
-			break;
+//		case ACTION_EDIT_PICTURE:
+//			switch(resultCode) {
+//			case Activity.RESULT_OK:
+//				if (imageFile.exists()) {
+//					Toast.makeText(this, "Bitmap saved as " + data.getData(), Toast.LENGTH_LONG).show();
+//				}
+//				break;
+//			case Activity.RESULT_CANCELED:
+//				//  no blather required!
+//				break;
+//			default:
+//				Toast.makeText(this, "Unexpected resultCode: " + resultCode, Toast.LENGTH_LONG).show();
+//				break;
+//			}
+//			break;
 		default:
 				Toast.makeText(this, "UNEXPECTED ACTIVITY COMPLETION", Toast.LENGTH_LONG).show();
 		}
