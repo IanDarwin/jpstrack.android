@@ -57,10 +57,6 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 		dataDir = new File(TEMP_HARDCODED_DIR);
 		dataDir.mkdirs();
 
-
-		// I/O Helper
-		trackerIO = new GPSFileSaver(TEMP_HARDCODED_DIR, FileNameUtils.getNextFilename());
-
 		// THE GUI
 		latOutput = (TextView) findViewById(R.id.lat_output);
 		longOutput = (TextView) findViewById(R.id.lon_output);
@@ -82,7 +78,35 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 		voiceNoteButton.setOnClickListener(this);
 		View takePictureButton = findViewById(R.id.takepicture_button);
 		takePictureButton.setOnClickListener(this);
+		
+		// Now see if we just got interrupted by e.g., rotation
+		Main old = (Main) getLastNonConfigurationInstance();
+		if (old != null) {
+			saving = old.saving;
+			paused = old.paused;
+			startButton.setEnabled(!saving);
+			pauseButton.setEnabled(!paused);
+			stopButton.setEnabled(saving);
+			if (saving) {
+				fileNameLabel.setText(trackerIO.startFile().getName());
+			}
+			// this is the most important part: keep saving to same file!
+			trackerIO = old.trackerIO;			
+			return;
+		}
+		
+		// I/O Helper
+		trackerIO = new GPSFileSaver(TEMP_HARDCODED_DIR, FileNameUtils.getNextFilename());
 	}
+	
+	/** Returns arbitrary single token object to keep alive across
+	 * the destruction and re-creation of the Enterprise.
+	 */
+	@Override
+	public Object onRetainNonConfigurationInstance() {
+		return this;
+	}
+	
 	
 	void initGPS() {
 		// GPS setup
@@ -106,17 +130,7 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 		final Location lastKnownLocation = mgr.getLastKnownLocation(preferred);
 		onLocationChanged(lastKnownLocation);
 	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		initGPS();
-		if (preferred != null) {
-			mgr.requestLocationUpdates(preferred, MIN_SECONDS * 1000,
-					MIN_METRES, this);
-		}
-	}
-
+	
 	/**
 	 * Called by Android when we get paused; turn off getting GPS updates in
 	 * hopes this will save battery life.
@@ -124,10 +138,21 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		if (preferred != null) {
+		if (!saving || paused) {
 			mgr.removeUpdates(this);
 		}
 	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		initGPS();
+		if (saving && !paused) {
+			mgr.requestLocationUpdates(preferred, MIN_SECONDS * 1000,
+					MIN_METRES, this);
+		}
+	}
+
 
 	/** From LocationListener, called when the location changes, obviously */
 	@Override
