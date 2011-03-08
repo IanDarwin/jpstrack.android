@@ -101,7 +101,7 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	}
 	
 	/** Returns arbitrary single token object to keep alive across
-	 * the destruction and re-creation of the Enterprise.
+	 * the destruction and re-creation of the entire Enterprise.
 	 */
 	@Override
 	public Object onRetainNonConfigurationInstance() {
