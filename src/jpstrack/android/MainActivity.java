@@ -82,16 +82,17 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 		// Now see if we just got interrupted by e.g., rotation
 		Main old = (Main) getLastNonConfigurationInstance();
 		if (old != null) {
+			mgr = old.mgr;
 			saving = old.saving;
 			paused = old.paused;
 			startButton.setEnabled(!saving);
-			pauseButton.setEnabled(!paused);
+			syncPauseButtonToState();
 			stopButton.setEnabled(saving);
-			if (saving) {
-				fileNameLabel.setText(trackerIO.startFile().getName());
-			}
-			// this is the most important part: keep saving to same file!
+			// this is the most important line: keep saving to same file!
 			trackerIO = old.trackerIO;			
+			if (saving) {
+				fileNameLabel.setText(trackerIO.getFileName());
+			}
 			return;
 		}
 		
@@ -104,6 +105,7 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	 */
 	@Override
 	public Object onRetainNonConfigurationInstance() {
+		Log.i(LOG_TAG, "Remember: 3");
 		return this;
 	}
 	
@@ -194,7 +196,6 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 			saving = true;
 			paused = false;
 			syncPauseButtonToState();
-			pauseButton.setEnabled(true);
 			stopButton.setEnabled(true);
 			break;
 		case R.id.pause_button:
@@ -203,10 +204,10 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 			break;
 		case R.id.stop_button:
 			logToScreen("Stopping File Updates");
-			pauseButton.setEnabled(false);
-			stopButton.setEnabled(false);
 			saving = false;
 			paused = false;
+			syncPauseButtonToState();
+			stopButton.setEnabled(false);
 			trackerIO.endFile();
 			fileNameLabel.setText(FileNameUtils.getDefaultFilenameFormatWithExt());
 			startButton.setEnabled(true);
@@ -242,6 +243,7 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	}
 
 	private void syncPauseButtonToState() {
+		pauseButton.setEnabled(saving);
 		((Button) pauseButton).setText(paused ? 
 				R.string.pause_button_resume_label :
 				R.string.pause_button_label);
