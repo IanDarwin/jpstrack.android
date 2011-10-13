@@ -43,11 +43,15 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	private boolean saving, paused;
 
 	public static final String TEMP_HARDCODED_DIR = "/sdcard/jpstrack"; // xxx
+	private static final String OUR_BUGSENSE_API_KEY = "";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		
+		// set up BugSense bug tracking
+		BugSenseHandler.setup(this, OUR_BUGSENSE_API_KEY);
 
 		saving = false;
 		paused = false;
