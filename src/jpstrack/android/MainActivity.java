@@ -22,6 +22,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bugsense.trace.BugSenseHandler;
+
 public class Main extends Activity implements LocationListener, OnClickListener {
 
 	private static final String LOG_TAG = "jpstrack";
