@@ -45,7 +45,25 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	private boolean saving, paused;
 
 	public static final String TEMP_HARDCODED_DIR = "/sdcard/jpstrack"; // xxx
-	private static final String OUR_BUGSENSE_API_KEY = "";
+	private static final String OUR_BUGSENSE_API_KEY;
+
+	// Constructor, needed for blank final field above
+	public Main() {
+		try {
+			InputStreamReader is = 
+			new InputStreamReader(getResources().openRawResource(R.raw.samplefile));
+			Properties p = is.load();
+			OUR_BUGSENSE_API_KEY = p.get("OUR_BUGSENSE_API_KEY");
+			if (OUR_BUGSENSE_API_KEY == null) {
+				String message = "Could not find BUGSENSE_API_KEY in props";
+				throw new ExceptionInInitializer(message);
+			}
+		} catch (Exception e) {
+			String message = "Error loading properties: " + e;
+			Log.d(message);
+			throw new ExceptionInInitializer(message, e);
+		}
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
