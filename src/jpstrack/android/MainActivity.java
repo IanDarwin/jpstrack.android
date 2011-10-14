@@ -1,7 +1,9 @@
 package jpstrack.android;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.List;
+import java.util.Properties;
 
 import jpstrack.fileio.FileNameUtils;
 import jpstrack.fileio.GPSFileSaver;
@@ -45,24 +47,26 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	private boolean saving, paused;
 
 	public static final String TEMP_HARDCODED_DIR = "/sdcard/jpstrack"; // xxx
-	private static final String OUR_BUGSENSE_API_KEY;
+	private final String OUR_BUGSENSE_API_KEY;
 
 	// Constructor, needed for blank final field above
 	public Main() {
 		try {
-			InputStreamReader is = 
-			new InputStreamReader(getResources().openRawResource(R.raw.samplefile));
-			Properties p = is.load();
-			OUR_BUGSENSE_API_KEY = p.get("OUR_BUGSENSE_API_KEY");
+			InputStream is = 
+			(getResources().openRawResource(R.raw.keys_props));
+			Properties p = new Properties();
+			p.load(is);
+			OUR_BUGSENSE_API_KEY = p.getProperty("BUGSENSE_API_KEY");
 			if (OUR_BUGSENSE_API_KEY == null) {
 				String message = "Could not find BUGSENSE_API_KEY in props";
-				throw new ExceptionInInitializer(message);
+				throw new ExceptionInInitializerError(message);
 			}
 		} catch (Exception e) {
 			String message = "Error loading properties: " + e;
-			Log.d(message);
-			throw new ExceptionInInitializer(message, e);
+			Log.d("jpstrack", message);
+			throw new ExceptionInInitializerError(message);
 		}
+		OUR_BUGSENSE_API_KEY = "failed to load key";
 	}
 
 	@Override
