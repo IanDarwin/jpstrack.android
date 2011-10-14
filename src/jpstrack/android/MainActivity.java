@@ -9,6 +9,7 @@ import jpstrack.fileio.FileNameUtils;
 import jpstrack.fileio.GPSFileSaver;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -47,13 +48,19 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	private boolean saving, paused;
 
 	public static final String TEMP_HARDCODED_DIR = "/sdcard/jpstrack"; // xxx
-	private final String OUR_BUGSENSE_API_KEY;
+	private String OUR_BUGSENSE_API_KEY;
 
-	// Constructor, needed for blank final field above
-	public Main() {
+	// Load a Props file from the APK zipped filesystem, extract our app key from that.
+	public void loadKeys() {
 		try {
-			InputStream is = 
-			(getResources().openRawResource(R.raw.keys_props));
+			Resources resources = getResources();
+			if (resources == null) {
+				throw new ExceptionInInitializerError("getResources() returned null");
+			}
+			InputStream is = resources.openRawResource(R.raw.keys_props);
+			if (is == null) {
+				throw new ExceptionInInitializerError("getResources().openRawResource() returned null");
+			}
 			Properties p = new Properties();
 			p.load(is);
 			OUR_BUGSENSE_API_KEY = p.getProperty("BUGSENSE_API_KEY");
@@ -61,12 +68,12 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 				String message = "Could not find BUGSENSE_API_KEY in props";
 				throw new ExceptionInInitializerError(message);
 			}
+			Log.d(LOG_TAG, "key = " + OUR_BUGSENSE_API_KEY);
 		} catch (Exception e) {
 			String message = "Error loading properties: " + e;
-			Log.d("jpstrack", message);
+			Log.d(LOG_TAG, message);
 			throw new ExceptionInInitializerError(message);
 		}
-		OUR_BUGSENSE_API_KEY = "failed to load key";
 	}
 
 	@Override
@@ -75,6 +82,7 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 		setContentView(R.layout.main);
 		
 		// set up BugSense bug tracking
+		loadKeys();
 		BugSenseHandler.setup(this, OUR_BUGSENSE_API_KEY);
 
 		saving = false;
