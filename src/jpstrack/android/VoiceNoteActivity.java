@@ -16,6 +16,12 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
 
+/**
+ * Offer a "voice note" facility so the user can record comments.
+ * onCreate calls startRecording(), since the user already pressed a button
+ * with "start recording" function; we offer discard and save buttons only.
+ * @author Ian Darwin
+ */
 public class VoiceNoteActivity extends Activity implements OnClickListener {
 	private static final String PROG_NAME = "VoiceNote";
 	MediaRecorder recorder  = new MediaRecorder();
@@ -59,7 +65,7 @@ public class VoiceNoteActivity extends Activity implements OnClickListener {
 		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 		try {
 			soundDir.mkdirs();
-			soundFile = new File(soundDir, FileNameUtils.getNextFilename(".mp3"));
+			soundFile = new File(soundDir, FileNameUtils.getNextFilename("mp3"));
 			soundFile.createNewFile();
 			recorder.setOutputFile(soundFile.getAbsolutePath());
 			recorder.prepare();
