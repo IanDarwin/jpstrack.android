@@ -5,14 +5,10 @@ This is a late Alpha/Early Beta release. Note the following:
   there are several places where it will NPE crash if the /sdcard
   is not available.
 
-- the Take Picture button isn't implemented yet.
-
 - Changing the directory to save in has a UI under Settings,
   but is ignored at present.
 
 - The menu icons are borked, but the text is OK.
-
-- The About box has no OK button. Use the back-arrow button.
 
 - There are no language-translation files yet so the program 
   only works in English.
