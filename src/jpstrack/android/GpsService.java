@@ -6,7 +6,9 @@ import android.os.IBinder;
 
 /** The Service is used to keep the GPS data flowing even
  * when our App is not current.
- * @author ian
+ * 
+ * NOT IN USE YET!!
+ * @author Ian Darwin
  */
 public class GpsService extends Service {
 
