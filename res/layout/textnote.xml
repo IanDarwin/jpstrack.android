@@ -3,7 +3,16 @@
 	android:orientation="vertical"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent">
+    	
+	<!-- Big TextView for Editing -->
 
+	<EditText
+	    android:id="@+id/textnote_text"
+	    android:inputType="textMultiLine"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:minLines="5" />
+	
 	<!-- Row for Discard and Save Button -->
 	<LinearLayout
 		android:orientation="horizontal"
@@ -18,11 +27,5 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"/>
 	</LinearLayout>
-	
-	<!-- Big TextView for Editing -->
-	<EditText
-		android:id="@+id/textnote_text"
-		android:layout_width="fill_parent"
-		android:layout_height="150sp" />
 	
 </LinearLayout>
