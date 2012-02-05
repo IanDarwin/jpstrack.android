@@ -15,6 +15,8 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -47,7 +49,6 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	private View startButton, pauseButton, stopButton;
 	private boolean saving, paused;
 
-	public static final String TEMP_HARDCODED_DIR = "/sdcard/jpstrack"; // xxx
 	private String OUR_BUGSENSE_API_KEY;
 	
 	// Load a Props file from the APK zipped filesystem, extract our app key from that.
@@ -90,8 +91,21 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 
 		output = (TextView) findViewById(R.id.output);
 
-		dataDir = new File(TEMP_HARDCODED_DIR);
-		dataDir.mkdirs();
+		// Set up the save location (gpx files, text notes, etc.)
+		String preferredSaveLocation =
+				PreferenceManager.getDefaultSharedPreferences(this).getString(SettingsActivity.OPTION_DIR, null);
+		if (preferredSaveLocation != null && !"".equals(preferredSaveLocation)) {
+			// We've been run before
+			dataDir = new File(preferredSaveLocation);
+		} else {
+			// First run on this device
+			dataDir = new File(Environment.getExternalStorageDirectory(), SettingsActivity.DIRECTORY_NAME);
+		}
+		Log.d(LOG_TAG, "Using Data Directory " + dataDir);
+		dataDir.mkdirs();	// just in case
+		if (!dataDir.exists()) {
+			Toast.makeText(this, "Warning: Directory " + dataDir + " not created", Toast.LENGTH_LONG).show();
+		}
 
 		// THE GUI
 		latOutput = (TextView) findViewById(R.id.lat_output);
@@ -133,7 +147,7 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 		}
 		
 		// I/O Helper
-		trackerIO = new GPSFileSaver(TEMP_HARDCODED_DIR, FileNameUtils.getNextFilename());
+		trackerIO = new GPSFileSaver(dataDir, FileNameUtils.getNextFilename());
 	}
 	
 	/** Returns arbitrary single token object to keep alive across
