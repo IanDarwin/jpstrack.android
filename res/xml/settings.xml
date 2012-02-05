@@ -3,6 +3,6 @@
 	android:key="dir"
 	android:title="@string/dir_title"
 	android:summary="@string/dir_summary"
-	android:defaultValue="/sdcard/jpstrack">
+	>
 </EditTextPreference>
 </PreferenceScreen>
