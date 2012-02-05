@@ -10,8 +10,8 @@ Reorganize to get service in onResume if not running
 Stay running / Run as service
 
 SETTINGS
-	Get / Preferences working, remove hard-coded directory path.
-	Add "seconds interval" and "min dist"
+	Add "seconds interval" and "min distance"
+	Add Username and password, store encrypted, use for upload.
 
 GPS:
 	1) Visual - GPS up/down
