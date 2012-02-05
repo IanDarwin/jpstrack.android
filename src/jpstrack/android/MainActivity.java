@@ -49,7 +49,7 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 
 	public static final String TEMP_HARDCODED_DIR = "/sdcard/jpstrack"; // xxx
 	private String OUR_BUGSENSE_API_KEY;
-
+	
 	// Load a Props file from the APK zipped filesystem, extract our app key from that.
 	public void loadKeys() {
 		try {

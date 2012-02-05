@@ -54,8 +54,7 @@ public class CameraNoteActivity extends Activity {
 
 							startActivityForResult(launchEditor, ACTION_EDIT_PICTURE);
 						}
-						catch (ActivityNotFoundException e)
-						{
+						catch (ActivityNotFoundException e) {
 							new AlertDialog.Builder(this).setTitle("Can't Edit").setMessage(
 							"You need a graphics editor e.g. Photoshop Express 1.1").show();
 						}
