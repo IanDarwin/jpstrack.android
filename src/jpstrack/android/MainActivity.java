@@ -159,7 +159,6 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 		return this;
 	}
 	
-	
 	void initGPS() {
 		// GPS setup
 		mgr = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -181,6 +180,10 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 		
 		final Location lastKnownLocation = mgr.getLastKnownLocation(preferred);
 		onLocationChanged(lastKnownLocation);
+		
+		// start receiving data...
+		mgr.requestLocationUpdates(preferred, MIN_SECONDS * 1000,
+				MIN_METRES, this);
 	}
 	
 	/**
@@ -212,7 +215,10 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 		if (location == null) {
 			Log.e(LOG_TAG, "Got NULL Location from provider!");
 			return;
+		} else {
+			Log.d(LOG_TAG, "Got location " + location);
 		}
+		
 		logToScreen("Location: " + location.getLatitude() + "," + location.getLongitude());
 		double latitude = location.getLatitude();
 		double longitude = location.getLongitude();
