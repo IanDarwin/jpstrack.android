@@ -144,10 +144,10 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 				fileNameLabel.setText(trackerIO.getFileName());
 			}
 			return;
+		} else {		
+			// I/O Helper
+			trackerIO = new GPSFileSaver(dataDir, FileNameUtils.getNextFilename());
 		}
-		
-		// I/O Helper
-		trackerIO = new GPSFileSaver(dataDir, FileNameUtils.getNextFilename());
 	}
 	
 	/** Returns arbitrary single token object to keep alive across
