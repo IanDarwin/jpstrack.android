@@ -7,7 +7,6 @@ Fix all the things noted in the RELEASE_NOTES file.
 Dialog if sdcard in use, like Audible uses. --> Recipe on Dialogs
 
 Reorganize to get service in onResume if not running
-Stay running / Run as service
 
 SETTINGS
 	Add "seconds interval" and "min distance"
@@ -16,10 +15,11 @@ SETTINGS
 GPS:
 	1) Visual - GPS up/down
 	2) Can we turn it on?
+	3) Upload saved data - popup when saving, if network on and username given.
 
 Version# and Done button in About screen.
 
 "Take picture" function - can we go straight back after clicking?
 
 Externalize rest of strings.
-	Do _es translation
+	Do rest of _es translation, including Spanish characters.
