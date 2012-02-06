@@ -2,7 +2,6 @@ package jpstrack.android;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Properties;
 
 import jpstrack.fileio.FileNameUtils;
@@ -10,7 +9,6 @@ import jpstrack.fileio.GPSFileSaver;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -34,6 +32,7 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	private static final String LOG_TAG = "jpstrack";
 	private static final int MIN_METRES = 1;
 	private static final int MIN_SECONDS = 5;
+	private final String PROVIDER = LocationManager.GPS_PROVIDER;
 	private static final String[] PROVIDER_STATUS_VALUES = { 
 		"out of service",
 		"down temporarily", 
@@ -42,7 +41,6 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	private LocationManager mgr;
 	private static File dataDir;
 	private TextView output;
-	private String preferred;
 	private TextView latOutput, longOutput;
 	private TextView fileNameLabel;
 	private GPSFileSaver trackerIO;
@@ -162,32 +160,18 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	void initGPS() {
 		// GPS setup
 		mgr = (LocationManager) getSystemService(LOCATION_SERVICE);
-		for (String prov : mgr.getAllProviders()) {
-			Log.i(LOG_TAG, getString(R.string.provider_found) + prov);
-		}
-		
-		Criteria criteria = new Criteria();
-		criteria.setAccuracy(Criteria.ACCURACY_FINE);
-		List<String> providers = mgr.getProviders(criteria, true);
-		if (providers == null || providers.size() == 0) {
-			Log.e(LOG_TAG, getString(R.string.cannot_get_gps_service));
-			Toast.makeText(this, "Could not open GPS service",
-					Toast.LENGTH_LONG).show();
-			return;
-		}
-		preferred = providers.get(0); // first == preferred
-		Log.i(LOG_TAG, getString(R.string.preferred_provider_is) + preferred);
-		
-		final Location lastKnownLocation = mgr.getLastKnownLocation(preferred);
+				
+		final Location lastKnownLocation = mgr.getLastKnownLocation(PROVIDER);
 		onLocationChanged(lastKnownLocation);
 		
 		// start receiving data...
-		mgr.requestLocationUpdates(preferred, MIN_SECONDS * 1000,
-				MIN_METRES, this);
+		mgr.requestLocationUpdates(PROVIDER, MIN_SECONDS * 1000,
+			MIN_METRES, this);
 	}
 	
 	/**
-	 * Called by Android when we get paused; turn off getting GPS updates in
+	 * Called by Android when we get paused; if not saving,
+	 * turn off getting GPS updates, in the (documented)
 	 * hopes this will save battery life.
 	 */
 	@Override
@@ -203,7 +187,7 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 		super.onResume();
 		initGPS();
 		if (saving && !paused) {
-			mgr.requestLocationUpdates(preferred, MIN_SECONDS * 1000,
+			mgr.requestLocationUpdates(PROVIDER, MIN_SECONDS * 1000,
 					MIN_METRES, this);
 		}
 	}
@@ -233,7 +217,7 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.start_button:
-			if (preferred == null) {
+			if (PROVIDER == null) {
 				Toast.makeText(this, "GPS not started", Toast.LENGTH_LONG).show(); // XXX LAME LAME LAME - move startup here.
 				return;
 			}
@@ -273,7 +257,7 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 			try {
 				startActivity(new Intent(this, VoiceNoteActivity.class));
 			} catch (Exception e) {
-				Toast.makeText(this, "Could not create note: " + e, Toast.LENGTH_LONG).show();
+				Toast.makeText(this, getString(R.string.cant_start_activity) + " " + e, Toast.LENGTH_LONG).show();
 			}
 			break;
 		case R.id.textnote_button:
@@ -281,7 +265,7 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 			try {
 				startActivity(new Intent(this, TextNoteActivity.class));
 			} catch (Exception e) {
-				Toast.makeText(this, "Could not create text note: " + e, Toast.LENGTH_LONG).show();
+				Toast.makeText(this, getString(R.string.cant_start_activity) + ": " + e, Toast.LENGTH_LONG).show();
 			}
 			break;
 		case R.id.takepicture_button:
@@ -289,7 +273,7 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 			try {
 				startActivity(new Intent(this, CameraNoteActivity.class));
 			} catch (Exception e) {
-				Toast.makeText(this, "Could not start picture acitivity: " + e, Toast.LENGTH_LONG).show();
+				Toast.makeText(this, getString(R.string.cant_start_activity) + ": " + e, Toast.LENGTH_LONG).show();
 			}
 			break;
 		default:

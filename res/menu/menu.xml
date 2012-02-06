@@ -3,9 +3,9 @@
 		android_title="@string/settings_name"
 		android:titleCondensed="@string/settings_shortname"
 		android:alphabeticShortcut="@string/settings_accel"
-		android:icon="@drawable/menu_settings"/>/>
+		android:icon="@android:drawable/ic_menu_preferences"/>
 	<item android:id="@+id/about"
 		android_title="@string/about_name"
 		android:titleCondensed="@string/about_shortname"
-		android:icon="@drawable/menu_about"/>
+		android:icon="@android:drawable/ic_menu_info_details"/>
 </menu>

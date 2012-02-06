@@ -42,7 +42,7 @@ public class CameraNoteActivity extends Activity {
 			switch(resultCode) {
 			case Activity.RESULT_OK:
 				if (imageFile.exists())
-					Toast.makeText(this, "Bitmap saved as " + imageFile.getAbsoluteFile(), Toast.LENGTH_LONG).show();
+					Toast.makeText(this, getString(R.string.picture_saved) + " " + imageFile.getAbsoluteFile(), Toast.LENGTH_LONG).show();
 					boolean edit = false;
 					if (edit) {
 						try {
@@ -61,7 +61,7 @@ public class CameraNoteActivity extends Activity {
 					}
 				else {
 					AlertDialog.Builder alert = new AlertDialog.Builder(this);
-					alert.setTitle("Inconnu").setMessage("Camera Intent returned OK but image not created!").show();
+					alert.setTitle(getString(R.string.error)).setMessage(getString(R.string.picture_created_but_missing)).show();
 				}
 				break;
 			case Activity.RESULT_CANCELED:
@@ -78,7 +78,7 @@ public class CameraNoteActivity extends Activity {
 //			switch(resultCode) {
 //			case Activity.RESULT_OK:
 //				if (imageFile.exists()) {
-//					Toast.makeText(this, "Bitmap saved as " + data.getData(), Toast.LENGTH_LONG).show();
+//					Toast.makeText(this, getString(R.string.picture_saved) + " " + data.getData(), Toast.LENGTH_LONG).show();
 //				}
 //				break;
 //			case Activity.RESULT_CANCELED:

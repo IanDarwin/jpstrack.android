@@ -18,20 +18,27 @@
     <string name="pause_button_resume_label">Resume</string>
     <string name="stop_button_label">Stop</string>
     
-    <string name="voicenote_button_label">Voice Note</string>
-    <string name="textnote_button_label">Text Note</string>
-    <string name="takepicture_button_label">Take Picture</string>
+    <!-- General Errors -->
+    <string name="error">Error</string>
+    <string name="cant_start_act">Unable to start Activity</string>
 
 	<!-- Voicenote -->
+    <string name="voicenote_button_label">Voice Note</string>
 	<string name="voicenote_name">VoiceNote Recording</string>
 	<string name="voicenote_discard_button_label">Discard VoiceNote</string>
 	<string name="voicenote_save_button_label">Save VoiceNote</string>
 
 	<!-- textnote -->
+    <string name="textnote_button_label">Text Note</string>
 	<string name="textnote_frame_label">TextNote Creation</string>
 	<string name="textnote_name">TextNote Creation</string>
 	<string name="textnote_discard_button_label">Discard Text</string>
 	<string name="textnote_save_button_label">Save Text</string>
+    
+    <!-- Take Picture -->
+    <string name="takepicture_button_label">Take Picture</string>
+    <string name="picture_saved">Picture saved as</string>
+    <string name="picture_created_but_missing">Camera Intent returned OK but image not created!</string>
 
     <!-- Menu -->
     <string name="settings_label">Settings...</string>
