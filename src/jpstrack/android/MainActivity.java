@@ -9,6 +9,7 @@ import jpstrack.fileio.GPSFileSaver;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -27,9 +28,9 @@ import android.widget.Toast;
 
 import com.bugsense.trace.BugSenseHandler;
 
-public class Main extends Activity implements LocationListener, OnClickListener {
+public class Main extends Activity implements GpsStatus.Listener, LocationListener, OnClickListener {
 
-	private static final String LOG_TAG = "jpstrack";
+	private static final String TAG = "jpstrack";
 	private static final int MIN_METRES = 1;
 	private static final int MIN_SECONDS = 5;
 	private final String PROVIDER = LocationManager.GPS_PROVIDER;
@@ -67,10 +68,10 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 				String message = "Could not find BUGSENSE_API_KEY in props";
 				throw new ExceptionInInitializerError(message);
 			}
-			Log.d(LOG_TAG, "key = " + OUR_BUGSENSE_API_KEY);
+			Log.d(TAG, "key = " + OUR_BUGSENSE_API_KEY);
 		} catch (Exception e) {
 			String message = "Error loading properties: " + e;
-			Log.d(LOG_TAG, message);
+			Log.d(TAG, message);
 			throw new ExceptionInInitializerError(message);
 		}
 	}
@@ -86,6 +87,12 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 
 		saving = false;
 		paused = false;
+		// GPS setup
+		mgr = (LocationManager) getSystemService(LOCATION_SERVICE);
+		mgr.addGpsStatusListener(this);
+		Location last = mgr.getLastKnownLocation(PROVIDER);
+		onLocationChanged(last);
+		startReceiving();
 
 		output = (TextView) findViewById(R.id.output);
 
@@ -99,7 +106,7 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 			// First run on this device
 			dataDir = new File(Environment.getExternalStorageDirectory(), SettingsActivity.DIRECTORY_NAME);
 		}
-		Log.d(LOG_TAG, "Using Data Directory " + dataDir);
+		Log.d(TAG, "Using Data Directory " + dataDir);
 		dataDir.mkdirs();	// just in case
 		if (!dataDir.exists()) {
 			Toast.makeText(this, "Warning: Directory " + dataDir + " not created", Toast.LENGTH_LONG).show();
@@ -153,20 +160,17 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	 */
 	@Override
 	public Object onRetainNonConfigurationInstance() {
-		Log.i(LOG_TAG, "Remember: 3");
+		Log.i(TAG, "Remember: 3");
 		return this;
 	}
-	
-	void initGPS() {
-		// GPS setup
-		mgr = (LocationManager) getSystemService(LOCATION_SERVICE);
-				
-		final Location lastKnownLocation = mgr.getLastKnownLocation(PROVIDER);
-		onLocationChanged(lastKnownLocation);
-		
-		// start receiving data...
-		mgr.requestLocationUpdates(PROVIDER, MIN_SECONDS * 1000,
-			MIN_METRES, this);
+
+	/** start receiving GPS data... */
+	private void startReceiving() {
+		Log.d(TAG, "startReceiving()");
+		mgr.requestLocationUpdates(PROVIDER, 
+			MIN_SECONDS * 1000,
+			MIN_METRES,
+			this);
 	}
 	
 	/**
@@ -176,6 +180,7 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	 */
 	@Override
 	protected void onPause() {
+		Log.d(TAG, "onPause()");
 		super.onPause();
 		if (!saving || paused) {
 			mgr.removeUpdates(this);
@@ -184,11 +189,10 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 
 	@Override
 	protected void onResume() {
+		Log.d(TAG, "onResume()");
 		super.onResume();
-		initGPS();
 		if (saving && !paused) {
-			mgr.requestLocationUpdates(PROVIDER, MIN_SECONDS * 1000,
-					MIN_METRES, this);
+			startReceiving();
 		}
 	}
 
@@ -196,11 +200,9 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	/** From LocationListener, called when the location changes, obviously */
 	@Override
 	public void onLocationChanged(Location location) {
+		Log.d(TAG, "Got location " + location);
 		if (location == null) {
-			Log.e(LOG_TAG, "Got NULL Location from provider!");
 			return;
-		} else {
-			Log.d(LOG_TAG, "Got location " + location);
 		}
 		
 		logToScreen("Location: " + location.getLatitude() + "," + location.getLongitude());
@@ -217,16 +219,13 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.start_button:
-			if (PROVIDER == null) {
-				Toast.makeText(this, "GPS not started", Toast.LENGTH_LONG).show(); // XXX LAME LAME LAME - move startup here.
-				return;
-			}
 			startButton.setEnabled(false);
 			try {
 				// New filename each time we start recording.
 				trackerIO.setFileName(FileNameUtils.getNextFilename());
 				File f = trackerIO.startFile();
 				fileNameLabel.setText(f.getName());
+				startReceiving();
 				logToScreen("Starting File Updates");
 			} catch (RuntimeException e) {
 				Toast.makeText(this, "Could not save: " + e, Toast.LENGTH_LONG).show();
@@ -325,10 +324,29 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	/** From LocationListener, something changed. */
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
+		
 		String mesg = String.format("Provider %s status %s", provider, PROVIDER_STATUS_VALUES[status]);
+		Log.d(TAG, mesg);
 		logToScreen(mesg);
 	}
 	
+	/** From GpsStatus.Listener */
+	@Override
+	public void onGpsStatusChanged(int event) {
+		switch(event) {
+		case GpsStatus.GPS_EVENT_FIRST_FIX:
+			Log.d(TAG, "GPS Status: GotaFix");	
+			break;
+		case GpsStatus.GPS_EVENT_STARTED:
+			Log.d(TAG, "GPS Status: Started!");	
+			break;
+		case GpsStatus.GPS_EVENT_STOPPED:
+			Log.d(TAG, "GPS Status: Stopped");	
+			break;
+		}
+
+	}
+
 	public static File getDataDir() {
 		return dataDir;
 	}
@@ -336,5 +354,4 @@ public class Main extends Activity implements LocationListener, OnClickListener 
 	private void logToScreen(String string) {
 		output.append(string + "\n");
 	}
-
 }
