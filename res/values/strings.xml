@@ -20,7 +20,7 @@
     
     <!-- General Errors -->
     <string name="error">Error</string>
-    <string name="cant_start_act">Unable to start Activity</string>
+    <string name="cant_start_activity">Unable to start Activity</string>
 
 	<!-- Voicenote -->
     <string name="voicenote_button_label">Voice Note</string>
