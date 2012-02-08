@@ -7,7 +7,10 @@ import java.util.Properties;
 import jpstrack.fileio.FileNameUtils;
 import jpstrack.fileio.GPSFileSaver;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.location.GpsStatus;
 import android.location.Location;
@@ -47,6 +50,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	private GPSFileSaver trackerIO;
 	private View startButton, pauseButton, stopButton;
 	private boolean saving, paused;
+	private boolean sdWritable;
 
 	private String OUR_BUGSENSE_API_KEY;
 	
@@ -80,8 +84,9 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		
 		View main = findViewById(R.id.mainView);
-		main.getBackground().setAlpha(45);
+		main.getBackground().setAlpha(70);
 		
 		// set up BugSense bug tracking
 		loadKeys();
@@ -89,14 +94,24 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 
 		saving = false;
 		paused = false;
-		// GPS setup
-		mgr = (LocationManager) getSystemService(LOCATION_SERVICE);
-		mgr.addGpsStatusListener(this);
-		Location last = mgr.getLastKnownLocation(PROVIDER);
-		onLocationChanged(last);
-		startReceiving();
-
-		output = (TextView) findViewById(R.id.output);
+		
+		// Filesystem setup
+		checkSdPresent(); // run it manually first, then on change.
+		if (!sdWritable)  {
+			Toast.makeText(this, "Warning, external storage not available", Toast.LENGTH_LONG).show();
+		}
+		BroadcastReceiver rcvr = new BroadcastReceiver() {			
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				Log.d(TAG, "BroadcastReceiver got: " + intent);
+				checkSdPresent();
+			}
+		};
+		
+		IntentFilter iFilter = new IntentFilter();
+		iFilter.addAction(Intent.ACTION_MEDIA_MOUNTED);
+		iFilter.addAction(Intent.ACTION_MEDIA_REMOVED);
+		registerReceiver(rcvr, iFilter);
 
 		// Set up the save location (gpx files, text notes, etc.)
 		String preferredSaveLocation =
@@ -105,15 +120,21 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			// We've been run before
 			dataDir = new File(preferredSaveLocation);
 		} else {
-			// First run on this device
-			dataDir = new File(Environment.getExternalStorageDirectory(), SettingsActivity.DIRECTORY_NAME);
+			// First run on this device, probably.
+			final File externalStorageDirectory = Environment.getExternalStorageDirectory();
+			Log.d(TAG, "ExternalStorageDirectory = " + externalStorageDirectory);
+			dataDir = new File(externalStorageDirectory, SettingsActivity.DIRECTORY_NAME);
 		}
 		Log.d(TAG, "Using Data Directory " + dataDir);
 		dataDir.mkdirs();	// just in case
 		if (!dataDir.exists()) {
-			Toast.makeText(this, "Warning: Directory " + dataDir + " not created", Toast.LENGTH_LONG).show();
+			final String message = "Warning: Directory " + dataDir + " not created";
+			Log.d(TAG, message);
+			Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 		}
-
+		
+		output = (TextView) findViewById(R.id.output);
+		
 		// THE GUI
 		latOutput = (TextView) findViewById(R.id.lat_output);
 		longOutput = (TextView) findViewById(R.id.lon_output);
@@ -136,10 +157,18 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		View takePictureButton = findViewById(R.id.takepicture_button);
 		takePictureButton.setOnClickListener(this);
 		
+		// GPS setup - do after GUI, of course...
+		mgr = (LocationManager) getSystemService(LOCATION_SERVICE);
+		mgr.addGpsStatusListener(this);
+		Location last = mgr.getLastKnownLocation(PROVIDER);
+		onLocationChanged(last);
+		startReceiving();
+		
 		// Now see if we just got interrupted by e.g., rotation
 		Main old = (Main) getLastNonConfigurationInstance();
 		if (old != null) {
-			mgr = old.mgr;
+			// Do NOT refer to any GUI components in the old object
+			mgr.removeGpsStatusListener(old); // prevent accidents
 			saving = old.saving;
 			paused = old.paused;
 			startButton.setEnabled(!saving);
@@ -154,6 +183,14 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		} else {		
 			// I/O Helper
 			trackerIO = new GPSFileSaver(dataDir, FileNameUtils.getNextFilename());
+		}
+	}
+	
+	private void checkSdPresent() {
+		String sdState = Environment.getExternalStorageState();
+		sdWritable = false;
+		if (Environment.MEDIA_MOUNTED.equals(sdState)) {
+			sdWritable = true;
 		}
 	}
 	
