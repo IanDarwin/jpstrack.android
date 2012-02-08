@@ -80,6 +80,8 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		View main = findViewById(R.id.mainView);
+		main.getBackground().setAlpha(45);
 		
 		// set up BugSense bug tracking
 		loadKeys();
