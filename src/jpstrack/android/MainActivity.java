@@ -352,6 +352,10 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	}
 
 	private void logToScreen(String string) {
+		if (output == null) {
+			Log.e(TAG, "output is NULL, unable to display: " + string);
+			return;
+		}
 		output.append(string + "\n");
 	}
 }
