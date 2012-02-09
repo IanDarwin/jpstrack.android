@@ -7,6 +7,8 @@ import java.util.Properties;
 import jpstrack.fileio.FileNameUtils;
 import jpstrack.fileio.GPSFileSaver;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,9 +18,11 @@ import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -34,6 +38,8 @@ import com.bugsense.trace.BugSenseHandler;
 public class Main extends Activity implements GpsStatus.Listener, LocationListener, OnClickListener {
 
 	private static final String TAG = "jpstrack";
+	
+	private static final int ACTION_TAKE_PICTURE = 1;
 	private static final int MIN_METRES = 1;
 	private static final int MIN_SECONDS = 5;
 	private final String PROVIDER = LocationManager.GPS_PROVIDER;
@@ -51,6 +57,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	private View startButton, pauseButton, stopButton;
 	private boolean saving, paused;
 	private boolean sdWritable;
+	private File imageFile;
 
 	private String OUR_BUGSENSE_API_KEY;
 	
@@ -235,7 +242,6 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		}
 	}
 
-
 	/** From LocationListener, called when the location changes, obviously */
 	@Override
 	public void onLocationChanged(Location location) {
@@ -309,7 +315,15 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		case R.id.takepicture_button:
 			logToScreen("Starting Camera Activity");
 			try {
-				startActivity(new Intent(this, CameraNoteActivity.class));
+				// Use an Intent to get the Camera app going.
+				Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+				// Set up file to save image into.
+				imageFile = new File(Main.getDataDir(), FileNameUtils.getNextFilename("jpg"));
+				Uri uri = Uri.fromFile(imageFile);
+				intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+				intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+				// And away we go!
+				startActivityForResult(intent, ACTION_TAKE_PICTURE);
 			} catch (Exception e) {
 				Toast.makeText(this, getString(R.string.cant_start_activity) + ": " + e, Toast.LENGTH_LONG).show();
 			}
@@ -317,6 +331,33 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		default:
 			logToScreen("Unexpected Click from " + v.getId());
 			break;
+		}
+	}
+	
+	/** Called when an Activity we started for Result is complete */
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+		case ACTION_TAKE_PICTURE:
+			switch(resultCode) {
+			case Activity.RESULT_OK:
+				if (imageFile.exists())
+					Toast.makeText(this, getString(R.string.picture_saved) + " " + imageFile.getAbsoluteFile(), Toast.LENGTH_LONG).show();
+				else {
+					AlertDialog.Builder alert = new AlertDialog.Builder(this);
+					alert.setTitle(getString(R.string.error)).setMessage(getString(R.string.picture_created_but_missing)).show();
+				}
+				break;
+			case Activity.RESULT_CANCELED:
+				//  no blather required!
+				break;
+			default:
+				Toast.makeText(this, "Unexpected resultCode: " + resultCode, Toast.LENGTH_LONG).show();
+				break;
+			}
+			break;
+		default:
+			Toast.makeText(this, "Completion of unknown activity request " + requestCode + "!", Toast.LENGTH_LONG).show();
 		}
 	}
 
