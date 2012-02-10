@@ -8,7 +8,6 @@ import jpstrack.fileio.FileNameUtils;
 import jpstrack.fileio.GPSFileSaver;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -58,6 +57,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	private boolean saving, paused;
 	private boolean sdWritable;
 	private File imageFile;
+	private BroadcastReceiver extStorageRcvr;
 
 	private String OUR_BUGSENSE_API_KEY;
 	
@@ -89,6 +89,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		Log.d(TAG, "onCreate()");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
@@ -107,7 +108,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		if (!sdWritable)  {
 			Toast.makeText(this, "Warning, external storage not available", Toast.LENGTH_LONG).show();
 		}
-		BroadcastReceiver rcvr = new BroadcastReceiver() {			
+		extStorageRcvr = new BroadcastReceiver() {			
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				Log.d(TAG, "BroadcastReceiver got: " + intent);
@@ -118,7 +119,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		IntentFilter iFilter = new IntentFilter();
 		iFilter.addAction(Intent.ACTION_MEDIA_MOUNTED);
 		iFilter.addAction(Intent.ACTION_MEDIA_REMOVED);
-		registerReceiver(rcvr, iFilter);
+		registerReceiver(extStorageRcvr, iFilter);
 
 		// Set up the save location (gpx files, text notes, etc.)
 		String preferredSaveLocation =
@@ -191,6 +192,12 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			// I/O Helper
 			trackerIO = new GPSFileSaver(dataDir, FileNameUtils.getNextFilename());
 		}
+	}
+	
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		unregisterReceiver(extStorageRcvr);
 	}
 	
 	private void checkSdPresent() {
