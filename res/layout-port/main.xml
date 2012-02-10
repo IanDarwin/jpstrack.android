@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/mainView"
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/worldmap">
+
+    <!-- A Row for the current latitude output --> 
+    <TableLayout
+    	android:orientation="horizontal"
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content">
+	    <TextView
+	    	android:id="@+id/lat_label"
+	    	android:text="@string/latitude_text"
+	    	android:layout_width="wrap_content"
+	    	android:layout_height="wrap_content" />
+	    <TextView
+	    	android:id="@+id/lat_output"
+	    	android:layout_width="120pt"
+	    	android:layout_height="45sp"
+	    	android:textSize="35sp"/>	
+
+	 <!-- A Row for the current longitude output --> 
+	    <TextView
+	    	android:id="@+id/lon_label"
+	    	android:text="@string/longitude_text"
+	    	android:layout_width="wrap_content"
+	    	android:layout_height="wrap_content" />
+	    <TextView
+	    	android:id="@+id/lon_output"
+	    	android:layout_width="120pt"
+	    	android:layout_height="45sp"
+	    	android:textSize="35sp"/>	
+    </TableLayout>
+    
+    <!-- A row for Start button, Filename, Stop Button -->
+    <LinearLayout
+    	android:orientation="horizontal"
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content">
+    	<Button android:id="@+id/start_button"
+    		android:text="@string/start_button_label"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
+		<TextView android:id="@+id/filename_label" 
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
+		<Button android:id="@+id/pause_button" 
+			android:text="@string/pause_button_label"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
+		<Button android:id="@+id/stop_button" 
+			android:text="@string/stop_button_label"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
+    </LinearLayout>
+    
+    <!-- A row for the Notes buttons -->
+    <LinearLayout
+    	android:orientation="horizontal"
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	>
+    	<Button android:id="@+id/voicenote_button"
+    		android:text="@string/voicenote_button_label" 
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
+		<Button android:id="@+id/textnote_button" 
+			android:text="@string/textnote_button_label" 
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
+		<Button android:id="@+id/takepicture_button" 
+			android:text="@string/takepicture_button_label"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
+    </LinearLayout>
+    
+    <!-- Scrolling Logger -->
+	<ScrollView android:layout_width="fill_parent" android:layout_height="fill_parent">
+    	<TextView
+     	 android:id="@+id/output"
+     	 android:layout_width="fill_parent"
+     	 android:layout_height="wrap_content"
+	     />
+	</ScrollView>
+
+</LinearLayout>
