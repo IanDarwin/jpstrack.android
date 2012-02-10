@@ -36,7 +36,7 @@ import com.bugsense.trace.BugSenseHandler;
 
 public class Main extends Activity implements GpsStatus.Listener, LocationListener, OnClickListener {
 
-	private static final String TAG = "jpstrack";
+	static final String TAG = "jpstrack";
 	
 	private static final int ACTION_TAKE_PICTURE = 1;
 	private static final int MIN_METRES = 1;
@@ -55,7 +55,8 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	private GPSFileSaver trackerIO;
 	private View startButton, pauseButton, stopButton;
 	private boolean saving, paused;
-	private boolean sdWritable;
+	private static boolean sdWritable;
+
 	private File imageFile;
 	private BroadcastReceiver extStorageRcvr;
 
@@ -444,5 +445,10 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			return;
 		}
 		output.append(string + "\n");
+	}
+	
+	// Plain accessors
+	public static boolean isSdWritable() {
+		return sdWritable;
 	}
 }

@@ -23,18 +23,21 @@ import android.widget.Toast;
  * @author Ian Darwin
  */
 public class VoiceNoteActivity extends Activity implements OnClickListener {
-	private static final String PROG_NAME = "VoiceNote";
 	MediaRecorder recorder  = new MediaRecorder();
-	private File soundDir;
 	private File soundFile;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.voicenote);
-		soundDir = Main.getDataDir();
 
-		// Create a View with Pause, Save and Discard buttons, 
+		if (!Main.isSdWritable()) {
+			Toast.makeText(this, "SD Card is not writable", Toast.LENGTH_LONG).show();
+			finish();
+			return;
+		}
+		
+		// View has only Save and Discard buttons, 
+		setContentView(R.layout.voicenote);
 		View saveButton = findViewById(R.id.voicenote_save_button);
 		saveButton.setOnClickListener(this);
 		View discardButton = findViewById(R.id.voicenote_discard_button);
@@ -54,16 +57,18 @@ public class VoiceNoteActivity extends Activity implements OnClickListener {
 			discardRecording();
 			break;
 		default:
-			Log.e(PROG_NAME, "Unexpected click");
+			Log.e(Main.TAG, "Unexpected click");
 		}
 		this.finish();		// Back to main!
 	}
 
 	protected void startRecording() {
+		
 		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 		recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
 		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 		try {
+			File soundDir = Main.getDataDir();
 			soundDir.mkdirs();
 			soundFile = new File(soundDir, FileNameUtils.getNextFilename("mp3"));
 			soundFile.createNewFile();
@@ -71,9 +76,10 @@ public class VoiceNoteActivity extends Activity implements OnClickListener {
 			recorder.prepare();
 			recorder.start();
 		} catch (Exception e) {
-			Log.e(PROG_NAME, "Could not save file:" + e);
+			final String message = "Could not save file:" + e;
+			Log.e(Main.TAG, message);
+			Toast.makeText(this, message, Toast.LENGTH_LONG);
 			this.finish();
-			throw new RuntimeException("Could not start: " + e);
 		}
 	}
 	
@@ -91,7 +97,7 @@ public class VoiceNoteActivity extends Activity implements OnClickListener {
 
 	protected void processaudiofile() {
 		ContentValues values = new ContentValues(4);
-		values.put(MediaStore.Audio.Media.TITLE, PROG_NAME + '-' + soundFile.getName());
+		values.put(MediaStore.Audio.Media.TITLE, Main.TAG + '-' + soundFile.getName());
 		values.put(MediaStore.Audio.Media.MIME_TYPE, "audio/mp3");
 		values.put(MediaStore.Audio.Media.DATA, soundFile.getAbsolutePath());
 		values.put(MediaStore.Audio.Media.DATE_ADDED, (int) (System.currentTimeMillis() / 1000));

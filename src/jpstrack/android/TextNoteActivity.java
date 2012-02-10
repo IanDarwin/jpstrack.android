@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import jpstrack.fileio.FileNameUtils;
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
@@ -17,6 +18,13 @@ public class TextNoteActivity extends Activity implements OnClickListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		if (!Main.isSdWritable()) {
+			Toast.makeText(this, "SD Card is not writable", Toast.LENGTH_LONG).show();
+			finish();
+			return;
+		}
+		
 		setContentView(R.layout.textnote);
 		View saver = findViewById(R.id.textnote_save_button);
 		saver.setOnClickListener(this);
@@ -49,7 +57,10 @@ public class TextNoteActivity extends Activity implements OnClickListener {
 			out.close();
 			Toast.makeText(this, "Saved text note into " + f, Toast.LENGTH_SHORT).show();
 		} catch (IOException e) {
-			throw new RuntimeException("Can't create text file " + f);
+			final String message = "Can't create text file " + f + "(" + e + ")";
+			Log.e(Main.TAG, message);
+			Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+			// Don't finish! Let them try later
 		}
 	}
 }
