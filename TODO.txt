@@ -8,8 +8,6 @@ About box is ugly.
 
 Dialog if sdcard in use, like Audible uses. --> Recipe on Dialogs
 
-Reorganize to get service in onResume if not running
-
 SETTINGS
 	Add "seconds interval" and "min distance"
 	Add Username and password, store encrypted, use for upload.
@@ -19,9 +17,7 @@ GPS:
 	2) Can we turn it on?
 	3) Upload saved data - popup when saving, if network on and username given.
 
-Version# and Done button in About screen.
-
-"Take picture" function - can we go straight back after clicking?
+Done button in About screen.
 
 Externalize rest of strings.
 	Do rest of _es translation, including Spanish characters.

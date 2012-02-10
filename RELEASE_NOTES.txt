@@ -1,16 +1,17 @@
 This is a late Alpha/Early Beta release. Note the following:
+
 - We try to ensure that the GPX file is closed correctly, but this
   does not always happen. If your destination app cannot read the file,
   try opening it with a plain-text editor (good ole vi!) and add
-  these three "end tag" lines after the last trackpoint (<trkpt>) element.
+  these three "end tag" lines after the last end-trackpoint (</trkpt>) tag.
     </trkseg>
 	</trk>
 	</gpx>
 	
 - Do NOT use the application with the USB connected and the SDCard
-  exported to your desktop, as obviously this disables
+  exported to your desktop, as obviously this disables all
   Android Apps's access to the /sdcard folder, and 
-  there are several places where the app might NPE crash if the /sdcard
+  there are several places where the app might crash if the /sdcard
   is not available.
 
 - There are no language-translation files yet so the program 
