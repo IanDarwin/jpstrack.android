@@ -2,11 +2,7 @@ package jpstrack.android;
 
 import java.io.File;
 
-import jpstrack.fileio.FileNameUtils;
 import android.app.Activity;
-import android.content.ContentResolver;
-import android.content.ContentValues;
-import android.content.Intent;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,8 +19,13 @@ import android.widget.Toast;
  * @author Ian Darwin
  */
 public class VoiceNoteActivity extends Activity implements OnClickListener {
-	MediaRecorder recorder  = new MediaRecorder();
-	private File soundFile;
+	MediaRecorder recorder  = null;
+	private String soundFile;
+	
+	class Wrapper {
+		MediaRecorder recorder;
+		String soundFile;
+	}
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +43,12 @@ public class VoiceNoteActivity extends Activity implements OnClickListener {
 		saveButton.setOnClickListener(this);
 		View discardButton = findViewById(R.id.voicenote_discard_button);
 		discardButton.setOnClickListener(this);
-		startRecording();	// Start immediately - already pressed Voice Note button
+		Wrapper w = (Wrapper) getLastNonConfigurationInstance();
+		if (w == null) {
+			startRecording();	// Start immediately - already pressed Voice Note button
+		} else {
+			continueRecording(w);
+		}
 	}
 	
 	@Override
@@ -63,53 +69,52 @@ public class VoiceNoteActivity extends Activity implements OnClickListener {
 	}
 
 	protected void startRecording() {
-		
+		recorder = new MediaRecorder();
 		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 		recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
 		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 		try {
-			File soundDir = Main.getDataDir();
-			soundDir.mkdirs();
-			soundFile = new File(soundDir, FileNameUtils.getNextFilename("mp3"));
-			soundFile.createNewFile();
-			recorder.setOutputFile(soundFile.getAbsolutePath());
+			Uri soundUri = getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT);			
+			soundFile = soundUri.getPath();
+			recorder.setOutputFile(soundFile);
+			Log.d(Main.TAG, "outputting to " + soundUri.getPath());
 			recorder.prepare();
 			recorder.start();
 		} catch (Exception e) {
-			final String message = "Could not save file:" + e;
+			final String message = "Could not create file:" + e;
 			Log.e(Main.TAG, message);
 			Toast.makeText(this, message, Toast.LENGTH_LONG);
 			this.finish();
 		}
 	}
 	
+	/**
+	 * Restore state after configuration change (rotation)
+	 * @param w
+	 */
+	private void continueRecording(Wrapper w) {
+		soundFile = w.soundFile;
+		recorder = w.recorder;
+	}
+
+	
 	protected void discardRecording() {
 		recorder.stop();
 		recorder.release();
-		soundFile.delete();
+		new File(soundFile).delete();
 	}
 
 	protected void saveRecording() {
 		recorder.stop();
 		recorder.release();
-		processaudiofile();
+		// We don't tell the MediaStore about it as it's not music!
 	}
-
-	protected void processaudiofile() {
-		ContentValues values = new ContentValues(4);
-		values.put(MediaStore.Audio.Media.TITLE, Main.TAG + '-' + soundFile.getName());
-		values.put(MediaStore.Audio.Media.MIME_TYPE, "audio/mp3");
-		values.put(MediaStore.Audio.Media.DATA, soundFile.getAbsolutePath());
-		values.put(MediaStore.Audio.Media.DATE_ADDED, (int) (System.currentTimeMillis() / 1000));
-		ContentResolver contentResolver = getContentResolver();
-
-		// XXX Start busy-notifier
-		
-		Uri base = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-		Uri newUri = contentResolver.insert(base, values);
-		
-		sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, newUri));
-				
-		// XXX Stop busy-notifier
+	
+	@Override
+	public Object onRetainNonConfigurationInstance() {
+		Wrapper w = new Wrapper();
+		w.soundFile = soundFile;
+		w.recorder = recorder;
+		return w;
 	}
 }
