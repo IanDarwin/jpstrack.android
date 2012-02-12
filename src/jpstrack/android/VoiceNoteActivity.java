@@ -32,7 +32,7 @@ public class VoiceNoteActivity extends Activity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 
 		if (!Main.isSdWritable()) {
-			Toast.makeText(this, "SD Card is not writable", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, "SD Card not writable", Toast.LENGTH_LONG).show();
 			finish();
 			return;
 		}
