@@ -15,7 +15,11 @@ This is a late Alpha/Early Beta release. Note the following:
   is not available.
 
 - There are no language-translation files yet so the program 
-  only works in English. Hay una traduccion muy cruda para Espanol.
+  only works in English. 
+  
+  Hay una traduccion muy cruda para Espanol, pero se puede morir
+  de reir si intenta usarlo. No pagamos las cuentas funerales que
+  resultan.
 
 - Sound files are saved as standard MP3's, but the CODEC used
   is not always available on the desktop.
