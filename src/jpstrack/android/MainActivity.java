@@ -198,6 +198,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	
 	@Override
 	protected void onDestroy() {
+		Log.d(TAG, "I'm being destroyed!");
 		super.onDestroy();
 		unregisterReceiver(extStorageRcvr);
 	}
