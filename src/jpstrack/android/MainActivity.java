@@ -228,6 +228,10 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			MIN_METRES,
 			this);
 	}
+	
+	private void stopReceiving() {
+		mgr.removeUpdates(this);
+	}
 
 	/**
 	 * Called by Android when we get paused; if not saving,
@@ -239,7 +243,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		Log.d(TAG, "onPause()");
 		super.onPause();
 		if (!saving || paused) {
-			mgr.removeUpdates(this);
+			stopReceiving();
 		}
 	}
 
@@ -293,6 +297,8 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			stopButton.setEnabled(true);
 			break;
 		case R.id.pause_button:
+			// Don't call stopReceiving() here, so the display
+			// will still update. Maybe make this a preference?
 			paused = !paused;
 			syncPauseButtonToState();
 			break;
@@ -362,7 +368,29 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 					Toast.makeText(this, getString(R.string.picture_saved) + " " + imageFile.getAbsoluteFile(), Toast.LENGTH_LONG).show();
 				else {
 					AlertDialog.Builder alert = new AlertDialog.Builder(this);
-					alert.setTitle(getString(R.string.error)).setMessage(getString(R.string.picture_created_but_missing)).show();
+					alert.setTitle(getString(R.string.error))
+						.setMessage(getString(R.string.picture_created_but_missing))
+						.show();
+				}
+				break;
+			case Activity.RESULT_CANCELED:
+				//  no blather required!
+				break;
+			default:
+				Toast.makeText(this, "Unexpected resultCode: " + resultCode, Toast.LENGTH_LONG).show();
+				break;
+			}
+			break;
+		case ACTION_TAKE_SOUNDBITE:
+			switch (resultCode) {
+			case Activity.RESULT_OK:
+				if (soundFile.exists())
+					Toast.makeText(this, getString(R.string.picture_saved) + " " + soundFile.getAbsoluteFile(), Toast.LENGTH_LONG).show();
+				else {
+					AlertDialog.Builder alert = new AlertDialog.Builder(this);
+					alert.setTitle(getString(R.string.error))
+						.setMessage(getString(R.string.picture_created_but_missing))
+						.show();
 				}
 				break;
 			case Activity.RESULT_CANCELED:
