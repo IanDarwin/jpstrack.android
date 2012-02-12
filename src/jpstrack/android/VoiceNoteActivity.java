@@ -14,7 +14,11 @@ import android.widget.Toast;
 
 /**
  * Offer a "voice note" facility so the user can record comments.
- * onCreate calls startRecording(), since the user already pressed a button
+ * We use this instead of the default Sound Record app since unlike
+ * the standard Video Recorder, the standard Voice Recorder app
+ * blatantly ignores Intent extra "Extra Output" for filename.
+ * 
+ * onCreate() calls startRecording(), since the user already pressed a button
  * with "start recording" function; we offer discard and save buttons only.
  * @author Ian Darwin
  */
@@ -25,6 +29,10 @@ public class VoiceNoteActivity extends Activity implements OnClickListener {
 	class Wrapper {
 		MediaRecorder recorder;
 		String soundFile;
+		@Override
+		public String toString() {
+			return "Wrapper[" + recorder + "; " + soundFile + "]";
+		}
 	}
 	
 	@Override
@@ -44,6 +52,7 @@ public class VoiceNoteActivity extends Activity implements OnClickListener {
 		View discardButton = findViewById(R.id.voicenote_discard_button);
 		discardButton.setOnClickListener(this);
 		Wrapper w = (Wrapper) getLastNonConfigurationInstance();
+		Log.d(Main.TAG, "LastConConfigurationInstance gave us " + w);
 		if (w == null) {
 			startRecording();	// Start immediately - already pressed Voice Note button
 		} else {
