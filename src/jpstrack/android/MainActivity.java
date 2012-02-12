@@ -34,18 +34,19 @@ import android.widget.Toast;
 
 import com.bugsense.trace.BugSenseHandler;
 
-public class Main extends Activity implements GpsStatus.Listener,
-		LocationListener, OnClickListener {
+public class Main extends Activity implements GpsStatus.Listener, LocationListener, OnClickListener {
 
 	static final String TAG = "jpstrack";
-
+	
 	private static final int ACTION_TAKE_PICTURE = 1;
 	private static final int ACTION_TAKE_SOUNDBITE = 2;
 	private static final int MIN_METRES = 1;
 	private static final int MIN_SECONDS = 5;
 	private final String PROVIDER = LocationManager.GPS_PROVIDER;
-	private static final String[] PROVIDER_STATUS_VALUES = { "out of service",
-			"down temporarily", "available" };
+	private static final String[] PROVIDER_STATUS_VALUES = { 
+		"out of service",
+		"down temporarily", 
+		"available" };
 
 	private LocationManager mgr;
 	private static File dataDir;
@@ -61,20 +62,17 @@ public class Main extends Activity implements GpsStatus.Listener,
 	private BroadcastReceiver extStorageRcvr;
 
 	private String OUR_BUGSENSE_API_KEY;
-
-	// Load a Props file from the APK zipped filesystem, extract our app key
-	// from that.
+	
+	// Load a Props file from the APK zipped filesystem, extract our app key from that.
 	public void loadKeys() {
 		try {
 			Resources resources = getResources();
 			if (resources == null) {
-				throw new ExceptionInInitializerError(
-						"getResources() returned null");
+				throw new ExceptionInInitializerError("getResources() returned null");
 			}
 			InputStream is = resources.openRawResource(R.raw.keys_props);
 			if (is == null) {
-				throw new ExceptionInInitializerError(
-						"getResources().openRawResource() returned null");
+				throw new ExceptionInInitializerError("getResources().openRawResource() returned null");
 			}
 			Properties p = new Properties();
 			p.load(is);
@@ -96,64 +94,57 @@ public class Main extends Activity implements GpsStatus.Listener,
 		Log.d(TAG, "onCreate()");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-
+		
 		View main = findViewById(R.id.mainView);
 		main.getBackground().setAlpha(70);
-
+		
 		// set up BugSense bug tracking
 		loadKeys();
 		BugSenseHandler.setup(this, OUR_BUGSENSE_API_KEY);
 
 		saving = false;
 		paused = false;
-
+		
 		// Filesystem setup
 		checkSdPresent(); // run it manually first, then on change.
-		if (!sdWritable) {
-			Toast.makeText(this, "Warning, external storage not available",
-					Toast.LENGTH_LONG).show();
+		if (!sdWritable)  {
+			Toast.makeText(this, "Warning, external storage not available", Toast.LENGTH_LONG).show();
 		}
-		extStorageRcvr = new BroadcastReceiver() {
+		extStorageRcvr = new BroadcastReceiver() {			
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				Log.d(TAG, "BroadcastReceiver got: " + intent);
 				checkSdPresent();
 			}
 		};
-
+		
 		IntentFilter iFilter = new IntentFilter();
 		iFilter.addAction(Intent.ACTION_MEDIA_MOUNTED);
 		iFilter.addAction(Intent.ACTION_MEDIA_REMOVED);
 		registerReceiver(extStorageRcvr, iFilter);
 
 		// Set up the save location (gpx files, text notes, etc.)
-		String preferredSaveLocation = PreferenceManager
-				.getDefaultSharedPreferences(this).getString(
-						SettingsActivity.OPTION_DIR, null);
+		String preferredSaveLocation =
+				PreferenceManager.getDefaultSharedPreferences(this).getString(SettingsActivity.OPTION_DIR, null);
 		if (preferredSaveLocation != null && !"".equals(preferredSaveLocation)) {
 			// We've been run before
 			dataDir = new File(preferredSaveLocation);
 		} else {
 			// First run on this device, probably.
-			final File externalStorageDirectory = Environment
-					.getExternalStorageDirectory();
-			Log
-					.d(TAG, "ExternalStorageDirectory = "
-							+ externalStorageDirectory);
-			dataDir = new File(externalStorageDirectory,
-					SettingsActivity.DIRECTORY_NAME);
+			final File externalStorageDirectory = Environment.getExternalStorageDirectory();
+			Log.d(TAG, "ExternalStorageDirectory = " + externalStorageDirectory);
+			dataDir = new File(externalStorageDirectory, SettingsActivity.DIRECTORY_NAME);
 		}
 		Log.d(TAG, "Using Data Directory " + dataDir);
-		dataDir.mkdirs(); // just in case
+		dataDir.mkdirs();	// just in case
 		if (!dataDir.exists()) {
-			final String message = "Warning: Directory " + dataDir
-					+ " not created";
+			final String message = "Warning: Directory " + dataDir + " not created";
 			Log.d(TAG, message);
 			Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 		}
-
+		
 		output = (TextView) findViewById(R.id.output);
-
+		
 		// THE GUI
 		latOutput = (TextView) findViewById(R.id.lat_output);
 		longOutput = (TextView) findViewById(R.id.lon_output);
@@ -175,14 +166,14 @@ public class Main extends Activity implements GpsStatus.Listener,
 		voiceNoteButton.setOnClickListener(this);
 		View takePictureButton = findViewById(R.id.takepicture_button);
 		takePictureButton.setOnClickListener(this);
-
+		
 		// GPS setup - do after GUI, of course...
 		mgr = (LocationManager) getSystemService(LOCATION_SERVICE);
 		mgr.addGpsStatusListener(this);
 		Location last = mgr.getLastKnownLocation(PROVIDER);
 		onLocationChanged(last);
 		startReceiving();
-
+		
 		// Now see if we just got interrupted by e.g., rotation
 		Main old = (Main) getLastNonConfigurationInstance();
 		if (old != null) {
@@ -194,24 +185,23 @@ public class Main extends Activity implements GpsStatus.Listener,
 			syncPauseButtonToState();
 			stopButton.setEnabled(saving);
 			// this is the most important line: keep saving to same file!
-			trackerIO = old.trackerIO;
+			trackerIO = old.trackerIO;			
 			if (saving) {
 				fileNameLabel.setText(trackerIO.getFileName());
 			}
 			return;
-		} else {
+		} else {		
 			// I/O Helper
-			trackerIO = new GPSFileSaver(dataDir, FileNameUtils
-					.getNextFilename());
+			trackerIO = new GPSFileSaver(dataDir, FileNameUtils.getNextFilename());
 		}
 	}
-
+	
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 		unregisterReceiver(extStorageRcvr);
 	}
-
+	
 	private void checkSdPresent() {
 		String sdState = Environment.getExternalStorageState();
 		sdWritable = false;
@@ -219,10 +209,9 @@ public class Main extends Activity implements GpsStatus.Listener,
 			sdWritable = true;
 		}
 	}
-
-	/**
-	 * Returns arbitrary single token object to keep alive across the
-	 * destruction and re-creation of the entire Enterprise.
+	
+	/** Returns arbitrary single token object to keep alive across
+	 * the destruction and re-creation of the entire Enterprise.
 	 */
 	@Override
 	public Object onRetainNonConfigurationInstance() {
@@ -240,8 +229,9 @@ public class Main extends Activity implements GpsStatus.Listener,
 	}
 
 	/**
-	 * Called by Android when we get paused; if not saving, turn off getting GPS
-	 * updates, in the (documented) hopes this will save battery life.
+	 * Called by Android when we get paused; if not saving,
+	 * turn off getting GPS updates, in the (documented)
+	 * hopes this will save battery life.
 	 */
 	@Override
 	protected void onPause() {
@@ -268,9 +258,8 @@ public class Main extends Activity implements GpsStatus.Listener,
 		if (location == null) {
 			return;
 		}
-
-		logToScreen("Location: " + location.getLatitude() + ","
-				+ location.getLongitude());
+		
+		logToScreen("Location: " + location.getLatitude() + "," + location.getLongitude());
 		double latitude = location.getLatitude();
 		double longitude = location.getLongitude();
 		latOutput.setText(Double.toString(latitude));
@@ -293,8 +282,7 @@ public class Main extends Activity implements GpsStatus.Listener,
 				startReceiving();
 				logToScreen("Starting File Updates");
 			} catch (RuntimeException e) {
-				Toast.makeText(this, "Could not save: " + e, Toast.LENGTH_LONG)
-						.show();
+				Toast.makeText(this, "Could not save: " + e, Toast.LENGTH_LONG).show();
 				startButton.setEnabled(true);
 				return;
 			}
@@ -314,8 +302,7 @@ public class Main extends Activity implements GpsStatus.Listener,
 			syncPauseButtonToState();
 			stopButton.setEnabled(false);
 			trackerIO.endFile();
-			fileNameLabel.setText(FileNameUtils
-					.getDefaultFilenameFormatWithExt());
+			fileNameLabel.setText(FileNameUtils.getDefaultFilenameFormatWithExt());
 			startButton.setEnabled(true);
 			break;
 		case R.id.voicenote_button:
@@ -336,9 +323,7 @@ public class Main extends Activity implements GpsStatus.Listener,
 			try {
 				startActivity(new Intent(this, TextNoteActivity.class));
 			} catch (Exception e) {
-				Toast.makeText(this,
-						getString(R.string.cant_start_activity) + ": " + e,
-						Toast.LENGTH_LONG).show();
+				Toast.makeText(this, getString(R.string.cant_start_activity) + ": " + e, Toast.LENGTH_LONG).show();
 			}
 			break;
 		case R.id.takepicture_button:
@@ -373,65 +358,30 @@ public class Main extends Activity implements GpsStatus.Listener,
 			switch (resultCode) {
 			case Activity.RESULT_OK:
 				if (imageFile.exists())
-					Toast.makeText(
-							this,
-							getString(R.string.picture_saved) + " "
-									+ imageFile.getAbsoluteFile(),
-							Toast.LENGTH_LONG).show();
+					Toast.makeText(this, getString(R.string.picture_saved) + " " + imageFile.getAbsoluteFile(), Toast.LENGTH_LONG).show();
 				else {
 					AlertDialog.Builder alert = new AlertDialog.Builder(this);
-					alert.setTitle(getString(R.string.error)).setMessage(
-							getString(R.string.picture_created_but_missing))
-							.show();
+					alert.setTitle(getString(R.string.error)).setMessage(getString(R.string.picture_created_but_missing)).show();
 				}
 				break;
 			case Activity.RESULT_CANCELED:
-				// no blather required!
+				//  no blather required!
 				break;
 			default:
-				Toast.makeText(this, "Unexpected resultCode: " + resultCode,
-						Toast.LENGTH_LONG).show();
-				break;
-			}
-			break;
-		case ACTION_TAKE_SOUNDBITE:
-			switch (resultCode) {
-			case Activity.RESULT_OK:
-				if (soundFile.exists())
-					Toast.makeText(
-							this,
-							getString(R.string.picture_saved) + " "
-									+ soundFile.getAbsoluteFile(),
-							Toast.LENGTH_LONG).show();
-				else {
-					AlertDialog.Builder alert = new AlertDialog.Builder(this);
-					alert.setTitle(getString(R.string.error)).setMessage(
-							getString(R.string.picture_created_but_missing))
-							.show();
-				}
-				break;
-			case Activity.RESULT_CANCELED:
-				// no blather required!
-				break;
-			default:
-				Toast.makeText(this, "Unexpected resultCode: " + resultCode,
-						Toast.LENGTH_LONG).show();
+				Toast.makeText(this, "Unexpected resultCode: " + resultCode, Toast.LENGTH_LONG).show();
 				break;
 			}
 			break;
 		default:
-			Toast.makeText(
-					this,
-					"Completion of unknown activity request " + requestCode
-							+ "!", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, "Completion of unknown activity request " + requestCode + "!", Toast.LENGTH_LONG).show();
 		}
 	}
 
 	private void syncPauseButtonToState() {
 		pauseButton.setEnabled(saving);
-		((Button) pauseButton)
-				.setText(paused ? R.string.pause_button_resume_label
-						: R.string.pause_button_label);
+		((Button) pauseButton).setText(paused ? 
+				R.string.pause_button_resume_label :
+				R.string.pause_button_label);
 	}
 
 	@Override
@@ -470,28 +420,26 @@ public class Main extends Activity implements GpsStatus.Listener,
 	/** From LocationListener, something changed. */
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
-
-		String mesg = String.format("Provider %s status %s", provider,
-				PROVIDER_STATUS_VALUES[status]);
+		
+		String mesg = String.format("Provider %s status %s", provider, PROVIDER_STATUS_VALUES[status]);
 		Log.d(TAG, mesg);
 		logToScreen(mesg);
 	}
-
+	
 	/** From GpsStatus.Listener */
 	@Override
 	public void onGpsStatusChanged(int event) {
 		switch (event) {
 		case GpsStatus.GPS_EVENT_FIRST_FIX:
-			Log.d(TAG, "GPS Status: GotaFix");
+			Log.d(TAG, "GPS Status: GotaFix");	
 			break;
 		case GpsStatus.GPS_EVENT_STARTED:
-			Log.d(TAG, "GPS Status: Started!");
+			Log.d(TAG, "GPS Status: Started!");	
 			break;
 		case GpsStatus.GPS_EVENT_STOPPED:
-			Log.d(TAG, "GPS Status: Stopped");
+			Log.d(TAG, "GPS Status: Stopped");	
 			break;
 		}
-
 	}
 
 	public static File getDataDir() {
@@ -505,7 +453,7 @@ public class Main extends Activity implements GpsStatus.Listener,
 		}
 		output.append(string + "\n");
 	}
-
+	
 	// Plain accessors
 	public static boolean isSdWritable() {
 		return sdWritable;
