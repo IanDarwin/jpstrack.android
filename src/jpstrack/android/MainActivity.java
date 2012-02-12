@@ -364,17 +364,21 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		case ACTION_TAKE_PICTURE:
 			switch (resultCode) {
 			case Activity.RESULT_OK:
-				if (imageFile.exists())
-					Toast.makeText(this, getString(R.string.picture_saved) + " " + imageFile.getAbsoluteFile(), Toast.LENGTH_LONG).show();
-				else {
+				if (imageFile.exists()) {
+					final String message = getString(R.string.picture_saved) + " " + imageFile.getAbsoluteFile();
+					logToScreen(message);
+					Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+				} else {
 					AlertDialog.Builder alert = new AlertDialog.Builder(this);
+					final String message = getString(R.string.picture_created_but_missing);
+					logToScreen(message);
 					alert.setTitle(getString(R.string.error))
-						.setMessage(getString(R.string.picture_created_but_missing))
+						.setMessage(message)
 						.show();
 				}
 				break;
 			case Activity.RESULT_CANCELED:
-				//  no blather required!
+				logToScreen("Canceled");
 				break;
 			default:
 				Toast.makeText(this, "Unexpected resultCode: " + resultCode, Toast.LENGTH_LONG).show();
@@ -384,17 +388,21 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		case ACTION_TAKE_SOUNDBITE:
 			switch (resultCode) {
 			case Activity.RESULT_OK:
-				if (soundFile.exists())
-					Toast.makeText(this, getString(R.string.picture_saved) + " " + soundFile.getAbsoluteFile(), Toast.LENGTH_LONG).show();
-				else {
+				if (soundFile.exists()) {
+					final String message = getString(R.string.picture_saved) + " " + soundFile.getAbsoluteFile();
+					logToScreen(message);
+					Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+				} else {
 					AlertDialog.Builder alert = new AlertDialog.Builder(this);
+					final String message = getString(R.string.picture_created_but_missing);
+					logToScreen(message);
 					alert.setTitle(getString(R.string.error))
-						.setMessage(getString(R.string.picture_created_but_missing))
+						.setMessage(message)
 						.show();
 				}
 				break;
 			case Activity.RESULT_CANCELED:
-				//  no blather required!
+				logToScreen("Canceled");
 				break;
 			default:
 				Toast.makeText(this, "Unexpected resultCode: " + resultCode, Toast.LENGTH_LONG).show();
