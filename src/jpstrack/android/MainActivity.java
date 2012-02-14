@@ -378,7 +378,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 				}
 				break;
 			case Activity.RESULT_CANCELED:
-				logToScreen("Canceled");
+				logToScreen("Done");
 				break;
 			default:
 				Toast.makeText(this, "Unexpected resultCode: " + resultCode, Toast.LENGTH_LONG).show();
@@ -402,7 +402,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 				}
 				break;
 			case Activity.RESULT_CANCELED:
-				logToScreen("Canceled");
+				logToScreen("Done");
 				break;
 			default:
 				Toast.makeText(this, "Unexpected resultCode: " + resultCode, Toast.LENGTH_LONG).show();
