@@ -70,6 +70,10 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			if (resources == null) {
 				throw new ExceptionInInitializerError("getResources() returned null");
 			}
+			
+			// If this line won't compile, create an empty file
+			// with the exact (but stupid) name res/raw/keys_props.properties 
+			// And do Project->Clean, all the usual stuff...
 			InputStream is = resources.openRawResource(R.raw.keys_props);
 			if (is == null) {
 				throw new ExceptionInInitializerError("getResources().openRawResource() returned null");
