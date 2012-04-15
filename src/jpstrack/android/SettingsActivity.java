@@ -10,6 +10,7 @@ public class SettingsActivity extends PreferenceActivity {
 	static final String DIRECTORY_NAME = "jpstrack.android";
 	
 	static final String OPTION_DIR = "dir";
+	static final String OPTION_SEEN_WELCOME = "seen_welcome";
 	//static final String OPTION_FORMAT = "format";
 	//static final String OPTION_OSM_USER = "osm_username";
 	//static final String OPTION_OSM_PASS = "osm_password";
@@ -22,6 +23,16 @@ public class SettingsActivity extends PreferenceActivity {
 	
 	public static String getDirectory(Context context) {
 		return PreferenceManager.getDefaultSharedPreferences(context).getString(OPTION_DIR, null);
+	}
+	
+	public static boolean hasSeenWelcome(Context context) {
+		return PreferenceManager.getDefaultSharedPreferences(context).
+			getBoolean(OPTION_SEEN_WELCOME, false);
+	}
+
+	public static void setSeenWelcome(Context context, boolean seenWelcome) {
+		PreferenceManager.getDefaultSharedPreferences(context).
+			edit().putBoolean(OPTION_SEEN_WELCOME, seenWelcome).commit();
 	}
 
 }

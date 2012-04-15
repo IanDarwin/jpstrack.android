@@ -97,6 +97,9 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	public void onCreate(Bundle savedInstanceState) {
 		Log.d(TAG, "onCreate()");
 		super.onCreate(savedInstanceState);
+		if (!SettingsActivity.hasSeenWelcome(this)) {
+			startActivity(new Intent(this, OnboardingActivity.class));
+		}
 		setContentView(R.layout.main);
 		
 		View main = findViewById(R.id.mainView);
