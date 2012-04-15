@@ -22,6 +22,7 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
+		<activity android:name=".OnboardingActivity" android:label="@string/settings_name"/>
 		<activity android:name=".SettingsActivity" android:label="@string/settings_name"/>
 		<activity android:name=".VoiceNoteActivity" android:label="@string/voicenote_name"/>
 		<activity android:name=".TextNoteActivity" android:label="@string/textnote_name"/>
