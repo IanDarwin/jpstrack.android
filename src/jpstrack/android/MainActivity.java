@@ -83,7 +83,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			OUR_BUGSENSE_API_KEY = p.getProperty("BUGSENSE_API_KEY");
 			if (OUR_BUGSENSE_API_KEY == null) {
 				String message = "Could not find BUGSENSE_API_KEY in props";
-				throw new ExceptionInInitializerError(message);
+				Log.w(TAG, message);
 			}
 			Log.d(TAG, "key = " + OUR_BUGSENSE_API_KEY);
 		} catch (Exception e) {
