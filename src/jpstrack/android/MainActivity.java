@@ -1,6 +1,7 @@
 package jpstrack.android;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -65,6 +66,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	
 	// Load a Props file from the APK zipped filesystem, extract our app key from that.
 	public void loadKeys() {
+		InputStream is = null;
 		try {
 			Resources resources = getResources();
 			if (resources == null) {
@@ -74,7 +76,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			// If this line won't compile, create an empty file
 			// with the exact (but stupid) name res/raw/keys_props.properties 
 			// And do Project->Clean, all the usual stuff...
-			InputStream is = resources.openRawResource(R.raw.keys_props);
+			is = resources.openRawResource(R.raw.keys_props);
 			if (is == null) {
 				throw new ExceptionInInitializerError("getResources().openRawResource() returned null");
 			}
@@ -84,12 +86,21 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			if (OUR_BUGSENSE_API_KEY == null) {
 				String message = "Could not find BUGSENSE_API_KEY in props";
 				Log.w(TAG, message);
+				return;
 			}
 			Log.d(TAG, "key = " + OUR_BUGSENSE_API_KEY);
 		} catch (Exception e) {
 			String message = "Error loading properties: " + e;
 			Log.d(TAG, message);
 			throw new ExceptionInInitializerError(message);
+		} finally {
+			if (is != null) {
+				try {
+					is.close();
+				} catch (IOException e) {
+					// What a useless exception
+				}
+			}
 		}
 	}
 
