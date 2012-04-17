@@ -42,17 +42,14 @@ public class OnboardingActivity extends Activity implements OnClickListener {
 			// startActivity(new Intent(this, Main.class));
 			finish();	// so "back" returns to main
 			break;
-		case R.id.videoButton:
-			Log.d(TAG, "Video Tutorial");
-			MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.jpstrack_tutorial);
-			if (mediaPlayer != null) {
-				mediaPlayer.start();
-			}
-			finish();
-			break;
 		case R.id.webButton:
 			Log.d(TAG, "Web Tutorial");
 			startActivity(new Intent(this, ShowWelcomePage.class));
+			finish();
+			break;
+		case R.id.videoButton:
+			Log.d(TAG, "Video Tutorial");
+			startActivity(new Intent(this, ShowWelcomeVideo.class));
 			finish();
 			break;
 		default:
