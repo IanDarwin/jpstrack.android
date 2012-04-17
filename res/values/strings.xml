@@ -41,10 +41,21 @@
     <string name="picture_created_but_missing">Camera Intent returned OK but image not created!</string>
 
     <!-- Menu -->
-    <string name="settings_label">Settings...</string>
+    <string name="settings_label">Settings…</string>
     <string name="settings_name">JPSTrack Settings</string>
     <string name="settings_shortname">Settings</string>
     <string name="settings_accel">s</string>
+    
+    <!-- Onboarding -->
+    <string name="welcome_name">Welcome to JPSTrack</string>
+    <string name="welcome_text">Welcome to JPSTrack!
+        You can watch a little video about this app, or see a brief web-page introduction,
+        or skip the whole "introduction" thing and go straight into the app. It\'s your choice!
+        </string>
+     <string name="skip_smarty">Skip, I can figure it out</string>
+     <string name="skip_done_that">Skip, I\'ve used this app</string>
+     <string name="watch_page">View Web Intro</string>
+     <string name="watch_video">Watch Intro Movie</string>
 
     <!--  About box -->
     <string name="about_name">About JPSTrack</string>
