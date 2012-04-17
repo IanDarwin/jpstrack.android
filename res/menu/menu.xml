@@ -7,7 +7,7 @@
 	<item android:id="@+id/rerun_intro"
 		android_title="@string/rerun_intro"
 		android:titleCondensed="@string/rerun_intro_shortname"
-		android:icon="@android:drawable/ic_menu_info_details"/>
+		android:icon="@android:drawable/ic_menu_help"/>
 	<item android:id="@+id/about"
 		android_title="@string/about_name"
 		android:titleCondensed="@string/about_shortname"

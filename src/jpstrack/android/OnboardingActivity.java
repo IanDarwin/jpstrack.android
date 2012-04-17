@@ -2,13 +2,17 @@ package jpstrack.android;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 
 public class OnboardingActivity extends Activity implements OnClickListener {
+	private static String TAG = Main.TAG + ".Onboarding";
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -34,14 +38,20 @@ public class OnboardingActivity extends Activity implements OnClickListener {
 		switch(id) {
 		case R.id.skipButton1:
 		case R.id.skipButton2:
+			Log.d(TAG, "Skip Tutorial");
 			// startActivity(new Intent(this, Main.class));
 			finish();	// so "back" returns to main
 			break;
 		case R.id.videoButton:
-			startActivity(new Intent(this, ShowWelcomeVideo.class));
+			Log.d(TAG, "Video Tutorial");
+			MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.jpstrack_tutorial);
+			if (mediaPlayer != null) {
+				mediaPlayer.start();
+			}
 			finish();
 			break;
 		case R.id.webButton:
+			Log.d(TAG, "Web Tutorial");
 			startActivity(new Intent(this, ShowWelcomePage.class));
 			finish();
 			break;
