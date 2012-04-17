@@ -27,13 +27,15 @@ public class OnboardingActivity extends Activity implements OnClickListener {
 		case R.id.skipButton1:
 		case R.id.skipButton2:
 			// startActivity(new Intent(this, Main.class));
-			finish();	// returns to main?
+			finish();	// so "back" returns to main
 			break;
 		case R.id.videoButton:
 			startActivity(new Intent(this, ShowWelcomeVideo.class));
+			finish();
 			break;
 		case R.id.webButton:
 			startActivity(new Intent(this, ShowWelcomePage.class));
+			finish();
 			break;
 		default:
 		}

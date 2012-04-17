@@ -16,6 +16,7 @@
     <string name="start_button_label">Start</string>
     <string name="pause_button_label">Pause</string>
     <string name="pause_button_resume_label">Resume</string>
+    <string name="done_button_label">Done</string>
     <string name="stop_button_label">Stop</string>
     
     <!-- General Errors -->
@@ -52,10 +53,10 @@
         You can watch a little video about this app, or see a brief web-page introduction,
         or skip the whole "introduction" thing and go straight into the app. It\'s your choice!
         </string>
-     <string name="skip_smarty">Skip, I can figure it out</string>
+     <string name="skip_smarty">Skip, let me figure it out</string>
      <string name="skip_done_that">Skip, I\'ve used this app</string>
      <string name="watch_page">View Web Intro</string>
-     <string name="watch_video">Watch Intro Movie</string>
+     <string name="watch_video">Watch Intro Video</string>
 
     <!--  About box -->
     <string name="about_name">About JPSTrack</string>

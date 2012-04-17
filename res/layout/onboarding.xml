@@ -25,17 +25,18 @@
         />
     
     <Button
+        android:id="@+id/webButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/watch_page"
+        />
+
+    <Button
         android:id="@+id/videoButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/watch_video" 
         />
     
-    <Button
-        android:id="@+id/webButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/watch_page"
-        />
 
 </LinearLayout>
