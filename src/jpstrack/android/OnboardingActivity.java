@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
 
 public class OnboardingActivity extends Activity implements OnClickListener {
@@ -12,10 +13,17 @@ public class OnboardingActivity extends Activity implements OnClickListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.onboarding);
+		boolean skipSkip = getIntent().getBooleanExtra(Main.SKIP_SKIP, false);
+		if (skipSkip) {
+			ViewGroup layout = (ViewGroup) findViewById(R.id.onboardLayout);
+			layout.removeView(findViewById(R.id.skipButton1));
+			layout.removeView(findViewById(R.id.skipButton2));
+		}
 		for (int id : new int[]{R.id.skipButton1, R.id.skipButton2, R.id.videoButton, R.id.webButton}) {
-			System.out.println(id);
 			Button b = (Button)findViewById(id);
-			b.setOnClickListener(this);
+			if (b != null) {
+				b.setOnClickListener(this);
+			}
 		}
 	}
 

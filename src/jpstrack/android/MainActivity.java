@@ -48,6 +48,8 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		"out of service",
 		"down temporarily", 
 		"available" };
+	
+	public static final String SKIP_SKIP = "DONT_SHOW_SKIP";
 
 	private LocationManager mgr;
 	private static File dataDir;
@@ -452,6 +454,11 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		switch (item.getItemId()) {
 		case R.id.settings:
 			startActivity(new Intent(this, SettingsActivity.class));
+			return true;
+		case R.id.rerun_intro:
+			Intent intent = new Intent(this, OnboardingActivity.class);
+			intent.putExtra(SKIP_SKIP, true);
+			startActivity(intent);
 			return true;
 		case R.id.about:
 			startActivity(new Intent(this, AboutActivity.class));
