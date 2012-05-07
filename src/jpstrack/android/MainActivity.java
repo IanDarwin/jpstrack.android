@@ -121,7 +121,9 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		
 		// set up BugSense bug tracking
 		loadKeys();
-		BugSenseHandler.setup(this, OUR_BUGSENSE_API_KEY);
+		if (OUR_BUGSENSE_API_KEY != null) {
+			BugSenseHandler.setup(this, OUR_BUGSENSE_API_KEY);
+		}
 
 		saving = false;
 		paused = false;
