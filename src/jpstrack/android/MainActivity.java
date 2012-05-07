@@ -80,7 +80,8 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			// And do Project->Clean, all the usual stuff...
 			is = resources.openRawResource(R.raw.keys_props);
 			if (is == null) {
-				throw new ExceptionInInitializerError("getResources().openRawResource() returned null");
+				Log.w(TAG, "loadKeys: getResources().openRawResource() returned null");
+				return;
 			}
 			Properties p = new Properties();
 			p.load(is);
