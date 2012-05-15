@@ -34,6 +34,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bugsense.trace.BugSenseHandler;
+import com.immersion.uhl.Launcher;
 
 public class Main extends Activity implements GpsStatus.Listener, LocationListener, OnClickListener {
 
@@ -65,6 +66,8 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	private BroadcastReceiver extStorageRcvr;
 
 	private String OUR_BUGSENSE_API_KEY;
+	
+	private Launcher launcher;	// UHL Haptic Launcher
 	
 	// Load a Props file from the APK zipped filesystem, extract our app key from that.
 	public void loadKeys() {
@@ -112,14 +115,15 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		Log.d(TAG, "onCreate()");
 		super.onCreate(savedInstanceState);
 		
-		// Until the onboarding is ready, people who download the app
-		// will be assumed to have figured it out so we don't later burden 
-		// experienced users with an introductory video...
-		SettingsActivity.setSeenWelcome(this, true);
-		
 		// Start the welcome video if they haven't seen it yet.
 		if (!SettingsActivity.hasSeenWelcome(this)) {
 			startActivity(new Intent(this, OnboardingActivity.class));
+		}
+		
+		try {
+			launcher = new Launcher(this);
+		} catch (RuntimeException e) {
+			Log.d(TAG, "Create Haptic Launcher Failed");
 		}
 		setContentView(R.layout.main);
 		
@@ -275,6 +279,9 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		if (!saving || paused) {
 			stopReceiving();
 		}
+		if (launcher != null) {
+			launcher.stop();
+		}
 	}
 
 	@Override
@@ -306,6 +313,13 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 
 	@Override
 	public void onClick(View v) {
+		try {
+			if (launcher != null) {
+				launcher.play(Launcher.BOUNCE_100);
+			}
+		} catch (RuntimeException e) {
+			// don't care
+		}
 		switch (v.getId()) {
 		case R.id.start_button:
 			startButton.setEnabled(false);
