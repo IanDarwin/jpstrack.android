@@ -111,6 +111,13 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	public void onCreate(Bundle savedInstanceState) {
 		Log.d(TAG, "onCreate()");
 		super.onCreate(savedInstanceState);
+		
+		// Until the onboarding is ready, people who download the app
+		// will be assumed to have figured it out so we don't later burden 
+		// experienced users with an introductory video...
+		SettingsActivity.setSeenWelcome(this, true);
+		
+		// Start the welcome video if they haven't seen it yet.
 		if (!SettingsActivity.hasSeenWelcome(this)) {
 			startActivity(new Intent(this, OnboardingActivity.class));
 		}
