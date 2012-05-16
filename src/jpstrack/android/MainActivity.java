@@ -223,6 +223,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			if (saving) {
 				fileNameLabel.setText(trackerIO.getFileName());
 			}
+			launcher = old.launcher;
 			return;
 		} else {		
 			// I/O Helper
