@@ -16,7 +16,8 @@ public class ShowWelcomeVideo extends Activity {
 		setContentView(R.layout.onboard_video);
 		VideoView vw = (VideoView) findViewById(R.id.onboard_videoView);
 		// This URL fetches a file from the res/raw folder.
-		String VIDEO_URL = "android.resource://" + getPackageName() +  "/" + R.raw.welcomevideo;
+		String VIDEO_URL = 
+				"android.resource://" + getPackageName() +  "/" + R.raw.welcomevideo;
 		vw.setVideoURI(Uri.parse(VIDEO_URL));
 		vw.setMediaController(new MediaController(this));
 		vw.start();
