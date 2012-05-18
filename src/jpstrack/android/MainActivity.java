@@ -384,16 +384,17 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 				// Use an Intent to get the Camera app going.
 				Intent imageIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 				// Set up file to save image into.
-				imageFile = new File(Main.getDataDir(), FileNameUtils
-						.getNextFilename("jpg"));
+				imageFile = new File(Main.getDataDir(), 
+					FileNameUtils.getNextFilename("jpg"));
 				imageIntent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
-				imageIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(imageFile));
+				imageIntent.putExtra(MediaStore.EXTRA_OUTPUT, 
+					Uri.fromFile(imageFile));
 				// And away we go!
 				startActivityForResult(imageIntent, ACTION_TAKE_PICTURE);
 			} catch (Exception e) {
 				Toast.makeText(this,
-						getString(R.string.cant_start_activity) + ": " + e,
-						Toast.LENGTH_LONG).show();
+					getString(R.string.cant_start_activity) + ": " + e,
+					Toast.LENGTH_LONG).show();
 			}
 			break;
 		default:
