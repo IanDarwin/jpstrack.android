@@ -3,6 +3,7 @@ package jpstrack.android;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.util.Properties;
 
 import jpstrack.fileio.FileNameUtils;
@@ -21,6 +22,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -114,17 +116,24 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	public void onCreate(Bundle savedInstanceState) {
 		Log.d(TAG, "onCreate()");
 		super.onCreate(savedInstanceState);
+		if (isDebug()) {
+			setStrictMode();
+		}
 		
 		// Start the welcome video if they haven't seen it yet.
 		if (!SettingsActivity.hasSeenWelcome(this)) {
 			startActivity(new Intent(this, OnboardingActivity.class));
 		}
 		
-		try {
-			launcher = new Launcher(this);
-		} catch (RuntimeException e) {
-			Log.d(TAG, "Create Haptic Launcher Failed");
-		}
+		ThreadUtils.execute(new Runnable() {
+			public void run() {
+				try {
+					launcher = new Launcher(Main.this);
+				} catch (RuntimeException e) {
+					Log.d(TAG, "Create Haptic Launcher Failed");
+				}
+			}
+		});
 		setContentView(R.layout.main);
 		
 		View main = findViewById(R.id.mainView);
@@ -158,24 +167,29 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		registerReceiver(extStorageRcvr, iFilter);
 
 		// Set up the save location (gpx files, text notes, etc.)
-		String preferredSaveLocation =
-				PreferenceManager.getDefaultSharedPreferences(this).getString(SettingsActivity.OPTION_DIR, null);
-		if (preferredSaveLocation != null && !"".equals(preferredSaveLocation)) {
-			// We've been run before
-			dataDir = new File(preferredSaveLocation);
-		} else {
-			// First run on this device, probably.
-			final File externalStorageDirectory = Environment.getExternalStorageDirectory();
-			Log.d(TAG, "ExternalStorageDirectory = " + externalStorageDirectory);
-			dataDir = new File(externalStorageDirectory, SettingsActivity.DIRECTORY_NAME);
-		}
-		Log.d(TAG, "Using Data Directory " + dataDir);
-		dataDir.mkdirs();	// just in case
-		if (!dataDir.exists()) {
-			final String message = "Warning: Directory " + dataDir + " not created";
-			Log.d(TAG, message);
-			Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-		}
+		ThreadUtils.executeAndWait(new Runnable() {
+			public void run() {				
+				String preferredSaveLocation =
+						PreferenceManager.getDefaultSharedPreferences(Main.this).getString(SettingsActivity.OPTION_DIR, null);
+				if (preferredSaveLocation != null && !"".equals(preferredSaveLocation)) {
+					// We've been run before
+					dataDir = new File(preferredSaveLocation);
+				} else {
+					// First run on this device, probably.
+					final File externalStorageDirectory = Environment.getExternalStorageDirectory();
+					Log.d(TAG, "ExternalStorageDirectory = " + externalStorageDirectory);
+					dataDir = new File(externalStorageDirectory, SettingsActivity.DIRECTORY_NAME);
+				}
+				Log.d(TAG, "Using Data Directory " + dataDir);
+				dataDir.mkdirs();	// just in case
+				if (!dataDir.exists()) {
+					final String message = "Warning: Directory " + dataDir + " not created";
+					Log.d(TAG, message);
+					Looper.prepare();
+					Toast.makeText(Main.this, message, Toast.LENGTH_LONG).show();
+				}
+			}
+		});
 		
 		output = (TextView) findViewById(R.id.output);
 		
@@ -231,6 +245,22 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		}
 	}
 	
+	private boolean isDebug() {
+		return true;
+	}
+	
+	public void setStrictMode() {
+		// StrictMode.enableDefaults();
+		try {
+			Class<?> c = Class.forName("android.os.StrictMode");
+			Method m = c.getMethod("enableDefaults", (Class<?>[])null);
+			m.invoke(null, (Object[])null);
+		} catch (Exception e) {
+			Log.d(TAG, "Unable to set StrictMode: " + e);
+			return;
+		}
+	}
+
 	@Override
 	protected void onDestroy() {
 		Log.d(TAG, "I'm being destroyed!");
@@ -312,6 +342,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		}
 	}
 
+	/** Remember - do not block the GUI thread, kiddies! */
 	@Override
 	public void onClick(View v) {
 		try {
@@ -329,7 +360,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 				trackerIO.setFileName(FileNameUtils.getNextFilename());
 				File f = trackerIO.startFile();
 				fileNameLabel.setText(f.getName());
-				startReceiving();
+				startReceiving();		// Disk IO is done on the service's thread.
 				logToScreen("Starting File Updates");
 			} catch (RuntimeException e) {
 				Toast.makeText(this, "Could not save: " + e, Toast.LENGTH_LONG).show();

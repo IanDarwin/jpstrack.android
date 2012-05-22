@@ -25,14 +25,36 @@ public class SettingsActivity extends PreferenceActivity {
 		return PreferenceManager.getDefaultSharedPreferences(context).getString(OPTION_DIR, null);
 	}
 	
-	public static boolean hasSeenWelcome(Context context) {
-		return PreferenceManager.getDefaultSharedPreferences(context).
-			getBoolean(OPTION_SEEN_WELCOME, false);
+	public static boolean hasSeenWelcome(final Context context) {
+		class Meh extends Thread implements Runnable {
+			boolean seen;
+			@Override
+			public void run() {
+				seen = PreferenceManager.getDefaultSharedPreferences(context).
+						getBoolean(OPTION_SEEN_WELCOME, false);
+			}
+			public boolean getSeen() {
+				return seen;
+			}
+		}
+		Meh t = new Meh();
+		t.start();
+		try {
+			t.join();
+		} catch (InterruptedException e) {
+			throw new RuntimeException("Interrupted? DOI! " + e);
+		}
+		return t.getSeen();
 	}
 
-	public static void setSeenWelcome(Context context, boolean seenWelcome) {
-		PreferenceManager.getDefaultSharedPreferences(context).
-			edit().putBoolean(OPTION_SEEN_WELCOME, seenWelcome).commit();
+	public static void setSeenWelcome(final Context context, final boolean seenWelcome) {
+		ThreadUtils.execute(new Runnable() {
+			@Override
+			public void run() {
+				PreferenceManager.getDefaultSharedPreferences(context).
+				edit().putBoolean(OPTION_SEEN_WELCOME, seenWelcome).commit();
+			}			
+		});
 	}
 
 }
