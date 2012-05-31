@@ -120,7 +120,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			setStrictMode();
 		}
 		
-		// Start the welcome video if they haven't seen it yet.
+		// Start the welcome page or video if they haven't seen it yet.
 		if (!SettingsActivity.hasSeenWelcome(this)) {
 			startActivity(new Intent(this, OnboardingActivity.class));
 		}
@@ -128,6 +128,8 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		ThreadUtils.execute(new Runnable() {
 			public void run() {
 				try {
+					// Start the UHL launcher for giving haptic feedback
+					// Not fatal if this fails
 					launcher = new Launcher(Main.this);
 				} catch (RuntimeException e) {
 					Log.d(TAG, "Create Haptic Launcher Failed");
