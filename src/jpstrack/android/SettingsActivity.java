@@ -38,12 +38,7 @@ public class SettingsActivity extends PreferenceActivity {
 			}
 		}
 		Meh t = new Meh();
-		t.start();
-		try {
-			t.join();
-		} catch (InterruptedException e) {
-			throw new RuntimeException("Interrupted? DOI! " + e);
-		}
+		ThreadUtils.executeAndWait(t);
 		return t.getSeen();
 	}
 
