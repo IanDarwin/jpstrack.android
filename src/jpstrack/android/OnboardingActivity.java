@@ -2,7 +2,7 @@ package jpstrack.android;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -53,7 +53,10 @@ public class OnboardingActivity extends Activity implements OnClickListener {
 			break;
 		case R.id.videoButton:
 			Log.d(TAG, "Video Tutorial");
-			startActivity(new Intent(this, ShowWelcomeVideo.class));
+			final String YT_VIDEO_ID = "opZ69P-0Jbc";			// XXX get from Properties
+			Uri uri = Uri.parse("vnd.youtube:" + YT_VIDEO_ID);
+		    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+		    startActivity(intent);
 			finish(); // Ditto
 			break;
 		default:
