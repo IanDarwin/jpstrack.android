@@ -7,7 +7,7 @@ import android.preference.PreferenceManager;
 
 public class SettingsActivity extends PreferenceActivity {
 
-	static final String DIRECTORY_NAME = "jpstrack.android";
+	static final String DIRECTORY_NAME = "jpstrack";
 	
 	static final String OPTION_DIR = "dir";
 	static final String OPTION_SEEN_WELCOME = "seen_welcome";
