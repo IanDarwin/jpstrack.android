@@ -29,8 +29,9 @@ public class OnboardingActivity extends Activity implements OnClickListener {
 		
 		// For each button that's still around, add us as a click listener
 		for (int id : new int[]{R.id.skipButton1, R.id.skipButton2, R.id.videoButton, R.id.webButton}) {
-			Button b = (Button)findViewById(id);
-			if (b != null) {
+			final View view = findViewById(id);
+			if (view != null && view instanceof Button) {
+				Button b = (Button)view;
 				b.setOnClickListener(this);
 			}
 		}
