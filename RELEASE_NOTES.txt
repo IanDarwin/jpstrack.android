@@ -1,4 +1,4 @@
-This is a late Alpha/Early Beta release. Note the following:
+This is a Beta release. Please note the following:
 
 - We try to ensure that the GPX file is closed correctly, but this
   does not always happen. If your destination app cannot read the file,
@@ -19,16 +19,16 @@ This is a late Alpha/Early Beta release. Note the following:
   
   Hay una traduccion muy cruda para Espanol, pero se puede morir
   de reir si intenta usarlo. No pagamos las cuentas funerales que
-  resultan.
+  resultan, ni ningunas otras consecuencias.
 
-- Sound files are saved as standard MP3's, but the CODEC used
+- Voice Note files are saved as standard MP3's, but the CODEC used
   is not always available on the desktop.
 
 - The footprint 'tracks' on the icon look more like missiles
   than the intended footprints. Somebody with a bit more
   artist-fu should work on them.
 
-If you find any new ways to crash it, please email.
+If you find any new ways to crash it, please email or use this:
 
 http://www.darwinsys.com/contact.jsp
 
