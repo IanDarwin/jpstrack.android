@@ -17,11 +17,12 @@
     <string name="start_button_label">Empezar</string>
     <string name="pause_button_label">Pausar</string>
     <string name="pause_button_resume_label">Continuar</string>
+    <string name="done_button_label">Completa</string>
     <string name="stop_button_label">Pare</string>
     
     <!-- General Errors -->
     <string name="error">Error</string>
-    <string name="cant_start_act">No se puede empecer la actividad</string>
+    <string name="cant_start_activity">No se puede empecer la actividad</string>
     
 	<!-- Voicenote -->
     <string name="voicenote_button_label">Nota vocal</string>
@@ -46,6 +47,20 @@
     <string name="settings_name">Preferencias JPSTrack</string>
     <string name="settings_shortname">Preferencias</string>
     <string name="settings_accel">s</string>
+    <string name="rerun_intro">Introduccion</string>
+    <string name="rerun_intro_shortname">Intro</string>
+    
+    <!-- Onboarding -->
+    <string name="welcome_name">Bienvenidos a JPSTrack</string>
+    <string name="welcome_text">Bienvenidos a JPSTrack!
+        You can watch a little video about this app, or see a brief web-page introduction,
+        or skip the whole "introduction" thing and go straight into the app. It\'s your choice!
+        </string>
+     <string name="skip_smarty">Skip, let me figure it out</string>
+     <string name="skip_done_that">Skip, I\'ve used this app</string>
+     <string name="watch_page">View Web Intro</string>
+     <string name="watch_video">Watch Intro Video</string>
+    
 
     <!--  About box -->
     <string name="about_name">Sobre JPSTrack</string>
