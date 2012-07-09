@@ -21,3 +21,13 @@ Done button in About screen.
 
 Externalize rest of strings.
 	Do rest of _es translation, including Spanish characters.
+
+JPSTrack is a program for saving tracks of where you have travelled
+with your GPS-enabled mobile device. It is mainly intended for
+those who wish to contribute map data to OpenStreetMap.org,
+the free editable map of the world. Note that it is not
+a "navigation" app; it will not show you maps and it will not
+help you find your way! It can only record where you have been.
+There are lots of other navigation apps in the Market, please use
+one of them if you want to get around.
+

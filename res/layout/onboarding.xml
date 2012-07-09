@@ -35,18 +35,11 @@
         android:text="@string/watch_page"
         />
 
-    <!-- 
     <Button
         android:id="@+id/videoButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="false"
         android:text="@string/watch_video" />
-     -->
-     <TextView
-        android:id="@+id/videoButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Video not available, sorry"/>
 
 </LinearLayout>
