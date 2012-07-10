@@ -10,7 +10,8 @@ public class SettingsActivity extends PreferenceActivity {
 	static final String DIRECTORY_NAME = "jpstrack";
 	
 	static final String OPTION_DIR = "dir";
-	static final String OPTION_SEEN_WELCOME = "seen_welcome";
+	static final String OPTION_SEEN_EULA = "accepted_eula";	// NOT IN GUI FOR OBVIOUS REASONS
+	static final String OPTION_SEEN_WELCOME = "seen_welcome"; // Ditto
 	//static final String OPTION_FORMAT = "format";
 	//static final String OPTION_OSM_USER = "osm_username";
 	//static final String OPTION_OSM_PASS = "osm_password";
@@ -25,31 +26,61 @@ public class SettingsActivity extends PreferenceActivity {
 		return PreferenceManager.getDefaultSharedPreferences(context).getString(OPTION_DIR, null);
 	}
 	
-	public static boolean hasSeenWelcome(final Context context) {
-		class Meh extends Thread implements Runnable {
-			boolean seen;
-			@Override
-			public void run() {
-				seen = PreferenceManager.getDefaultSharedPreferences(context).
-						getBoolean(OPTION_SEEN_WELCOME, false);
-			}
-			public boolean getSeen() {
-				return seen;
-			}
+	private static class Getter extends Thread {
+		public Getter(Context context, String optionName) {
+			super();
+			this.context = context;
+			this.optionName = optionName;
 		}
-		Meh t = new Meh();
+		Context context;
+		String optionName;
+		boolean seen;
+		
+		@Override
+		public void run() {
+			seen = PreferenceManager.getDefaultSharedPreferences(context).
+					getBoolean(optionName, false);
+		}
+		public boolean getSeen() {
+			return seen;
+		}
+	}
+	
+	public static boolean hasSeenEula(final Context context) {		
+		Getter t = new Getter(context, OPTION_SEEN_EULA);
 		ThreadUtils.executeAndWait(t);
 		return t.getSeen();
 	}
+	
+	public static boolean hasSeenWelcome(final Context context) {		
+		Getter t = new Getter(context, OPTION_SEEN_WELCOME);
+		ThreadUtils.executeAndWait(t);
+		return t.getSeen();
+	}
+	
+	private static class Setter extends Thread {
+		public Setter(Context context, String optionName, boolean seenValue) {
+			super();
+			this.context = context;
+			this.optionName = optionName;
+			this.seenValue = seenValue;
+		}
+		Context context;
+		String optionName;
+		boolean seenValue;
+		@Override
+		public void run() {
+			PreferenceManager.getDefaultSharedPreferences(context).
+			edit().putBoolean(optionName, seenValue).commit();
+		}
+	}
 
-	public static void setSeenWelcome(final Context context, final boolean seenWelcome) {
-		ThreadUtils.execute(new Runnable() {
-			@Override
-			public void run() {
-				PreferenceManager.getDefaultSharedPreferences(context).
-				edit().putBoolean(OPTION_SEEN_WELCOME, seenWelcome).commit();
-			}			
-		});
+	public static void setSeenEula(final Context context, final boolean seenValue) {
+		ThreadUtils.execute(new Setter(context, OPTION_SEEN_EULA, seenValue));
+	}
+	
+	public static void setSeenWelcome(final Context context, final boolean seenValue) {
+		ThreadUtils.execute(new Setter(context, OPTION_SEEN_WELCOME, seenValue));
 	}
 
 }

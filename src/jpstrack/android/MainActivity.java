@@ -44,6 +44,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	
 	private static final int ACTION_TAKE_PICTURE = 1;
 	private static final int ACTION_TAKE_SOUNDBITE = 2;
+	private static final int ACTION_ACCEPT_EULA = 3;
 	private static final int MIN_METRES = 1;
 	private static final int MIN_SECONDS = 5;
 	private final String PROVIDER = LocationManager.GPS_PROVIDER;
@@ -120,6 +121,11 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			setStrictMode();
 		}
 		
+		// Show the EULA agreed to it it yet.
+		if (!SettingsActivity.hasSeenEula(this)) {
+			startActivityForResult(new Intent(this, EulaActivity.class), ACTION_ACCEPT_EULA);
+		}
+				
 		// Start the welcome page or video if they haven't seen it yet.
 		if (!SettingsActivity.hasSeenWelcome(this)) {
 			startActivity(new Intent(this, OnboardingActivity.class));
@@ -440,6 +446,11 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
+		case ACTION_ACCEPT_EULA:
+			switch (resultCode) {
+			case Activity.RESULT_OK:
+				SettingsActivity.setSeenEula(this, true);
+			}
 		case ACTION_TAKE_PICTURE:
 			switch (resultCode) {
 			case Activity.RESULT_OK:
