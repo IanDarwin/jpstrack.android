@@ -6,6 +6,9 @@
     <string name="dir_title">Data Directory</string>
     <string name="dir_summary">Locacion para filas GPX, imagenes, notaciones, &amp;c.</string>
     
+    <string name="accept_eula">I accept the EULA terms.</string>
+    <string name="reject_eula">I do not accept the EULA terms.</string>
+    
     <string name="last_known_location_">La ultima locacion =</string>
     <string name="preferred_provider_is">Provedador preferida esta: </string>
     <string name="cannot_get_gps_service">No funcione la servicia GPS</string>
