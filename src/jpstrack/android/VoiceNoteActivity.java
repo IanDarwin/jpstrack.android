@@ -92,7 +92,7 @@ public class VoiceNoteActivity extends Activity implements OnClickListener {
 		} catch (Exception e) {
 			final String message = "Could not create file:" + e;
 			Log.e(Main.TAG, message);
-			Toast.makeText(this, message, Toast.LENGTH_LONG);
+			Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 			this.finish();
 		}
 	}
