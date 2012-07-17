@@ -12,6 +12,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
@@ -71,47 +72,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	private String OUR_BUGSENSE_API_KEY;
 	
 	private Launcher launcher;	// UHL Haptic Launcher
-	
-	// Load a Props file from the APK zipped filesystem, extract our app key from that.
-	public void loadKeys() {
-		InputStream is = null;
-		try {
-			Resources resources = getResources();
-			if (resources == null) {
-				throw new ExceptionInInitializerError("getResources() returned null");
-			}
-			
-			// If this line won't compile, create an empty file
-			// with the exact (but stupid) name res/raw/keys_props.properties 
-			// And do Project->Clean, all the usual stuff...
-			is = resources.openRawResource(R.raw.keys_props);
-			if (is == null) {
-				Log.w(TAG, "loadKeys: getResources().openRawResource() returned null");
-				return;
-			}
-			Properties p = new Properties();
-			p.load(is);
-			OUR_BUGSENSE_API_KEY = p.getProperty("BUGSENSE_API_KEY");
-			if (OUR_BUGSENSE_API_KEY == null) {
-				String message = "Could not find BUGSENSE_API_KEY in props";
-				Log.w(TAG, message);
-				return;
-			}
-			Log.d(TAG, "key = " + OUR_BUGSENSE_API_KEY);
-		} catch (Exception e) {
-			String message = "Error loading properties: " + e;
-			Log.d(TAG, message);
-			throw new ExceptionInInitializerError(message);
-		} finally {
-			if (is != null) {
-				try {
-					is.close();
-				} catch (IOException e) {
-					// What a useless exception
-				}
-			}
-		}
-	}
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -121,9 +82,28 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			setStrictMode();
 		}
 		
-		// Show the EULA agreed to it it yet.
+		// Show the EULA if they've not yet agreed to it it.
 		if (!SettingsActivity.hasSeenEula(this)) {
-			startActivityForResult(new Intent(this, EulaActivity.class), ACTION_ACCEPT_EULA);
+			final AlertDialog alertDialog = new AlertDialog.Builder(this)
+					.setTitle(R.string.terms)
+					.setMessage(R.string.eula)
+					.setPositiveButton(R.string.accept_eula,
+							new AlertDialog.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int which) {
+									Log.d(Main.TAG, "User accepted EULA!");
+									SettingsActivity.setSeenEula(Main.this, true);
+									finish();
+								}
+							})
+					.setNegativeButton(R.string.reject_eula,
+							new AlertDialog.OnClickListener() {
+								public void onClick(DialogInterface dialog, int which) {
+									Log.d(Main.TAG, "User REJECTED EULA!");	
+									System.exit(-1);
+								}
+							}).create();
+			alertDialog.show();
 		}
 				
 		// Start the welcome page or video if they haven't seen it yet.
@@ -252,6 +232,50 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			trackerIO = new GPSFileSaver(dataDir, FileNameUtils.getNextFilename());
 		}
 	}
+	
+	/**
+	 *  Load a Props file from the APK zipped filesystem, extract our app key from that.
+	 */
+	public void loadKeys() {
+		InputStream is = null;
+		try {
+			Resources resources = getResources();
+			if (resources == null) {
+				throw new ExceptionInInitializerError("getResources() returned null");
+			}
+			
+			// If this line won't compile, create an empty file
+			// with the exact (but stupid) name res/raw/keys_props.properties 
+			// And do Project->Clean, all the usual stuff...
+			is = resources.openRawResource(R.raw.keys_props);
+			if (is == null) {
+				Log.w(TAG, "loadKeys: getResources().openRawResource() returned null");
+				return;
+			}
+			Properties p = new Properties();
+			p.load(is);
+			OUR_BUGSENSE_API_KEY = p.getProperty("BUGSENSE_API_KEY");
+			if (OUR_BUGSENSE_API_KEY == null) {
+				String message = "Could not find BUGSENSE_API_KEY in props";
+				Log.w(TAG, message);
+				return;
+			}
+			Log.d(TAG, "key = " + OUR_BUGSENSE_API_KEY);
+		} catch (Exception e) {
+			String message = "Error loading properties: " + e;
+			Log.d(TAG, message);
+			throw new ExceptionInInitializerError(message);
+		} finally {
+			if (is != null) {
+				try {
+					is.close();
+				} catch (IOException e) {
+					// What a useless exception
+				}
+			}
+		}
+	}
+
 	
 	private boolean isDebug() {
 		return true;
@@ -446,11 +470,6 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
-		case ACTION_ACCEPT_EULA:
-			switch (resultCode) {
-			case Activity.RESULT_OK:
-				SettingsActivity.setSeenEula(this, true);
-			}
 		case ACTION_TAKE_PICTURE:
 			switch (resultCode) {
 			case Activity.RESULT_OK:
