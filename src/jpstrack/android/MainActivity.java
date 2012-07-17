@@ -10,6 +10,7 @@ import jpstrack.fileio.FileNameUtils;
 import jpstrack.fileio.GPSFileSaver;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -45,7 +46,10 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	
 	private static final int ACTION_TAKE_PICTURE = 1;
 	private static final int ACTION_TAKE_SOUNDBITE = 2;
-	private static final int ACTION_ACCEPT_EULA = 3;
+	
+	private static final int DIALOG_EULA = 0;
+	private static final int DIALOG_ABOUT = 1;
+	
 	private static final int MIN_METRES = 1;
 	private static final int MIN_SECONDS = 5;
 	private final String PROVIDER = LocationManager.GPS_PROVIDER;
@@ -55,6 +59,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		"available" };
 	
 	public static final String SKIP_SKIP = "DONT_SHOW_SKIP";
+
 
 	private LocationManager mgr;
 	private static File dataDir;
@@ -84,26 +89,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		
 		// Show the EULA if they've not yet agreed to it it.
 		if (!SettingsActivity.hasSeenEula(this)) {
-			final AlertDialog alertDialog = new AlertDialog.Builder(this)
-					.setTitle(R.string.terms)
-					.setMessage(R.string.eula)
-					.setPositiveButton(R.string.accept_eula,
-							new AlertDialog.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int which) {
-									Log.d(Main.TAG, "User accepted EULA!");
-									SettingsActivity.setSeenEula(Main.this, true);
-									finish();
-								}
-							})
-					.setNegativeButton(R.string.reject_eula,
-							new AlertDialog.OnClickListener() {
-								public void onClick(DialogInterface dialog, int which) {
-									Log.d(Main.TAG, "User REJECTED EULA!");	
-									System.exit(-1);
-								}
-							}).create();
-			alertDialog.show();
+			showDialog(DIALOG_EULA);
 		}
 				
 		// Start the welcome page or video if they haven't seen it yet.
@@ -276,7 +262,50 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		}
 	}
 
-	
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		switch (id) {
+		case DIALOG_EULA:
+			final AlertDialog alertDialog = new AlertDialog.Builder(this)
+			.setCancelable(false)
+			.setTitle(R.string.terms)
+			.setMessage(R.string.eula)
+			.setPositiveButton(R.string.accept_eula,
+					new AlertDialog.OnClickListener() {
+						public void onClick(DialogInterface dialog,
+								int which) {
+							Log.d(Main.TAG, "User accepted EULA!");
+							SettingsActivity.setSeenEula(Main.this, true);
+						}
+					})
+			.setNegativeButton(R.string.reject_eula,
+					new AlertDialog.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							Log.d(Main.TAG, "User REJECTED EULA!");	
+							System.exit(-1);
+						}
+					})
+			.create();
+			return alertDialog;
+		case DIALOG_ABOUT:
+			final AlertDialog aboutDialog = new AlertDialog.Builder(this)
+			.setCancelable(true)
+			.setTitle(R.string.about_name)
+			.setMessage(R.string.about_text)
+			.setPositiveButton(R.string.about_done_button_label,
+					new AlertDialog.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							Log.d(Main.TAG, "User accepted EULA!");
+							SettingsActivity.setSeenEula(Main.this, true);
+							finish();
+						}
+			}).create();
+			return aboutDialog;
+		default:
+				return null;
+		}
+	}
+
 	private boolean isDebug() {
 		return true;
 	}
@@ -550,7 +579,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			startActivity(intent);
 			return true;
 		case R.id.about:
-			startActivity(new Intent(this, AboutActivity.class));
+			showDialog(DIALOG_ABOUT);
 			return true;
 		}
 		return false;
