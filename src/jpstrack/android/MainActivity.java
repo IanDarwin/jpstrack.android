@@ -430,7 +430,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			});
 			String mesg = "Saved as " + savingFile.getAbsolutePath();
 			logToScreen("Stopping file updates; " + mesg);
-			Toast.makeText(this, mesg, Toast.LENGTH_LONG);
+			Toast.makeText(this, mesg, Toast.LENGTH_LONG).show();
 			fileNameLabel.setText(FileNameUtils.getDefaultFilenameFormatWithExt());
 			startButton.setEnabled(true);
 			break;
