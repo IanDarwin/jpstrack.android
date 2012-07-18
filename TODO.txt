@@ -2,6 +2,8 @@ jpstrack.android
 
 Fix all the things noted in the RELEASE_NOTES file.
 
+logToScreen - make persistent in memory, keep across rotations!
+
 Make OnboardActivity a Dialog, with custom View.
 
 Dialog if sdcard in use, like Audible uses.
