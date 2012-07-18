@@ -68,6 +68,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	private GPSFileSaver trackerIO;
 	private View startButton, pauseButton, stopButton;
 	private boolean saving, paused;
+	private File savingFile;
 	private static boolean sdWritable;
 
 	private File imageFile, soundFile;
@@ -397,8 +398,8 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			try {
 				// New filename each time we start recording.
 				trackerIO.setFileName(FileNameUtils.getNextFilename());
-				File f = trackerIO.startFile();
-				fileNameLabel.setText(f.getName());
+				savingFile = trackerIO.startFile();
+				fileNameLabel.setText(savingFile.getName());
 				startReceiving();		// Disk IO is done on the service's thread.
 				logToScreen("Starting File Updates");
 			} catch (RuntimeException e) {
@@ -418,12 +419,18 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			syncPauseButtonToState();
 			break;
 		case R.id.stop_button:
-			logToScreen("Stopping File Updates");
 			saving = false;
 			paused = false;
 			syncPauseButtonToState();
 			stopButton.setEnabled(false);
-			trackerIO.endFile();
+			ThreadUtils.executeAndWait(new Runnable() {
+				public void run() {	
+					trackerIO.endFile();
+				}
+			});
+			String mesg = "Saved as " + savingFile.getAbsolutePath();
+			logToScreen("Stopping file updates; " + mesg);
+			Toast.makeText(this, mesg, Toast.LENGTH_LONG);
 			fileNameLabel.setText(FileNameUtils.getDefaultFilenameFormatWithExt());
 			startButton.setEnabled(true);
 			break;

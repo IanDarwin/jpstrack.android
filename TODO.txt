@@ -1,8 +1,5 @@
 jpstrack.android
 
-"Stop" Button - MUST have Toast with saved filename!!
-	And it must go into the log file.
-
 Fix all the things noted in the RELEASE_NOTES file.
 
 Make OnboardActivity a Dialog, with custom View.
