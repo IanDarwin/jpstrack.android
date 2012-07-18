@@ -9,9 +9,9 @@ This is a Beta release. Please note the following:
 	</gpx>
 	
 - Do NOT use the application with the USB connected and the SDCard
-  exported to your desktop, as obviously this disables all
-  Android Apps's access to the /sdcard folder, and 
-  there are several places where the app might crash if the /sdcard
+  exported to your desktop, on platforms where this disables all
+  Android Apps's access to the /sdcard folder, as there may be
+  some places where the app might crash if the /sdcard
   is not available.
 
 - There are no language-translation files yet so the program 
