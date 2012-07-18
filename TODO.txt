@@ -1,10 +1,11 @@
 jpstrack.android
 
-Try to export an Ant build.xml
+"Stop" Button - MUST have Toast with saved filename!!
+	And it must go into the log file.
 
 Fix all the things noted in the RELEASE_NOTES file.
 
-About box is ugly.
+Make OnboardActivity a Dialog, with custom View.
 
 Dialog if sdcard in use, like Audible uses.
 
@@ -16,8 +17,6 @@ GPS:
 	1) Visual - GPS up/down
 	2) Can we turn it on?
 	3) Upload saved data - popup when saving, if network on and username given.
-
-Done button in About screen.
 
 Externalize rest of strings.
 	Do rest of _es translation, including Spanish characters.
