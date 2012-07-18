@@ -38,7 +38,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bugsense.trace.BugSenseHandler;
-import com.immersion.uhl.Launcher;
 
 public class Main extends Activity implements GpsStatus.Listener, LocationListener, OnClickListener {
 
@@ -75,9 +74,6 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	private BroadcastReceiver extStorageRcvr;
 
 	private String OUR_BUGSENSE_API_KEY;
-	
-	private Launcher launcher;	// UHL Haptic Launcher
-
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -96,18 +92,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		if (!SettingsActivity.hasSeenWelcome(this)) {
 			startActivity(new Intent(this, OnboardingActivity.class));
 		}
-		
-		ThreadUtils.execute(new Runnable() {
-			public void run() {
-				try {
-					// Start the UHL launcher for giving haptic feedback
-					// Not fatal if this fails
-					launcher = new Launcher(Main.this);
-				} catch (RuntimeException e) {
-					Log.d(TAG, "Create Haptic Launcher Failed");
-				}
-			}
-		});
+
 		setContentView(R.layout.main);
 		
 		View main = findViewById(R.id.mainView);
@@ -211,7 +196,6 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			if (saving) {
 				fileNameLabel.setText(trackerIO.getFileName());
 			}
-			launcher = old.launcher;
 			return;
 		} else {		
 			// I/O Helper
@@ -371,9 +355,6 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		if (!saving || paused) {
 			stopReceiving();
 		}
-		if (launcher != null) {
-			launcher.stop();
-		}
 	}
 
 	@Override
@@ -406,13 +387,6 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	/** Remember - do not block the GUI thread, kiddies! */
 	@Override
 	public void onClick(View v) {
-		try {
-			if (launcher != null) {
-				launcher.play(Launcher.BOUNCE_100);
-			}
-		} catch (RuntimeException e) {
-			// don't care
-		}
 		switch (v.getId()) {
 		case R.id.start_button:
 			startButton.setEnabled(false);
