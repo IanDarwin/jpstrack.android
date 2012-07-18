@@ -368,19 +368,23 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 
 	/** From LocationListener, called when the location changes, obviously */
 	@Override
-	public void onLocationChanged(Location location) {
+	public void onLocationChanged(final Location location) {
 		Log.d(TAG, "Got location " + location);
 		if (location == null) {
 			return;
 		}
 		
 		logToScreen("Location: " + location.getLatitude() + "," + location.getLongitude());
-		double latitude = location.getLatitude();
-		double longitude = location.getLongitude();
+		final double latitude = location.getLatitude();
+		final double longitude = location.getLongitude();
 		latOutput.setText(Double.toString(latitude));
 		longOutput.setText(Double.toString(longitude));
 		if (saving && !paused) {
-			trackerIO.write(location.getTime(), latitude, longitude);
+			ThreadUtils.executeAndWait(new Runnable() {
+				public void run() {	
+					trackerIO.write(location.getTime(), latitude, longitude);
+				}
+			});
 		}
 	}
 
