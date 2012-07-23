@@ -13,6 +13,13 @@
     <string name="cannot_get_gps_service">CANNOT GET GPS SERVICE</string>
     <string name="provider_found">Provider found: </string>
     
+    <!-- "GPS is off" dialog -->
+    <string name="gps_dialog_name">GPS Problem</string>
+	<string name="gps_dialog_text">The GPS is powered off. 
+	    Please visit the Settings App and enable the \'Use GPS Satellites\' option.</string>
+	<string name="gps_dialog_dismiss_label">Ignore</string>
+	<string name="gps_dialog_settings_label">Settings…</string>
+    
     <string name="latitude_text">Latitude</string>
     <string name="longitude_text">Longitude</string>
     

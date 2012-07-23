@@ -48,6 +48,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	
 	private static final int DIALOG_EULA = 0;
 	private static final int DIALOG_ABOUT = 1;
+	private static final int DIALOG_TURN_ON_GPS = 2;
 	
 	private static final int MIN_METRES = 1;
 	private static final int MIN_SECONDS = 5;
@@ -58,7 +59,6 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		"available" };
 	
 	public static final String SKIP_SKIP = "DONT_SHOW_SKIP";
-
 
 	private LocationManager mgr;
 	private static File dataDir;
@@ -87,6 +87,8 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		// Show the EULA if they've not yet agreed to it it.
 		if (!SettingsActivity.hasSeenEula(this)) {
 			showDialog(DIALOG_EULA);
+			// We don't build the rest of the UI until the EULA is accepted.
+			return;
 		}
 				
 		// Start the welcome page or video if they haven't seen it yet.
@@ -177,6 +179,9 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		
 		// GPS setup - do after GUI, of course...
 		mgr = (LocationManager) getSystemService(LOCATION_SERVICE);
+		if (!mgr.isProviderEnabled(PROVIDER)) {
+			showDialog(DIALOG_TURN_ON_GPS);
+		}
 		mgr.addGpsStatusListener(this);
 		Location last = mgr.getLastKnownLocation(PROVIDER);
 		onLocationChanged(last);
@@ -261,6 +266,8 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 								int which) {
 							Log.d(Main.TAG, "User accepted EULA!");
 							SettingsActivity.setSeenEula(Main.this, true);
+							// Trigger a restart!
+							startActivity(new Intent(Main.this, Main.class));
 						}
 					})
 			.setNegativeButton(R.string.reject_eula,
@@ -280,12 +287,31 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			.setPositiveButton(R.string.about_done_button_label,
 					new AlertDialog.OnClickListener() {
 						public void onClick(DialogInterface dialog, int which) {
-							Log.d(Main.TAG, "User accepted EULA!");
-							SettingsActivity.setSeenEula(Main.this, true);
-							finish();
+							// Nothing to do?
 						}
 			}).create();
 			return aboutDialog;
+		case DIALOG_TURN_ON_GPS:
+			final AlertDialog gpsOffDialog = new AlertDialog.Builder(this)
+			.setCancelable(true)
+			.setTitle(R.string.gps_dialog_name)
+			.setMessage(R.string.gps_dialog_text)
+			.setPositiveButton(R.string.gps_dialog_dismiss_label,
+				new android.content.DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// nothing to do?
+					}
+			})
+			.setNeutralButton(R.string.gps_dialog_settings_label,
+				new android.content.DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						Intent settings = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+						startActivity(settings);
+					}
+			}).create();
+			return gpsOffDialog;
 		default:
 				return null;
 		}
@@ -334,6 +360,9 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	/** start receiving GPS data... */
 	private void startReceiving() {
 		Log.d(TAG, "startReceiving()");
+		if (mgr == null) {
+			throw new NullPointerException("mgr == null in startReceiving()");
+		}
 		mgr.requestLocationUpdates(PROVIDER, 
 			MIN_SECONDS * 1000,
 			MIN_METRES,
@@ -341,7 +370,8 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	}
 	
 	private void stopReceiving() {
-		mgr.removeUpdates(this);
+		if (mgr != null)
+			mgr.removeUpdates(this);
 	}
 
 	/**
