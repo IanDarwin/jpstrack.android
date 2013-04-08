@@ -1,8 +1,24 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-<EditTextPreference
-	android:key="dir"
-	android:title="@string/dir_title"
-	android:summary="@string/dir_summary"
-	>
-</EditTextPreference>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="@string/local_storage_title" >
+        <EditTextPreference
+            android:key="dir"
+            android:summary="@string/dir_summary"
+            android:title="@string/dir_title" >
+        </EditTextPreference>
+    </PreferenceCategory>
+    
+    <PreferenceCategory android:title="@string/remote_account_title" >
+        <EditTextPreference
+            android:key="osm_username"
+            android:summary="@string/username_summary"
+            android:title="@string/username_title" />
+        
+        <CheckBoxPreference
+			android:key="osm_alwaysUpload"
+			android:title="@string/osm_alwaysUpload_title"
+			android:summary="@string/osm_alwaysUpload_summary"
+		/>
+    </PreferenceCategory>
+
 </PreferenceScreen>

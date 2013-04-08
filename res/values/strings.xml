@@ -2,8 +2,6 @@
 <resources>
 	<!-- Main stuff -->
     <string name="app_name">JPSTrack</string>
-    <string name="dir_title">Data Directory</string>
-    <string name="dir_summary">Location to save GPX files, images, notations, etc.</string>
     
     <string name="accept_eula">I accept the EULA terms.</string>
     <string name="reject_eula">I do not accept the EULA terms.</string>
@@ -69,6 +67,18 @@
      <string name="skip_done_that">Skip, I\'ve used this app</string>
      <string name="watch_page">View Web Intro</string>
      <string name="watch_video">Watch Intro Video</string>
+     
+    <!-- Preferences -->
+    <string name="local_storage_title">Local storage</string>
+    <string name="dir_summary">Location to save GPX files, images, notations, etc.</string>
+    <string name="dir_title">Data Directory</string>
+    
+    <string name="remote_account_title">OSM Uploading</string>
+    <string name="username_summary">Your login name (we don\'t save your password permanently, due to security)</string>
+    <string name="username_title">OSM User Name</string>
+    
+    <string name="osm_alwaysUpload_title">Always upload after save</string>
+    <string name="osm_alwaysUpload_summary">It checked, will try to upload each file to OSM after saving it.</string>
 
     <!--  About box -->
     <string name="about_name">About JPSTrack</string>

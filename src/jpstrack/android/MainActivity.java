@@ -34,6 +34,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,6 +50,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	private static final int DIALOG_EULA = 0;
 	private static final int DIALOG_ABOUT = 1;
 	private static final int DIALOG_TURN_ON_GPS = 2;
+	private static final int DIALOG_OSM_PASSWORD = 3;
 	
 	private static final int MIN_METRES = 1;
 	private static final int MIN_SECONDS = 5;
@@ -66,7 +68,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	private TextView latOutput, longOutput;
 	private TextView fileNameLabel;
 	private GPSFileSaver trackerIO;
-	private View startButton, pauseButton, stopButton;
+	private View startButton, pauseButton, saveButton;
 	private boolean saving, paused;
 	private File savingFile;
 	private static boolean sdWritable;
@@ -75,6 +77,8 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	private BroadcastReceiver extStorageRcvr;
 
 	private String OUR_BUGSENSE_API_KEY;
+
+	private Object password;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -163,9 +167,9 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		pauseButton = findViewById(R.id.pause_button);
 		pauseButton.setOnClickListener(this);
 		pauseButton.setEnabled(false);
-		stopButton = findViewById(R.id.stop_button);
-		stopButton.setOnClickListener(this);
-		stopButton.setEnabled(false);
+		saveButton = findViewById(R.id.stop_button);
+		saveButton.setOnClickListener(this);
+		saveButton.setEnabled(false);
 		fileNameLabel = (TextView) findViewById(R.id.filename_label);
 		fileNameLabel.setText(FileNameUtils.getDefaultFilenameFormatWithExt());
 
@@ -196,7 +200,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			paused = old.paused;
 			startButton.setEnabled(!saving);
 			syncPauseButtonToState();
-			stopButton.setEnabled(saving);
+			saveButton.setEnabled(saving);
 			// this is the most important line: keep saving to same file!
 			trackerIO = old.trackerIO;			
 			if (saving) {
@@ -220,6 +224,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 				throw new ExceptionInInitializerError("getResources() returned null");
 			}
 			
+			// This is only needed for BugSense bug tracking.
 			// If this line won't compile, create an empty file
 			// with the exact (but stupid) name res/raw/keys_props.properties 
 			// And do Project->Clean, all the usual stuff...
@@ -312,8 +317,27 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 					}
 			}).create();
 			return gpsOffDialog;
+		case DIALOG_OSM_PASSWORD:
+			final EditText passwordText = new EditText(this);
+			final AlertDialog osmPasswordDialog = new AlertDialog.Builder(this)
+			.setCancelable(true)
+			.setMessage("OSM Password").setPositiveButton("Set", new android.content.DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					Main.this.password = passwordText.getText();
+				}
+				
+			})
+			.setNegativeButton("Cancel", new android.content.DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					// nothing to do?
+				}
+			}).create();
+			osmPasswordDialog.setView(passwordText);
+			return osmPasswordDialog;
 		default:
-				return null;
+			return null;
 		}
 	}
 
@@ -440,7 +464,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			saving = true;
 			paused = false;
 			syncPauseButtonToState();
-			stopButton.setEnabled(true);
+			saveButton.setEnabled(true);
 			break;
 		case R.id.pause_button:
 			// Don't call stopReceiving() here, so the display
@@ -452,7 +476,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			saving = false;
 			paused = false;
 			syncPauseButtonToState();
-			stopButton.setEnabled(false);
+			saveButton.setEnabled(false);
 			ThreadUtils.executeAndWait(new Runnable() {
 				public void run() {	
 					trackerIO.endFile();
@@ -461,6 +485,11 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			String mesg = "Saved as " + savingFile.getAbsolutePath();
 			logToScreen("Stopping file updates; " + mesg);
 			Toast.makeText(this, mesg, Toast.LENGTH_LONG).show();
+			if (SettingsActivity.isAlwaysUpload(this)) {
+				if (password == null) { /// save when rotating
+					showDialog(DIALOG_OSM_PASSWORD);
+				}
+			}
 			fileNameLabel.setText(FileNameUtils.getDefaultFilenameFormatWithExt());
 			startButton.setEnabled(true);
 			break;
