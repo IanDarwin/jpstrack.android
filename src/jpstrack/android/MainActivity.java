@@ -197,6 +197,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			// Do NOT refer to any GUI components in the old object
 			mgr.removeGpsStatusListener(old); // prevent accidents
 			saving = old.saving;
+			savingFile = old.savingFile;
 			paused = old.paused;
 			startButton.setEnabled(!saving);
 			syncPauseButtonToState();
