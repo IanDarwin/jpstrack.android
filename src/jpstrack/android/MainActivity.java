@@ -457,7 +457,11 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			try {
 				// New filename each time we start recording.
 				trackerIO.setFileName(FileNameUtils.getNextFilename());
-				savingFile = trackerIO.startFile();
+				ThreadUtils.executeAndWait(new Runnable() {
+					public void run() {
+						savingFile = trackerIO.startFile();
+					}
+				});
 				fileNameLabel.setText(savingFile.getName());
 				startReceiving();		// Disk IO is done on the service's thread.
 				logToScreen("Starting File Updates");

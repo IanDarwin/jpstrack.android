@@ -2,6 +2,7 @@ package jpstrack.android;
 
 import java.lang.reflect.Method;
 
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -11,6 +12,8 @@ import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
 
 public class ButtonSnazzler implements OnTouchListener {
+	
+	static final String TAG = Main.TAG;
 
 	static final int API_LEVEL = Integer.parseInt(android.os.Build.VERSION.SDK);
 
@@ -27,11 +30,11 @@ public class ButtonSnazzler implements OnTouchListener {
 
 	@Override
 	public boolean onTouch(View v, MotionEvent me) {
-		System.out.println("ButtonSnazzler.onTouch(): API Level = " + API_LEVEL);
+		Log.d(TAG, "ButtonSnazzler.onTouch(): API Level = " + API_LEVEL);
 		if (API_LEVEL < 11) { // Honeycomb
 			return false;
 		}
-		System.out.println("ButtonSnazzler.onTouch(): Version OK");
+		Log.d(TAG, "ButtonSnazzler.onTouch(): Version OK");
 		
 		if (!(v instanceof Button)) {
 			return false;
@@ -51,21 +54,22 @@ public class ButtonSnazzler implements OnTouchListener {
 	}
 
 	private void animate(View v, Interpolator inter, float scale, int duration) {
-		System.out.println("ButtonSnazzler.animate()");
+		Log.d(TAG, "ButtonSnazzler.animate()");
 		try {
-			Method animate = View.class.getMethod("animate", null);
+			Method animate = View.class.getMethod("animate", (Class[])null);
 			if (animate == null) {
 				return;
 			}
 
 			Object viewPropertyAnimator = animate.invoke(v, (Object[])null);
-			Class viewPropertyAnimatorClazz = viewPropertyAnimator.getClass();
+			Class<? extends Object> viewPropertyAnimatorClazz = viewPropertyAnimator.getClass();
 
 			Method setInterpolator = viewPropertyAnimatorClazz.getMethod(
 					"setInterpolator", new Class[] { Interpolator.class });
-			setInterpolator.invoke(viewPropertyAnimator, new Interpolator[] { inter });
+			setInterpolator.invoke(viewPropertyAnimator, new Object[] { inter });
 
-			Class[] floatArray = new Class[] { float.class };
+			@SuppressWarnings("unchecked")
+			Class<? extends Object>[] floatArray = new Class[] { float.class };
 			float[] scaleArray = new float[] { scale };
 			Method scaleX = viewPropertyAnimatorClazz.getMethod("scaleX", floatArray);
 			scaleX.invoke(viewPropertyAnimator, scaleArray);
@@ -78,7 +82,7 @@ public class ButtonSnazzler implements OnTouchListener {
 			setDuration.invoke(viewPropertyAnimator, new int[] { duration });
 
 		} catch (Exception e) {
-			System.err.println("animate: caught exception " + e);
+			Log.e(TAG, "animate: caught exception " + e, e);
 		}
 	}
 }
