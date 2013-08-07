@@ -37,7 +37,9 @@ public class SettingsActivity extends PreferenceActivity {
 	
 	/** No set method, it is set by our PreferencesActivity subclass */
 	public static boolean isAlwaysUpload(Context context) {
-		return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(OPTION_ALWAYS_UPLOAD , false);
+		Getter t = new Getter(context, OPTION_ALWAYS_UPLOAD);
+		ThreadUtils.executeAndWait(t);
+		return t.getSeen();
 	}
 
 	public static void setSeenEula(final Context context, final boolean seenValue) {

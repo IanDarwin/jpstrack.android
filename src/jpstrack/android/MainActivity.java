@@ -77,8 +77,9 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	private BroadcastReceiver extStorageRcvr;
 
 	private String OUR_BUGSENSE_API_KEY;
-
 	private Object password;
+	
+	private ButtonSnazzler snazzler;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -163,11 +164,14 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		latOutput = (TextView) findViewById(R.id.lat_output);
 		longOutput = (TextView) findViewById(R.id.lon_output);
 		startButton = findViewById(R.id.start_button);
+		startButton.setOnTouchListener(snazzler);
 		startButton.setOnClickListener(this);
 		pauseButton = findViewById(R.id.pause_button);
+		pauseButton.setOnTouchListener(snazzler);
 		pauseButton.setOnClickListener(this);
 		pauseButton.setEnabled(false);
 		saveButton = findViewById(R.id.stop_button);
+		saveButton.setOnTouchListener(snazzler);
 		saveButton.setOnClickListener(this);
 		saveButton.setEnabled(false);
 		fileNameLabel = (TextView) findViewById(R.id.filename_label);
