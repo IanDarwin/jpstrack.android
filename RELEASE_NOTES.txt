@@ -1,3 +1,12 @@
+Version 0.8 - 2014-01-27
+
+Minor bug fix and enhancements.
+
+Fixes a bug in the generated XML that caused strict XML parsers used
+in some third-party software to reject the GPX files.
+
+Version 0.7 - first release to the Android Play Store and BlackBerry World.
+
 This is a Beta release. Please note the following:
 
 - We try to ensure that the GPX file is closed correctly, but this
@@ -19,7 +28,8 @@ This is a Beta release. Please note the following:
   
   Hay una traduccion muy cruda para Espanol, pero se puede morir
   de reir si intenta usarlo. No pagamos las cuentas funerales que
-  resultan, ni ningunas otras consecuencias.
+  resultan, ni ningunas otras consecuencias. Sirvense ayudarnos
+  con una traduccion mas correcta?
 
 - Voice Note files are saved as standard MP3's, but the CODEC used
   is not always available on the desktop.
