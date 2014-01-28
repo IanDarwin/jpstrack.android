@@ -30,11 +30,11 @@ public class ButtonSnazzler implements OnTouchListener {
 
 	@Override
 	public boolean onTouch(View v, MotionEvent me) {
-		Log.d(TAG, "ButtonSnazzler.onTouch(): API Level = " + API_LEVEL);
+		//Log.d(TAG, "ButtonSnazzler.onTouch(): API Level = " + API_LEVEL);
 		if (API_LEVEL < 11) { // Honeycomb
 			return false;
 		}
-		Log.d(TAG, "ButtonSnazzler.onTouch(): Version OK");
+		//Log.d(TAG, "ButtonSnazzler.onTouch(): Version OK");
 		
 		if (!(v instanceof Button)) {
 			return false;
