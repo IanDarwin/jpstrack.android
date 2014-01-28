@@ -5,6 +5,9 @@ Minor bug fix and enhancements.
 Fixes a bug in the generated XML that caused strict XML parsers used
 in some third-party software to reject the GPX files.
 
+Fixes a bug that would occasionally cause a crash if you rotated the 
+device while recording GPS.
+
 Version 0.7 - first release to the Android Play Store and BlackBerry World.
 
 This is a Beta release. Please note the following:
