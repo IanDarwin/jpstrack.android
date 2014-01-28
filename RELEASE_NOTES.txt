@@ -31,7 +31,7 @@ This is a Beta release. Please note the following:
   
   Hay una traduccion muy cruda para Espanol, pero se puede morir
   de reir si intenta usarlo. No pagamos las cuentas funerales que
-  resultan, ni ningunas otras consecuencias. Sirvense ayudarnos
+  resultan, ni ningunas otras consecuencias. Sirvense ayudanos
   con una traduccion mas correcta?
 
 - Voice Note files are saved as standard MP3's, but the CODEC used
