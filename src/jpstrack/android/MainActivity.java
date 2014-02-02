@@ -40,6 +40,8 @@ import android.widget.Toast;
 
 import com.bugsense.trace.BugSenseHandler;
 
+/** The main class for the Android version of JPSTrack
+ */
 public class Main extends Activity implements GpsStatus.Listener, LocationListener, OnClickListener {
 
 	static final String TAG = "jpstrack";
@@ -133,30 +135,8 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		iFilter.addAction(Intent.ACTION_MEDIA_REMOVED);
 		registerReceiver(extStorageRcvr, iFilter);
 
-		// Set up the save location (gpx files, text notes, etc.)
-		ThreadUtils.executeAndWait(new Runnable() {
-			public void run() {				
-				String preferredSaveLocation =
-						PreferenceManager.getDefaultSharedPreferences(Main.this).getString(SettingsActivity.OPTION_DIR, null);
-				if (preferredSaveLocation != null && !"".equals(preferredSaveLocation)) {
-					// We've been run before
-					dataDir = new File(preferredSaveLocation);
-				} else {
-					// First run on this device, probably.
-					final File externalStorageDirectory = Environment.getExternalStorageDirectory();
-					Log.d(TAG, "ExternalStorageDirectory = " + externalStorageDirectory);
-					dataDir = new File(externalStorageDirectory, SettingsActivity.DIRECTORY_NAME);
-				}
-				Log.d(TAG, "Using Data Directory " + dataDir);
-				dataDir.mkdirs();	// just in case
-				if (!dataDir.exists()) {
-					final String message = "Warning: Directory " + dataDir + " not created";
-					Log.d(TAG, message);
-					Looper.prepare();
-					Toast.makeText(Main.this, message, Toast.LENGTH_LONG).show();
-				}
-			}
-		});
+
+		ThreadUtils.executeAndWait(setupSaveDirLocation);
 		
 		output = (TextView) findViewById(R.id.output);
 		
@@ -217,6 +197,31 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			trackerIO = new GPSFileSaver(dataDir, FileNameUtils.getNextFilename());
 		}
 	}
+	
+	/** Set up the save location (gpx files, text notes, etc.) */
+	Runnable setupSaveDirLocation = new Runnable() {
+		public void run() {				
+			String preferredSaveLocation =
+					PreferenceManager.getDefaultSharedPreferences(Main.this).getString(SettingsActivity.OPTION_DIR, null);
+			if (preferredSaveLocation != null && !"".equals(preferredSaveLocation)) {
+				// We've been run before
+				dataDir = new File(preferredSaveLocation);
+			} else {
+				// First run on this device, probably.
+				final File externalStorageDirectory = Environment.getExternalStorageDirectory();
+				Log.d(TAG, "ExternalStorageDirectory = " + externalStorageDirectory);
+				dataDir = new File(externalStorageDirectory, SettingsActivity.DIRECTORY_NAME);
+			}
+			Log.d(TAG, "Using Data Directory " + dataDir);
+			dataDir.mkdirs();	// just in case
+			if (!dataDir.exists()) {
+				final String message = "Warning: Directory " + dataDir + " not created";
+				Log.d(TAG, message);
+				Looper.prepare();
+				Toast.makeText(Main.this, message, Toast.LENGTH_LONG).show();
+			}
+		}
+	};
 	
 	/**
 	 *  Load a Props file from the APK zipped filesystem, extract our app key from that.
@@ -434,9 +439,9 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			return;
 		}
 		
-		logToScreen("Location: " + location.getLatitude() + "," + location.getLongitude());
 		final double latitude = location.getLatitude();
 		final double longitude = location.getLongitude();
+		logToScreen("Location: " + latitude + "," + longitude);
 		latOutput.setText(Double.toString(latitude));
 		longOutput.setText(Double.toString(longitude));
 		if (saving && !paused) {
@@ -456,6 +461,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			startButton.setEnabled(false);
 			try {
 				// New filename each time we start recording.
+				ThreadUtils.executeAndWait(setupSaveDirLocation);
 				trackerIO.setFileName(FileNameUtils.getNextFilename());
 				ThreadUtils.executeAndWait(new Runnable() {
 					public void run() {
