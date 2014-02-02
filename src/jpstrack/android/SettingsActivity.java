@@ -5,6 +5,11 @@ import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 
+/**
+ * The Settings or Preferences activity.
+ * This will be SOOO cleanable-uppable when Android catches up to Java 8
+ * @author Ian Darwin
+ */
 public class SettingsActivity extends PreferenceActivity {
 
 	static final String DIRECTORY_NAME = "jpstrack";
