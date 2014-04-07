@@ -623,7 +623,9 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		super.onCreateOptionsMenu(menu);
 		MenuInflater inf = getMenuInflater();
 		inf.inflate(R.menu.menu, menu);
-		return true;
+		// Calling super after populating the menu is necessary here to ensure that the
+        // action bar helpers have a chance to handle this event.
+        return super.onCreateOptionsMenu(menu);
 	}
 
 	@Override
