@@ -251,7 +251,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 				Log.w(TAG, message);
 				return;
 			}
-			Log.d(TAG, "key = " + OUR_BUGSENSE_API_KEY);
+			Log.d(TAG, "BUGSENSE_API_KEY loaded OK");
 		} catch (Exception e) {
 			String message = "Error loading properties: " + e;
 			Log.d(TAG, message);
