@@ -83,7 +83,7 @@
     <!--  About box -->
     <string name="about_name">About JPSTrack</string>
     <string name="about_shortname">About</string>
-    <string name="about_text">JPSTrack 0.1. See http://www.darwinsys.com/jpstrack/</string>
+    <string name="about_text">JPSTrack 0.1. See http://darwinsys.com/jpstrack/</string>
     <string name="about_done_button_label">OK</string>
     
 </resources>
