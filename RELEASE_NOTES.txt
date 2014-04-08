@@ -1,3 +1,14 @@
+Version 1.0.0-SNAPSHOT - 2014-04-14
+
+UI updated. Still supports phones as far back as API Level 7 (had to move up from 6
+to get the support library for the ActionBar; sorry to both of you that still run
+Android 1.6 devices).
+
+Enables auto-loading. Set your OSM username/email in Preferences and enable Auto-Upload.
+When you save a reading, you'll be asked to confirm (and enter your password if it's
+the first upload of this invocation; we only store the password in memory for security
+reasons; OAuth2.x coming later).
+
 Version 0.8 - 2014-01-27
 
 Minor bug fix and enhancements.
@@ -43,6 +54,6 @@ This is a Beta release. Please note the following:
 
 If you find any new ways to crash it, please email or use this:
 
-http://www.darwinsys.com/contact.jsp
+http://darwinsys.com/contact.jsp
 
 $Id$
