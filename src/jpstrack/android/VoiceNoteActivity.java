@@ -40,7 +40,7 @@ public class VoiceNoteActivity extends Activity implements OnClickListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		if (!Main.isSdWritable()) {
+		if (!MainActivity.isSdWritable()) {
 			Toast.makeText(this, "SD Card not writable", Toast.LENGTH_LONG).show();
 			finish();
 			return;
@@ -53,7 +53,7 @@ public class VoiceNoteActivity extends Activity implements OnClickListener {
 		View discardButton = findViewById(R.id.voicenote_discard_button);
 		discardButton.setOnClickListener(this);
 		Wrapper w = (Wrapper) getLastNonConfigurationInstance();
-		Log.d(Main.TAG, "LastConConfigurationInstance gave us " + w);
+		Log.d(MainActivity.TAG, "LastConConfigurationInstance gave us " + w);
 		if (w == null) {
 			startRecording();	// Start immediately - already pressed Voice Note button
 		} else {
@@ -73,7 +73,7 @@ public class VoiceNoteActivity extends Activity implements OnClickListener {
 			discardRecording();
 			break;
 		default:
-			Log.e(Main.TAG, "Unexpected click");
+			Log.e(MainActivity.TAG, "Unexpected click");
 		}
 		this.finish();		// Back to main!
 	}
@@ -95,13 +95,13 @@ public class VoiceNoteActivity extends Activity implements OnClickListener {
 			Uri soundUri = getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT);			
 			soundFile = soundUri.getPath();
 			recorder.setOutputFile(soundFile);
-			Log.d(Main.TAG, "outputting to " + soundUri.getPath());
+			Log.d(MainActivity.TAG, "outputting to " + soundUri.getPath());
 			recorder.prepare();
 			recorder.start();
 			recording = true;
 		} catch (Exception e) {
 			final String message = "Could not create file:" + e;
-			Log.e(Main.TAG, message);
+			Log.e(MainActivity.TAG, message);
 			Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 			this.finish();
 		}

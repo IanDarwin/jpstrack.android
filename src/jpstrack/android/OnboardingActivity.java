@@ -17,7 +17,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 public class OnboardingActivity extends Activity implements OnClickListener {
-	private static String TAG = Main.TAG + ".Onboarding";
+	private static String TAG = MainActivity.TAG + ".Onboarding";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +26,7 @@ public class OnboardingActivity extends Activity implements OnClickListener {
 		
 		// If called from Main's Menu, intent will have extra boolean
         // reminding us to skip the skip buttons
-		boolean skipSkip = getIntent().getBooleanExtra(Main.SKIP_SKIP, false);
+		boolean skipSkip = getIntent().getBooleanExtra(MainActivity.SKIP_SKIP, false);
 		if (skipSkip) {
 			ViewGroup layout = (ViewGroup) findViewById(R.id.onboardLayout);
 			layout.removeView(findViewById(R.id.skipButton1));

@@ -13,7 +13,7 @@ import android.widget.Button;
 
 public class ButtonSnazzler implements OnTouchListener {
 	
-	static final String TAG = Main.TAG;
+	static final String TAG = MainActivity.TAG;
 
 	static final int API_LEVEL = Integer.parseInt(android.os.Build.VERSION.SDK);
 

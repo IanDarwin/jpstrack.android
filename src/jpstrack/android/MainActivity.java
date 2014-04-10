@@ -42,7 +42,7 @@ import com.bugsense.trace.BugSenseHandler;
 
 /** The main class for the Android version of JPSTrack
  */
-public class Main extends Activity implements GpsStatus.Listener, LocationListener, OnClickListener {
+public class MainActivity extends Activity implements GpsStatus.Listener, LocationListener, OnClickListener {
 
 	static final String TAG = "jpstrack";
 	
@@ -176,7 +176,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 		startReceiving();
 		
 		// Now see if we just got interrupted by e.g., rotation
-		Main old = (Main) getLastNonConfigurationInstance();
+		MainActivity old = (MainActivity) getLastNonConfigurationInstance();
 		if (old != null) {
 			// Do NOT refer to any GUI components in the old object
 			mgr.removeGpsStatusListener(old); // prevent accidents
@@ -202,7 +202,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 	Runnable setupSaveDirLocation = new Runnable() {
 		public void run() {				
 			String preferredSaveLocation =
-					PreferenceManager.getDefaultSharedPreferences(Main.this).getString(SettingsActivity.OPTION_DIR, null);
+					PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getString(SettingsActivity.OPTION_DIR, null);
 			if (preferredSaveLocation != null && !"".equals(preferredSaveLocation)) {
 				// We've been run before
 				dataDir = new File(preferredSaveLocation);
@@ -218,7 +218,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 				final String message = "Warning: Directory " + dataDir + " not created";
 				Log.d(TAG, message);
 				Looper.prepare();
-				Toast.makeText(Main.this, message, Toast.LENGTH_LONG).show();
+				Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
 			}
 		}
 	};
@@ -279,16 +279,16 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 					new AlertDialog.OnClickListener() {
 						public void onClick(DialogInterface dialog,
 								int which) {
-							Log.d(Main.TAG, "User accepted EULA!");
-							SettingsActivity.setSeenEula(Main.this, true);
+							Log.d(TAG, "User accepted EULA!");
+							SettingsActivity.setSeenEula(MainActivity.this, true);
 							// Trigger a restart!
-							startActivity(new Intent(Main.this, Main.class));
+							startActivity(new Intent(MainActivity.this, MainActivity.class));
 						}
 					})
 			.setNegativeButton(R.string.reject_eula,
 					new AlertDialog.OnClickListener() {
 						public void onClick(DialogInterface dialog, int which) {
-							Log.d(Main.TAG, "User REJECTED EULA!");	
+							Log.d(TAG, "User REJECTED EULA!");	
 							System.exit(-1);
 						}
 					})
@@ -334,7 +334,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			.setMessage("OSM Password").setPositiveButton("Set", new android.content.DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					Main.this.password = passwordText.getText();
+					MainActivity.this.password = passwordText.getText();
 				}
 				
 			})
@@ -515,7 +515,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 			// GRRR, standard Sound Recorder doesn't accept MediaStore.EXTRA_OUTPUT)
 			Intent soundIntent = new Intent(this, VoiceNoteActivity.class);
 			// Set up file to save image into.
-			soundFile = new File(Main.getDataDir(), FileNameUtils
+			soundFile = new File(MainActivity.getDataDir(), FileNameUtils
 					.getNextFilename("mp3"));
 			soundIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(soundFile));
 			// And away we go!
@@ -535,7 +535,7 @@ public class Main extends Activity implements GpsStatus.Listener, LocationListen
 				// Use an Intent to get the Camera app going.
 				Intent imageIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 				// Set up file to save image into.
-				imageFile = new File(Main.getDataDir(), 
+				imageFile = new File(MainActivity.getDataDir(), 
 					FileNameUtils.getNextFilename("jpg"));
 				imageIntent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
 				imageIntent.putExtra(MediaStore.EXTRA_OUTPUT, 

@@ -19,7 +19,7 @@ public class TextNoteActivity extends Activity implements OnClickListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		if (!Main.isSdWritable()) {
+		if (!MainActivity.isSdWritable()) {
 			Toast.makeText(this, "SD Card is not writable", Toast.LENGTH_LONG).show();
 			finish();
 			return;
@@ -50,7 +50,7 @@ public class TextNoteActivity extends Activity implements OnClickListener {
 
 	private void doSave() {
 		EditText tv = (EditText) findViewById(R.id.textnote_text);
-		File f = new File(Main.getDataDir(), FileNameUtils.getNextFilename("txt"));
+		File f = new File(MainActivity.getDataDir(), FileNameUtils.getNextFilename("txt"));
 		try {
 			PrintWriter out = new PrintWriter(f);
 			out.print(tv.getText().toString());
@@ -58,7 +58,7 @@ public class TextNoteActivity extends Activity implements OnClickListener {
 			Toast.makeText(this, "Saved text note into " + f, Toast.LENGTH_SHORT).show();
 		} catch (IOException e) {
 			final String message = "Can't create text file " + f + "(" + e + ")";
-			Log.e(Main.TAG, message);
+			Log.e(MainActivity.TAG, message);
 			Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 			// Don't finish! Let them try later
 		}
