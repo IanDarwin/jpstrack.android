@@ -25,6 +25,7 @@ import android.widget.Toast;
 public class VoiceNoteActivity extends Activity implements OnClickListener {
 	MediaRecorder recorder  = null;
 	private String soundFile;
+	private boolean recording;
 	
 	class Wrapper {
 		MediaRecorder recorder;
@@ -76,6 +77,14 @@ public class VoiceNoteActivity extends Activity implements OnClickListener {
 		}
 		this.finish();		// Back to main!
 	}
+	
+	@Override
+	public void onBackPressed() {
+		if (recording) {
+			return;			// Can't back out, must save or cancel.
+		}
+		super.onBackPressed();
+	}
 
 	protected void startRecording() {
 		recorder = new MediaRecorder();
@@ -89,6 +98,7 @@ public class VoiceNoteActivity extends Activity implements OnClickListener {
 			Log.d(Main.TAG, "outputting to " + soundUri.getPath());
 			recorder.prepare();
 			recorder.start();
+			recording = true;
 		} catch (Exception e) {
 			final String message = "Could not create file:" + e;
 			Log.e(Main.TAG, message);
@@ -109,12 +119,14 @@ public class VoiceNoteActivity extends Activity implements OnClickListener {
 	
 	protected void discardRecording() {
 		recorder.stop();
+		recording = false;
 		recorder.release();
 		new File(soundFile).delete();
 	}
 
 	protected void saveRecording() {
 		recorder.stop();
+		recording = false;
 		recorder.release();
 		// We don't tell the MediaStore about it as it's not music!
 	}
