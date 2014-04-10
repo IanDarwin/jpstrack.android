@@ -272,11 +272,14 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 		}
 	}
 	
+	/**
+	 * UPLOAD A FILE TO OSM
+	 */
 	private void doUpload() {
 		try {
 			String description = "Map Track created by JPSTrack";
 			TraceVisibility visibility = TraceVisibility.IDENTIFIABLE;
-			File gpxFile = new File(trackerIO.getFileName());
+			File gpxFile = trackerIO.getFile();
 			final String encodedPostBody = 
 					Upload.encodePostBody(description, visibility, gpxFile);		
 			UploadResponse response = 
