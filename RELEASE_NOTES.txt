@@ -9,6 +9,9 @@ When you save a reading, you'll be asked to confirm (and enter your password if 
 the first upload of this invocation; we only store the password in memory for security
 reasons; OAuth2.x coming later).
 
+Prevent using back button during voice recording, as this leaves the recorder
+in a confused state.
+
 Version 0.8 - 2014-01-27
 
 Minor bug fix and enhancements.
