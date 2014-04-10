@@ -8,6 +8,9 @@ import java.util.Properties;
 
 import jpstrack.fileio.FileNameUtils;
 import jpstrack.fileio.GPSFileSaver;
+import jpstrack.upload.TraceVisibility;
+import jpstrack.upload.Upload;
+import jpstrack.upload.UploadResponse;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -52,7 +55,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 	private static final int DIALOG_EULA = 0;
 	private static final int DIALOG_ABOUT = 1;
 	private static final int DIALOG_TURN_ON_GPS = 2;
-	private static final int DIALOG_OSM_PASSWORD = 3;
+	private static final int DIALOG_OSM_PASSWORD_AND_UPLOAD = 3;
 	
 	private static final int MIN_METRES = 1;
 	private static final int MIN_SECONDS = 5;
@@ -79,7 +82,9 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 	private BroadcastReceiver extStorageRcvr;
 
 	private String OUR_BUGSENSE_API_KEY;
-	private Object password;
+	private String osmPassword;
+	private String osmHostProd = "hostname=api.openstreetmap.org";
+	private String osmHostTest = "api06.dev.openstreetmap.org";
 	
 	private ButtonSnazzler snazzler;
 
@@ -222,7 +227,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 			}
 		}
 	};
-	
+
 	/**
 	 *  Load a Props file from the APK zipped filesystem, extract our app key from that.
 	 */
@@ -261,9 +266,28 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 				try {
 					is.close();
 				} catch (IOException e) {
-					// What a useless exception
+					System.err.println("What a useless exception: " + e);
 				}
 			}
+		}
+	}
+	
+	private void doUpload() {
+		try {
+			String description = "Map Track created by JPSTrack";
+			TraceVisibility visibility = TraceVisibility.IDENTIFIABLE;
+			File gpxFile = new File(trackerIO.getFileName());
+			final String encodedPostBody = 
+					Upload.encodePostBody(description, visibility, gpxFile);		
+			UploadResponse response = 
+					Upload.converse(osmHostTest, 80,
+							SettingsActivity.getOSMUserName(this), 
+							osmPassword,
+							encodedPostBody);
+			final long gpxId = response.getGpxId();
+			Toast.makeText(this, "Created GPX " + gpxId, Toast.LENGTH_LONG).show();
+		} catch (IOException e) {
+			System.err.println("Caught " + e);
 		}
 	}
 
@@ -327,14 +351,15 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 					}
 			}).create();
 			return gpsOffDialog;
-		case DIALOG_OSM_PASSWORD:
+		case DIALOG_OSM_PASSWORD_AND_UPLOAD:
 			final EditText passwordText = new EditText(this);
 			final AlertDialog osmPasswordDialog = new AlertDialog.Builder(this)
 			.setCancelable(true)
-			.setMessage("OSM Password").setPositiveButton("Set", new android.content.DialogInterface.OnClickListener() {
+			.setMessage("OSM Password").setPositiveButton("Upload", new android.content.DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					MainActivity.this.password = passwordText.getText();
+					MainActivity.this.osmPassword = passwordText.getText().toString();
+					MainActivity.this.doUpload();
 				}
 				
 			})
@@ -501,9 +526,8 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 			logToScreen("Stopping file updates; " + mesg);
 			Toast.makeText(this, mesg, Toast.LENGTH_LONG).show();
 			if (SettingsActivity.isAlwaysUpload(this)) {
-				if (password == null) { /// save when rotating
-					showDialog(DIALOG_OSM_PASSWORD);
-				}
+				// Show even if we have a password, it's confirmation to upload
+				showDialog(DIALOG_OSM_PASSWORD_AND_UPLOAD);
 			}
 			fileNameLabel.setText(FileNameUtils.getDefaultFilenameFormatWithExt());
 			startButton.setEnabled(true);
