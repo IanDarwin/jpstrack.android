@@ -1,23 +1,18 @@
 jpstrack.android
 
-Show Stopper - recent MainActivity changes leaves a blank Activity on the call stack!!!
-
 Fix all the things noted in the RELEASE_NOTES file.
 
 logToScreen - make persistent in memory, keep across rotations!
 
 Make OnboardActivity a Dialog, with custom View.
 
-Dialog if sdcard in use, like Audible uses.
-
 SETTINGS
 	Add "seconds interval" and "min distance"
-	Add Username and password, store encrypted, use for upload.
+	Show/hide password
+	Expose host name, or, have a checkbox to use the sandbox.	
 
 GPS:
 	1) Visual - GPS up/down
-	2) Can we turn it on?
-	3) Upload saved data - popup when saving, if network on and username given.
 
 Externalize rest of strings.
 	Do rest of _es translation, including Spanish characters.
