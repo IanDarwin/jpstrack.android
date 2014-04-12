@@ -14,7 +14,7 @@ public class SettingsActivity extends PreferenceActivity {
 
 	static final String DIRECTORY_NAME = "jpstrack";
 	
-	// Keys MUST agree with keys defined in xml/settings.xml!
+	// Keys MUST agree with keys defined in settings.xml!
 	
 	static final String OPTION_DIR = "dir";
 	static final String OPTION_SEEN_EULA = "accepted_eula";	// NOT IN GUI FOR OBVIOUS REASONS
@@ -23,6 +23,7 @@ public class SettingsActivity extends PreferenceActivity {
 	static final String OPTION_OSM_USER = "osm_username";
 	//static final String OPTION_OSM_PASS = "osm_password";
 	private static String OPTION_ALWAYS_UPLOAD = "osm_alwaysUpload";
+	private static String OPTION_USE_SANDBOX = "osm_use_sandbox";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +64,12 @@ public class SettingsActivity extends PreferenceActivity {
 	
 	public static boolean hasSeenWelcome(final Context context) {		
 		Getter t = new Getter(context, OPTION_SEEN_WELCOME);
+		ThreadUtils.executeAndWait(t);
+		return t.getSeen();
+	}
+	
+	public static boolean useSandbox(final Context context) {		
+		Getter t = new Getter(context, OPTION_SEEN_EULA);
 		ThreadUtils.executeAndWait(t);
 		return t.getSeen();
 	}

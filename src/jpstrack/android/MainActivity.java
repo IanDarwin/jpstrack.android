@@ -281,9 +281,10 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 			TraceVisibility visibility = TraceVisibility.IDENTIFIABLE;
 			File gpxFile = trackerIO.getFile();
 			final String encodedPostBody = 
-					Upload.encodePostBody(description, visibility, gpxFile);		
+					Upload.encodePostBody(description, visibility, gpxFile);
+			String host = SettingsActivity.useSandbox(this) ? osmHostTest : osmHostProd;
 			UploadResponse response = 
-					Upload.converse(osmHostTest, 80,
+					Upload.converse(host, 80,
 							SettingsActivity.getOSMUserName(this), 
 							osmPassword,
 							encodedPostBody);
