@@ -6,7 +6,11 @@ JPSTrack is a map-making tool for OpenStreetMap.
 
 === HowTo
 
-To build this from source, you must rename one sample file, in res/raw.
+Look, if you just want to run this, 
+link:$$https://play.google.com/store/apps/details?id=jpstrack.android$$[get it from Google's Play Store].
+You do *not* have to build it from source to use it.
+
+If you do want to build this from source, you must rename one sample file, in res/raw.
 Directions are contained in the sample file in that directory.
 
 Once that's done, it should compile under either Eclipse or Maven,
