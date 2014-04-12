@@ -19,6 +19,12 @@
 			android:title="@string/osm_alwaysUpload_title"
 			android:summary="@string/osm_alwaysUpload_summary"
 		/>
+        
+        <CheckBoxPreference
+			android:key="osm_useSandbox"
+			android:title="@string/osm_useSandbox_title"
+			android:summary="@string/osm_useSandbox_summary"
+		/>
     </PreferenceCategory>
 
 </PreferenceScreen>

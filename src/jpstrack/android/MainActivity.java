@@ -287,8 +287,19 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 							SettingsActivity.getOSMUserName(this), 
 							osmPassword,
 							encodedPostBody);
-			final long gpxId = response.getGpxId();
-			Toast.makeText(this, "Created GPX " + gpxId, Toast.LENGTH_LONG).show();
+			int ret = response.getStatus();
+			switch(ret) {
+			case 200:
+				final long gpxId = response.getGpxId();
+				Toast.makeText(this, "Created GPX " + gpxId, Toast.LENGTH_LONG).show();
+				break;
+			case 401: case 403: // auth probs
+				Toast.makeText(this, "Login failed", Toast.LENGTH_LONG).show();
+				break;
+			default:
+				Toast.makeText(this, "Unexpected upload status " + ret, Toast.LENGTH_LONG).show();
+				break;
+			}
 		} catch (IOException e) {
 			System.err.println("Caught " + e);
 		}
@@ -362,7 +373,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					MainActivity.this.osmPassword = passwordText.getText().toString();
-					MainActivity.this.doUpload();
+					doUpload();
 				}
 				
 			})

@@ -78,8 +78,11 @@
     <string name="username_title">OSM User Name</string>
     
     <string name="osm_alwaysUpload_title">Always upload after save</string>
-    <string name="osm_alwaysUpload_summary">It checked, will try to upload each file to OSM after saving it.</string>
+    <string name="osm_alwaysUpload_summary">If checked, will try to upload each file to OSM after saving it.</string>
 
+    <string name="osm_useSandbox_title">Upload to Sandbox</string>
+    <string name="osm_useSandbox_summary">Developers only: upload to OSM "Sandbox" or test server (requires separate login/password!).</string>
+    
     <!--  About box -->
     <string name="about_name">About JPSTrack</string>
     <string name="about_shortname">About</string>
