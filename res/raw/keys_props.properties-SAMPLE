@@ -1,0 +1,6 @@
+# To install this file:
+# mv keys_props.properties-SAMPLE keys_props.properties
+# To use bugsense reporting, you'd need to have a key from BugSense.com
+# and save it in a file like this (uncommented of course):
+
+# BUGSENSE_API_KEY=your_key_here
