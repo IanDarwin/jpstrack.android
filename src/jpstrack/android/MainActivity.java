@@ -8,9 +8,9 @@ import java.util.Properties;
 
 import jpstrack.fileio.FileNameUtils;
 import jpstrack.fileio.GPSFileSaver;
+import jpstrack.net.NetResult;
 import jpstrack.upload.TraceVisibility;
 import jpstrack.upload.Upload;
-import jpstrack.upload.UploadResponse;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -272,37 +272,43 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 		}
 	}
 	
+	NetResult<String> response;
 	/**
 	 * UPLOAD A FILE TO OSM
 	 */
 	private void doUpload() {
-		try {
-			String description = "Map Track created by JPSTrack";
-			TraceVisibility visibility = TraceVisibility.IDENTIFIABLE;
-			File gpxFile = trackerIO.getFile();
-			final String encodedPostBody = 
-					Upload.encodePostBody(description, visibility, gpxFile);
-			String host = SettingsActivity.useSandbox(this) ? osmHostTest : osmHostProd;
-			UploadResponse response = 
-					Upload.converse(host, 80,
-							SettingsActivity.getOSMUserName(this), 
+		final String description = "Map Track created by JPSTrack";
+		final TraceVisibility visibility = TraceVisibility.IDENTIFIABLE;
+		final File gpxFile = trackerIO.getFile();
+		Runnable r = new Runnable() {
+			public void run() {
+				try {
+					final String encodedPostBody = 
+							Upload.encodePostBody(description, visibility, gpxFile);
+					String host = SettingsActivity.useSandbox(MainActivity.this) ? osmHostTest : osmHostProd;
+					response = Upload.converse(host, 80,
+							SettingsActivity.getOSMUserName(MainActivity.this), 
 							osmPassword,
 							encodedPostBody);
-			int ret = response.getStatus();
-			switch(ret) {
-			case 200:
-				final long gpxId = response.getGpxId();
-				Toast.makeText(this, "Created GPX " + gpxId, Toast.LENGTH_LONG).show();
-				break;
-			case 401: case 403: // auth probs
-				Toast.makeText(this, "Login failed", Toast.LENGTH_LONG).show();
-				break;
-			default:
-				Toast.makeText(this, "Unexpected upload status " + ret, Toast.LENGTH_LONG).show();
-				break;
+				} catch (IOException e) {
+					response = new NetResult();
+					response.setStatus(500);
+				}
 			}
-		} catch (IOException e) {
-			System.err.println("Caught " + e);
+		};
+		ThreadUtils.executeAndWait(r);
+		int ret = response.getStatus();
+		switch(ret) {
+		case 200:
+			final long gpxId = Long.parseLong(response.getPayload());
+			Toast.makeText(this, "Created GPX " + gpxId, Toast.LENGTH_LONG).show();
+			break;
+		case 401: case 403: // auth probs
+			Toast.makeText(this, "Login failed", Toast.LENGTH_LONG).show();
+			break;
+		default:
+			Toast.makeText(this, "Unexpected upload status " + ret, Toast.LENGTH_LONG).show();
+			break;
 		}
 	}
 
