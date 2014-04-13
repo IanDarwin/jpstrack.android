@@ -23,7 +23,7 @@ public class SettingsActivity extends PreferenceActivity {
 	static final String OPTION_OSM_USER = "osm_username";
 	//static final String OPTION_OSM_PASS = "osm_password";
 	private static String OPTION_ALWAYS_UPLOAD = "osm_alwaysUpload";
-	private static String OPTION_USE_SANDBOX = "osm_use_sandbox";
+	private static String OPTION_USE_SANDBOX = "osm_useSandbox";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +38,7 @@ public class SettingsActivity extends PreferenceActivity {
 	
 	/** No set method, it is set by our PreferencesActivity subclass */
 	public static String getOSMUserName(Context context) {
-		return PreferenceManager.getDefaultSharedPreferences(context).getString(OPTION_DIR, null);
+		return PreferenceManager.getDefaultSharedPreferences(context).getString(OPTION_OSM_USER, null);
 	}
 	
 	/** No set method, it is set by our PreferencesActivity subclass */
@@ -69,7 +69,7 @@ public class SettingsActivity extends PreferenceActivity {
 	}
 	
 	public static boolean useSandbox(final Context context) {		
-		Getter t = new Getter(context, OPTION_SEEN_EULA);
+		Getter t = new Getter(context, OPTION_USE_SANDBOX);
 		ThreadUtils.executeAndWait(t);
 		return t.getSeen();
 	}
