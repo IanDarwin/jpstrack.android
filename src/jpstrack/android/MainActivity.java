@@ -30,6 +30,7 @@ import android.os.Environment;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -83,7 +84,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 
 	private String OUR_BUGSENSE_API_KEY;
 	private String osmPassword;
-	private String osmHostProd = "hostname=api.openstreetmap.org";
+	private String osmHostProd = "api.openstreetmap.org";
 	private String osmHostTest = "api06.dev.openstreetmap.org";
 	
 	private ButtonSnazzler snazzler;
@@ -286,13 +287,17 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 					final String encodedPostBody = 
 							Upload.encodePostBody(description, visibility, gpxFile);
 					String host = SettingsActivity.useSandbox(MainActivity.this) ? osmHostTest : osmHostProd;
+					final String userName = SettingsActivity.getOSMUserName(MainActivity.this);
+					if (TextUtils.isEmpty(userName)) {
+						startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+					}
 					response = Upload.converse(host, 80,
-							SettingsActivity.getOSMUserName(MainActivity.this), 
-							osmPassword,
+							userName, osmPassword,
 							encodedPostBody);
 				} catch (IOException e) {
-					response = new NetResult();
-					response.setStatus(500);
+					Log.e(TAG, "Upload caught " + e, e);
+					response = new NetResult<String>();
+					response.setStatus(599);
 				}
 			}
 		};
