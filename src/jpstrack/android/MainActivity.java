@@ -135,12 +135,10 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 				checkSdPresent();
 			}
 		};
-		
 		IntentFilter iFilter = new IntentFilter();
 		iFilter.addAction(Intent.ACTION_MEDIA_MOUNTED);
 		iFilter.addAction(Intent.ACTION_MEDIA_REMOVED);
 		registerReceiver(extStorageRcvr, iFilter);
-
 
 		ThreadUtils.executeAndWait(setupSaveDirLocation);
 		
@@ -422,15 +420,16 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 	protected void onDestroy() {
 		Log.d(TAG, "I'm being destroyed!");
 		super.onDestroy();
-		unregisterReceiver(extStorageRcvr);
+		try {
+			unregisterReceiver(extStorageRcvr);
+		} catch (RuntimeException e) {
+			// Don't care; interrupted onCreate()
+		}
 	}
 	
 	private void checkSdPresent() {
 		String sdState = Environment.getExternalStorageState();
-		sdWritable = false;
-		if (Environment.MEDIA_MOUNTED.equals(sdState)) {
-			sdWritable = true;
-		}
+		sdWritable = Environment.MEDIA_MOUNTED.equals(sdState);
 	}
 	
 	/** Returns arbitrary single token object to keep alive across
@@ -455,6 +454,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 	}
 	
 	private void stopReceiving() {
+		Log.d(TAG, "stopReceiving()");
 		if (mgr != null)
 			mgr.removeUpdates(this);
 	}
@@ -514,11 +514,18 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 				// New filename each time we start recording.
 				ThreadUtils.executeAndWait(setupSaveDirLocation);
 				trackerIO.setFileName(FileNameUtils.getNextFilename());
+				if (sdWritable) {
 				ThreadUtils.executeAndWait(new Runnable() {
 					public void run() {
 						savingFile = trackerIO.startFile();
 					}
 				});
+				} else {
+					final String message = "External storage not available; can't record";
+					Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+					logToScreen(message);
+					return;
+				}
 				fileNameLabel.setText(savingFile.getName());
 				startReceiving();		// Disk IO is done on the service's thread.
 				logToScreen("Starting File Updates");
