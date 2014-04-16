@@ -1,4 +1,4 @@
-Version 1.0.0-SNAPSHOT - 2014-04-14
+Version 1.0.0 - 2014-04-15
 -----------------------------------
 
 UI updated with Android ActionBar. I still support phones as far back as API
