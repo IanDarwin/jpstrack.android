@@ -2,18 +2,23 @@ jpstrack.android
 
 Fix all the things noted in the RELEASE_NOTES file.
 
-logToScreen - make persistent in memory, keep across rotations!
+Fix all the bugs in the bugs database.
+
+logToScreen - make persistent in memory as List<string>, keep across rotations!
+
+When uploading, prompt for tags and description of the track.
+
+A File Manager to let you try again to upload a track.
+A local database with tracks' status, to avoid uploading twice
 
 Make OnboardActivity a Dialog, with custom View.
 
 SETTINGS
 	Add "seconds interval" and "min distance"
 	Show/hide password
-	Expose host name, or, have a checkbox to use the sandbox.	
 
 GPS:
 	1) Visual - GPS up/down
 
 Externalize rest of strings.
 	Do rest of _es translation, including Spanish characters.
-
