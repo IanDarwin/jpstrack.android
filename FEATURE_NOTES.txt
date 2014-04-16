@@ -11,6 +11,8 @@ web-based editor on the OSM site.
 The program collects data once you press the Start button, and
 goes until you PAUSE or SAVE. PAUSE can be resumed with the 
 RESUME button. The SAVE button ends a run and closes the file.
+You can optionally have tracks uploaded automatically when
+you save them.
 
 There is also voice notes, text notes, and pictures.
 All are saved, along with the GPX files, in 
