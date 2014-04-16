@@ -12,6 +12,12 @@ reasons; OAuth2.x coming later).
 Prevent using back button during voice recording, as this leaves the recorder
 in a confused state.
 
+Further small changes to the XML detected when auto-loading was enabled. Traces now
+get uploaded and import successfully.
+
+There is a proper buglist in a database on our server, although it's not yet
+web-accessible, so your suggestions are being saved and acted upon.
+
 Version 0.8 - 2014-01-27
 
 Minor bug fix and enhancements.
