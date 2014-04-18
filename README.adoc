@@ -4,13 +4,25 @@ The widely-used version of JPSTrack, as found on Android devices everywhere.
 
 JPSTrack is a map-making tool for OpenStreetMap.
 
-=== HowTo
+=== You don't want the source
 
-Look, if you just want to run this, 
-link:$$https://play.google.com/store/apps/details?id=jpstrack.android$$[get it from Google's Play Store].
+Look, if you just want to run this, go and
+link:$$https://play.google.com/store/apps/details?id=jpstrack.android$$[get it for free
+from Google's Play Store].
 You do *not* have to build it from source to use it.
 
-If you do want to build this from source, you must rename one sample file, in res/raw.
+=== Build Pre-req
+
+You must have the AppCompatv7 library project installed to build with Eclipse.
+
+Since we're using Google Analytics, you must have "Google Play Services" installed,
+see https://developer.android.com/google/play-services/setup.html.
+
+Alas, you need to have a bunch of API levels installed for these Google dependencies to compile.
+
+=== HowTo Build
+
+Finally, before you can build this from source, you must copy one sample file, in res/raw.
 Directions are contained in the sample file in that directory.
 
 Once that's done, it should compile under either Eclipse or Maven,
