@@ -54,6 +54,8 @@
     <string name="settings_name">JPSTrack Settings</string>
     <string name="settings_shortname">Settings</string>
     <string name="settings_accel">s</string>
+    <string name="suggest">Suggest Improvement</string>
+    <string name="suggest_shortname">Suggestion</string>
     <string name="rerun_intro">Introduction</string>
     <string name="rerun_intro_shortname">Intro</string>
     

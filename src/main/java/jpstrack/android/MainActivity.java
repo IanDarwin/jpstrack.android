@@ -692,9 +692,12 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 			startActivity(new Intent(this, SettingsActivity.class));
 			return true;
 		case R.id.rerun_intro:
-			Intent intent = new Intent(this, OnboardingActivity.class);
-			intent.putExtra(SKIP_SKIP, true);
-			startActivity(intent);
+			Intent onboardIntent = new Intent(this, OnboardingActivity.class);
+			onboardIntent.putExtra(SKIP_SKIP, true);
+			startActivity(onboardIntent);
+			return true;
+		case R.id.suggest:
+			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://darwinsys.com/contact.jsp?subject='Software: Free Software Feedback'")));
 			return true;
 		case R.id.about:
 			showDialog(DIALOG_ABOUT);

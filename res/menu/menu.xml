@@ -10,6 +10,10 @@
 		android:titleCondensed="@string/rerun_intro_shortname"
 		android:icon="@android:drawable/ic_menu_help"
 		android:showAsAction="ifRoom"/>
+	<item android:id="@+id/suggest"
+		android:title="@string/suggest"
+		android:titleCondensed="@string/suggest_shortname"
+		android:showAsAction="ifRoom"/>
 	<item android:id="@+id/about"
 		android:title="@string/about_name"
 		android:titleCondensed="@string/about_shortname"
