@@ -1,8 +1,8 @@
 jpstrack.android
 
-Fix all the things noted in the RELEASE_NOTES file.
+Fix ALL the things noted in the RELEASE_NOTES file.
 
-Fix all the bugs in the bugs database.
+Fix ALL the bugs in the bugs database.
 
 logToScreen - make persistent in memory as List<string>, keep across rotations!
 
