@@ -25,6 +25,13 @@
 			<version>${platform.version}</version>
 			<scope>provided</scope>
 		</dependency>
+
+		<!-- Put OSMdroid in for displaying maps -->
+		<dependency>
+			<groupId>org.osmdroid</groupId>
+			<artifactId>osmdroid-android</artifactId>
+			<version>4.2</version>
+		</dependency>
 	</dependencies>
 
 	<build>
