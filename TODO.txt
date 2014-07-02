@@ -9,6 +9,7 @@ logToScreen - make persistent in memory as List<string>, keep across rotations!
 When uploading, prompt for tags and description of the track.
 
 A File Manager to let you try again to upload a track.
+	See Effic Andr Threading book, FileLoader
 A local database with tracks' status, to avoid uploading twice
 
 Make OnboardActivity a Dialog, with custom View.
