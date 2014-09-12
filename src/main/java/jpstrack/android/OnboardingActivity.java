@@ -81,9 +81,14 @@ public class OnboardingActivity extends Activity implements OnClickListener {
 						Uri uri = Uri.parse(line);
 						Intent intent = new Intent(Intent.ACTION_VIEW, uri);
 						startActivity(intent);
-					} catch (IOException e) {
+					} catch (final IOException e) {
 						Log.e(TAG, "Failure", e);
-						Toast.makeText(OnboardingActivity.this, "Video failure: " + e, Toast.LENGTH_LONG).show();				
+						runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								Toast.makeText(OnboardingActivity.this, "Video failure: " + e, Toast.LENGTH_LONG).show();			
+							}	
+						});	
 					}
 				}					
 			});
