@@ -25,6 +25,13 @@
 			<version>${platform.version}</version>
 			<scope>provided</scope>
 		</dependency>
+	
+		<!-- BugSense API (also needs their repo listed, below). -->
+		<dependency>
+			<groupId>com.bugsense.trace</groupId>
+			<artifactId>bugsense</artifactId>
+			<version>3.6.1</version>
+		</dependency>
 
 		<!-- Put OSMdroid in for displaying maps -->
 		<dependency>
@@ -33,6 +40,15 @@
 			<version>4.2</version>
 		</dependency>
 	</dependencies>
+
+	<repositories>
+		<!-- Custom repo for BugSense only -->
+		<repository>
+			<id>bugsense repo</id>
+			<name>The BugSense Repository</name>
+			<url>http://www.bugsense.com/maven/</url>
+		</repository>
+	</repositories>
 
 	<build>
 		<plugins>
