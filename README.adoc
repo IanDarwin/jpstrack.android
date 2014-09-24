@@ -15,7 +15,7 @@ You do *not* have to build it from source to use it.
 
 You must have the AppCompatv7 library project installed to build with Eclipse.
 
-Alas, you need to have a bunch of API levels installed for these Google dependencies to compile.
+Note that building under Eclipse currently builds an APK missing some main .class files :-(
 
 === HowTo Build
 
