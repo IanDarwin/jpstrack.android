@@ -42,7 +42,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bugsense.trace.BugSenseHandler;
+import com.splunk.mint.Mint;
 
 /** The main class for the Android version of JPSTrack
  */
@@ -117,7 +117,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 		// set up BugSense bug tracking
 		loadKeys();
 		if (OUR_BUGSENSE_API_KEY != null) {
-			BugSenseHandler.setup(this, OUR_BUGSENSE_API_KEY);
+			Mint.initAndStartSession(this, OUR_BUGSENSE_API_KEY);
 		}
 
 		saving = false;

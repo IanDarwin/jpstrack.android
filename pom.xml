@@ -12,7 +12,7 @@
 	<url>http://darwinsys.com/jpstrack</url>
 
 	<properties>
-		<platform.version>2.3.3</platform.version>
+		<platform.version>4.1.1.4</platform.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
@@ -25,12 +25,20 @@
 			<version>${platform.version}</version>
 			<scope>provided</scope>
 		</dependency>
-	
-		<!-- BugSense API (also needs their repo listed, below). -->
+
+		<!-- The Java library part of this app -->
 		<dependency>
-			<groupId>com.bugsense.trace</groupId>
-			<artifactId>bugsense</artifactId>
-			<version>3.6.1</version>
+			<groupId>com.darwinsys</groupId>
+			<artifactId>jpstrack</artifactId>
+			<version>1.0.4-SNAPSHOT</version>
+			</dependency>
+	
+		<!-- The Splunk Mint formerly known as BugSense (also needs their repo listed, 
+			below). -->
+		<dependency>
+			<groupId>com.splunk.mint</groupId>
+			<artifactId>mint</artifactId>
+			<version>4.0</version>
 		</dependency>
 
 		<!-- Put OSMdroid in for displaying maps -->
@@ -42,11 +50,11 @@
 	</dependencies>
 
 	<repositories>
-		<!-- Custom repo for BugSense only -->
+		<!-- Custom repo for Splunk Mint (BugSense) only -->
 		<repository>
-			<id>bugsense repo</id>
-			<name>The BugSense Repository</name>
-			<url>http://www.bugsense.com/maven/</url>
+			<id>Splunk MINT repo</id>
+			<name>The Splunk MINT Repository</name>
+			<url>https://mint.splunk.com/maven/</url>
 		</repository>
 	</repositories>
 

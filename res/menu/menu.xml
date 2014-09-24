@@ -4,19 +4,19 @@
 		android:titleCondensed="@string/settings_shortname"
 		android:alphabeticShortcut="@string/settings_accel"
 		android:icon="@android:drawable/ic_menu_preferences"
-		android:showAsAction="always"/>
+		/>
 	<item android:id="@+id/rerun_intro"
 		android:title="@string/rerun_intro"
 		android:titleCondensed="@string/rerun_intro_shortname"
 		android:icon="@android:drawable/ic_menu_help"
-		android:showAsAction="ifRoom"/>
+		/>
 	<item android:id="@+id/suggest"
 		android:title="@string/suggest"
 		android:titleCondensed="@string/suggest_shortname"
-		android:showAsAction="ifRoom"/>
+		/>
 	<item android:id="@+id/about"
 		android:title="@string/about_name"
 		android:titleCondensed="@string/about_shortname"
 		android:icon="@android:drawable/ic_menu_info_details"
-		android:showAsAction="ifRoom"/>
+		/>
 </menu>
