@@ -14,6 +14,7 @@ import jpstrack.upload.Upload;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -697,7 +698,12 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 			startActivity(onboardIntent);
 			return true;
 		case R.id.suggest:
-			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://darwinsys.com/contact.jsp?subject='Software: Free Software Feedback'")));
+			Uri suggest = Uri.parse("http://darwinsys.com/contact.jsp?subject='Software: Free Software Feedback'");
+			try {
+			startActivity(new Intent(Intent.ACTION_VIEW, suggest));
+			} catch (ActivityNotFoundException e) {
+				Toast.makeText(this, "Can't start a browser for this URI: " + suggest, Toast.LENGTH_LONG).show();
+			}
 			return true;
 		case R.id.about:
 			showDialog(DIALOG_ABOUT);

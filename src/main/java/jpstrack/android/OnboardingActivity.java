@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -79,8 +80,11 @@ public class OnboardingActivity extends Activity implements OnClickListener {
 						is.close();
 						Log.d(TAG, "Video URL is: " + line);
 						Uri uri = Uri.parse(line);
-						Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-						startActivity(intent);
+						try {
+							startActivity(new Intent(Intent.ACTION_VIEW, uri));
+						} catch (ActivityNotFoundException e) {
+							Toast.makeText(OnboardingActivity.this, "Can't start a browser for this URI: " + uri, Toast.LENGTH_LONG).show();
+						}
 					} catch (final IOException e) {
 						Log.e(TAG, "Failure", e);
 						runOnUiThread(new Runnable() {
