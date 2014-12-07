@@ -108,14 +108,4 @@ public class OnboardingActivity extends Activity implements OnClickListener {
 		}
 		SettingsActivity.setSeenWelcome(this, true);
 	}
-	
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		final String YT_VIDEO_ID = "opZ69P-0Jbc";			// XXX get from Properties
-		Uri uri = null; 
-		
-		uri = Uri.parse("vnd.youtube:" + YT_VIDEO_ID);
-		uri = Uri.parse("http://darwinsys.com:88/jpstrack/JpsTrack.m4v");
-	}
 }

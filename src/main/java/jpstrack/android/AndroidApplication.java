@@ -1,8 +1,5 @@
 package jpstrack.android;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import android.app.Application;
 
 /**
