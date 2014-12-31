@@ -6,10 +6,10 @@ JPSTrack is a map-making tool for OpenStreetMap.
 
 === You don't want the source
 
-Look, if you just want to run this, go and
+Look, if you just want to run this app, go and
 link:$$https://play.google.com/store/apps/details?id=jpstrack.android$$[get it for free
 from Google's Play Store].
-You do *not* have to build it from source to use it.
+Just because it's "open source" does *not* mean you have to build it from source to use it!
 
 === Build Pre-req
 
@@ -26,6 +26,6 @@ Once that's done, it should compile under either Eclipse or Maven,
 assuming you have the Android SDK installed.
 
 Oh, for now, the Eclipse classpath is not Mavenized, so create an
-Eclipse classpath variable M2_REPO set to $HOME/.m2/repositor, 
+Eclipse classpath variable M2_REPO set to $HOME/.m2/repository,
 and extend it to darwinsys-api-1.0.3.jar
-Or Mavenize .classpath and send me a pull request.
+Better yet, Mavenize the Eclipse classpath and send me a pull request.
