@@ -17,7 +17,7 @@ You must have the AppCompatv7 library project installed to build with Eclipse.
 
 Note that building under Eclipse currently builds an APK missing some main .class files :-(
 
-=== HowTo Build
+=== HowTo Build - Maven or Eclipse
 
 Finally, before you can build this from source, you must copy one sample file, in res/raw.
 Directions are contained in the sample file in that directory.
@@ -25,7 +25,10 @@ Directions are contained in the sample file in that directory.
 Once that's done, it should compile under either Eclipse or Maven,
 assuming you have the Android SDK installed.
 
-Oh, for now, the Eclipse classpath is not Mavenized, so create an
-Eclipse classpath variable M2_REPO set to $HOME/.m2/repositor, 
-and extend it to darwinsys-api-1.0.3.jar
-Or Mavenize .classpath and send me a pull request.
+=== HowNotTo Build - Android Studio
+
+Please don't ask me to help you with moving it to Android Studio. If their import wizard
+cannot handle a simple project like this, oh well. I cannot anyway, because I don't use Android Studio unless forced to;
+it is a poor excuse for an IDE. I am staying with Eclipse and the "andmore" plugin - the Eclipse Foundation 
+has picked up maintenance of the old ADT and added a bunch of new stuff in. 
+See https://projects.eclipse.org/projects/tools.andmore
