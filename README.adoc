@@ -6,10 +6,10 @@ JPSTrack is a map-making tool for OpenStreetMap.
 
 === You don't want the source
 
-Look, if you just want to run this, go and
+Look, if you just want to run this app, go and
 link:$$https://play.google.com/store/apps/details?id=jpstrack.android$$[get it for free
 from Google's Play Store].
-You do *not* have to build it from source to use it.
+Just because it's "open source" does *not* mean you have to build it from source to use it!
 
 === Build Pre-req
 
@@ -32,3 +32,4 @@ cannot handle a simple project like this, oh well. I cannot anyway, because I do
 it is a poor excuse for an IDE. I am staying with Eclipse and the "andmore" plugin - the Eclipse Foundation 
 has picked up maintenance of the old ADT and added a bunch of new stuff in. 
 See https://projects.eclipse.org/projects/tools.andmore
+

@@ -1,0 +1,29 @@
+Categories:Navigation
+License:NewBSD
+Web Site:https://github.com/IanDarwin/jpstrack.android
+Source Code:https://github.com/IanDarwin/jpstrack.android
+Issue Tracker:https://github.com/IanDarwin/jpstrack.android/issues
+
+Summary: jpstrack lets you collect data for import into OpenStreetMap using your device's GPS
+Description:
+The Android version of jpstrack lets you collect data for import into OpenStreetMap using your device's GPS.
+The JavaSE version works with gpsd to use whatever GPS device you have available.
+Data are stored in GPX format which can be loaded into OpenStreetMap for editing,
+and might be useful in Goole Earth or in testing a different Android app with the ADB tools.
+.
+Maintainer Notes: you have to build https://github.com/IanDarwin/jpstrack as a library first.
+I hope to get this into Maven Central "someday".
+.
+Repo Type:git
+Repo:https://github.com/IanDarwin/jpstrack.android
+
+Build:1.0.2,012,
+	maven=yes,
+    commit=da8e64e390027074ef3b77c6c2acb68e37e47afc
+
+Auto Update Mode:None
+Update Check Mode:Tags
+# The Google Play version will send crash reports but the f-droid version doesn't have the api key to do so
+AntiFeatures
+	Tracking=no
+
