@@ -66,23 +66,21 @@
 
 	<build>
 		<sourceDirectory>src</sourceDirectory>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>com.simpligility.maven.plugins</groupId>
-					<artifactId>android-maven-plugin</artifactId>
-					<version>${android.plugin.version}</version>
-					<configuration>
-						<androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>
-						<resourceDirectory>${project.basedir}/res</resourceDirectory>
-						<sdk>
-							<platform>23</platform>
-						</sdk>
-						<undeployBeforeDeploy>false</undeployBeforeDeploy>
-					</configuration>
-					<extensions>true</extensions>
-				</plugin>
-			</plugins>
-		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>com.simpligility.maven.plugins</groupId>
+				<artifactId>android-maven-plugin</artifactId>
+				<version>${android.plugin.version}</version>
+				<configuration>
+					<androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>
+					<resourceDirectory>${project.basedir}/res</resourceDirectory>
+					<sdk>
+						<platform>23</platform>
+					</sdk>
+					<undeployBeforeDeploy>false</undeployBeforeDeploy>
+				</configuration>
+				<extensions>true</extensions>
+			</plugin>
+		</plugins>
 	</build>
 </project>
