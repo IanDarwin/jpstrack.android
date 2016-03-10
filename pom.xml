@@ -13,9 +13,15 @@
 
 	<properties>
 		<javase-version>1.7</javase-version>
+		<maven.compiler.source>${javase.version}</maven.compiler.source>
+		<maven.compiler.target>${javase.version}</maven.compiler.target>
+		<maven.compiler.testSource>${javase.version}</maven.compiler.testSource>
+		<maven.compiler.testTarget>${javase.version}</maven.compiler.testTarget>
 		<platform.version>4.1.1.4</platform.version>
+		<android.plugin.version>4.4.1</android.plugin.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<maven.javadoc.failOnError>false</maven.javadoc.failOnError>
 	</properties>
 
 	<dependencies>
@@ -34,8 +40,7 @@
 			<version>1.0.4-SNAPSHOT</version>
 		</dependency>
 	
-		<!-- The Splunk Mint formerly known as BugSense (also needs their repo listed, 
-			below). -->
+		<!-- The Splunk Mint formerly known as BugSense (also needs their repo listed, below). -->
 		<dependency>
 			<groupId>com.splunk.mint</groupId>
 			<artifactId>mint</artifactId>
@@ -60,33 +65,24 @@
 	</repositories>
 
 	<build>
-		<plugins>
-			<!-- Use the Android Plugin -->
-			<plugin>
-				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
-				<artifactId>android-maven-plugin</artifactId>
-				<version>3.8.2</version>
-				<configuration>
-					<androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>
-					<assetsDirectory>${project.basedir}/assets</assetsDirectory>
-					<resourceDirectory>${project.basedir}/res</resourceDirectory>
-					<nativeLibrariesDirectory>${project.basedir}/src/main/native</nativeLibrariesDirectory>
-					<sdk>
-						<platform>10</platform>
-					</sdk>
-					<undeployBeforeDeploy>true</undeployBeforeDeploy>
-				</configuration>
-				<extensions>true</extensions>
-			</plugin>
-
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<source>${javase-version}</source>
-					<target>${javase-version}</target>
-				</configuration>
-			</plugin>
-		</plugins>
+		<sourceDirectory>src</sourceDirectory>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>com.simpligility.maven.plugins</groupId>
+					<artifactId>android-maven-plugin</artifactId>
+					<version>${android.plugin.version}</version>
+					<configuration>
+						<androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>
+						<resourceDirectory>${project.basedir}/res</resourceDirectory>
+						<sdk>
+							<platform>23</platform>
+						</sdk>
+						<undeployBeforeDeploy>false</undeployBeforeDeploy>
+					</configuration>
+					<extensions>true</extensions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 </project>
