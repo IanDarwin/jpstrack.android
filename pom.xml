@@ -37,7 +37,7 @@
 		<dependency>
 			<groupId>com.darwinsys</groupId>
 			<artifactId>jpstrack</artifactId>
-			<version>1.0.4-SNAPSHOT</version>
+			<version>1.0.4</version>
 		</dependency>
 	
 		<!-- The Splunk Mint formerly known as BugSense (also needs their repo listed, below). -->
