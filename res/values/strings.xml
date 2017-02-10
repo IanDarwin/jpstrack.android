@@ -58,6 +58,8 @@
     <string name="suggest_shortname">Suggestion</string>
     <string name="rerun_intro">Introduction</string>
     <string name="rerun_intro_shortname">Intro</string>
+	<string name="privacy_policy">Privacy Policy</string>
+	<string name="privacy_shortname">Privacy</string>
     
     <!-- Onboarding -->
     <string name="welcome_name">Welcome to JPSTrack</string>

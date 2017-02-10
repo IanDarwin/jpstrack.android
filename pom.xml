@@ -73,6 +73,7 @@
 				<version>${android.plugin.version}</version>
 				<configuration>
 					<androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>
+					
 					<resourceDirectory>${project.basedir}/res</resourceDirectory>
 					<sdk>
 						<platform>23</platform>

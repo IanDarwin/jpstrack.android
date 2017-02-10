@@ -1,3 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="actionbar_title_color">#224894</color>
+	<!-- Cherry-picked from "Orange" palette at 
+	     https://www.google.com/design/spec/style/color.html -->
+    <color name="primary">#FF9800</color>
+    <color name="primary_dark">#F57C00</color>
+    <color name="accent">#FFCC80</color>
 </resources>
