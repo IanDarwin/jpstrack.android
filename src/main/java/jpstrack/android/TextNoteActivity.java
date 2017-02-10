@@ -50,7 +50,7 @@ public class TextNoteActivity extends Activity implements OnClickListener {
 
 	private void doSave() {
 		EditText tv = (EditText) findViewById(R.id.textnote_text);
-		File f = new File(MainActivity.getDataDir(), FileNameUtils.getNextFilename("txt"));
+		File f = new File(MainActivity.getDataDirectory(), FileNameUtils.getNextFilename("txt"));
 		try {
 			PrintWriter out = new PrintWriter(f);
 			out.print(tv.getText().toString());

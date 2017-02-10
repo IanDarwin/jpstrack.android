@@ -43,8 +43,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.splunk.mint.Mint;
-
 /** The main class for the Android version of JPSTrack
  */
 public class MainActivity extends Activity implements GpsStatus.Listener, LocationListener, OnClickListener {
@@ -118,7 +116,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 		// set up BugSense bug tracking
 		loadKeys();
 		if (OUR_BUGSENSE_API_KEY != null) {
-			Mint.initAndStartSession(this, OUR_BUGSENSE_API_KEY);
+			// Mint.initAndStartSession(this, OUR_BUGSENSE_API_KEY);
 		}
 
 		saving = false;
@@ -573,7 +571,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 			// GRRR, standard Sound Recorder doesn't accept MediaStore.EXTRA_OUTPUT)
 			Intent soundIntent = new Intent(this, VoiceNoteActivity.class);
 			// Set up file to save image into.
-			soundFile = new File(MainActivity.getDataDir(), FileNameUtils
+			soundFile = new File(MainActivity.getDataDirectory(), FileNameUtils
 					.getNextFilename("mp3"));
 			soundIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(soundFile));
 			// And away we go!
@@ -593,7 +591,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 				// Use an Intent to get the Camera app going.
 				Intent imageIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 				// Set up file to save image into.
-				imageFile = new File(MainActivity.getDataDir(), 
+				imageFile = new File(MainActivity.getDataDirectory(),
 					FileNameUtils.getNextFilename("jpg"));
 				imageIntent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
 				imageIntent.putExtra(MediaStore.EXTRA_OUTPUT, 
@@ -698,18 +696,25 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 			startActivity(onboardIntent);
 			return true;
 		case R.id.suggest:
-			Uri suggest = Uri.parse("http://darwinsys.com/contact.jsp?subject='Software: Free Software Feedback'");
-			try {
-			startActivity(new Intent(Intent.ACTION_VIEW, suggest));
-			} catch (ActivityNotFoundException e) {
-				Toast.makeText(this, "Can't start a browser for this URI: " + suggest, Toast.LENGTH_LONG).show();
-			}
+			startUrl("http://darwinsys.com/contact.jsp?subject='Software: Free Software Feedback'");
+			return true;
+		case R.id.privacy:
+			startUrl("http://darwinsys.com/jpstrack/privacy.html");
 			return true;
 		case R.id.about:
 			showDialog(DIALOG_ABOUT);
 			return true;
 		}
 		return false;
+	}
+
+	public void startUrl(String url) {
+		Uri uri = Uri.parse(url);
+		try {
+		startActivity(new Intent(Intent.ACTION_VIEW, uri));
+		} catch (ActivityNotFoundException e) {
+			Toast.makeText(this, "Can't start a browser for this URI: " + url, Toast.LENGTH_LONG).show();
+		}
 	}
 
 	/** From LocationListener, providing very bad news... */
@@ -749,7 +754,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 		}
 	}
 
-	public static File getDataDir() {
+	public static File getDataDirectory() {
 		return dataDir;
 	}
 

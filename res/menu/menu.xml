@@ -19,4 +19,8 @@
 		android:titleCondensed="@string/about_shortname"
 		android:icon="@android:drawable/ic_menu_info_details"
 		/>
+	<item android:id="@+id/privacy"
+		android:title="@string/privacy_policy"
+		android:titleCondensed="@string/privacy_shortname"
+		/>
 </menu>
