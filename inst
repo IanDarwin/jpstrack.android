@@ -1,1 +1,5 @@
+#!/bin/sh
+
+set -x
+
 adb install target/jpstrack\-android\-1.*.apk
