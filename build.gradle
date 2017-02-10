@@ -1,8 +1,5 @@
-// Sample build.gradle used in making ADT/AndMore projects work with Android Studio
-// while making only minimal or no changes to the filesystem hierarchy.
-// See https://androidcookbook.com/r/5203 for caveats and details!
-// See https://developer.android.com/studio/ for more on Android Studio.
-// See https://gradle.org/ for more on Gradle
+// Gradle build for jpstrack.android, converted from Eclipse as per my recipe at
+// https://androidcookbook.com/r/5203
 
 apply plugin: 'com.android.application'
 
@@ -20,7 +17,7 @@ android {
 	buildToolsVersion "25.0.2"
 
 	defaultConfig {
-		// applicationId "YOUR.PACKAGE.NAME.HERE"
+		applicationId "jpstrack.android"
 		minSdkVersion 7
 		targetSdkVersion 21
 		versionCode 1
