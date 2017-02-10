@@ -194,7 +194,6 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 			if (saving) {
 				fileNameLabel.setText(trackerIO.getFileName());
 			}
-			return;
 		} else {		
 			// I/O Helper
 			trackerIO = new GPSFileSaver(dataDir, FileNameUtils.getNextFilename());
@@ -203,6 +202,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 	
 	/** Set up the save location (gpx files, text notes, etc.) */
 	Runnable setupSaveDirLocation = new Runnable() {
+		@Override
 		public void run() {				
 			String preferredSaveLocation =
 					PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getString(SettingsActivity.OPTION_DIR, null);
@@ -279,6 +279,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 		final TraceVisibility visibility = TraceVisibility.IDENTIFIABLE;
 		final File gpxFile = trackerIO.getFile();
 		Runnable r = new Runnable() {
+			@Override
 			public void run() {
 				try {
 					final String encodedPostBody = 
@@ -293,7 +294,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 							encodedPostBody);
 				} catch (IOException e) {
 					Log.e(TAG, "Upload caught " + e, e);
-					response = new NetResult<String>();
+					response = new NetResult<>();
 					response.setStatus(599);
 				}
 			}
@@ -411,7 +412,6 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 			m.invoke(null, (Object[])null);
 		} catch (Exception e) {
 			Log.d(TAG, "Unable to set StrictMode: " + e);
-			return;
 		}
 	}
 
@@ -545,6 +545,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 			syncPauseButtonToState();
 			break;
 		case R.id.stop_button:
+			stopReceiving();
 			saving = false;
 			paused = false;
 			syncPauseButtonToState();
