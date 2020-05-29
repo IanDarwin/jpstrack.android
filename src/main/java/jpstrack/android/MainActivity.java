@@ -123,7 +123,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 		paused = false;
 		
 		// Filesystem setup
-		checkSdPresent(); // run it manually first, then on change.
+		checkSdPresent(); // run it manually first, then on change as per BroadcastReceiver:
 		if (!sdWritable)  {
 			Toast.makeText(this, "Warning, external storage not available", Toast.LENGTH_LONG).show();
 		}
