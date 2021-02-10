@@ -2,19 +2,22 @@
 <resources>
     <string name="terms">Terms</string>
     <string name="eula">
-This is your agreement for using the jpstrack program.
-If you don\'t agree with it, don\'t install or, if it\'s too late,
+This is your agreement for using the jpstrack program, a geo-tracker.
+If you don\'t agree with this agreement, don\'t install or, if it\'s too late,
 uninstall the software.  
-
+\n
 The program is free software and is open source. Everyone who has
 a device capable of running it is allowed to run it, to share it,
 without cost.
-
+\n
+You need to approve Background Location Permission because the app needs to
+be able to keep logging even if, say, a phone call comes in or you need to use another app.
+\n
 You agree that the providers of this software are not responsible
 for anything at all that happens while or because of running it,
 including software bugs, corruption of data, traffic accidents
 however caused, or any other incident however caused.
-Do not operate a vehicle while manipulating this program.
+Do not operate a vehicle of any kind while your attention is focussed on this program.
 \n
 Copyright © 2009, 2010, 2011, 2012 Ian F. Darwin. All rights reserved.
 \n
@@ -26,7 +29,7 @@ are met:\n
 2. Redistributions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.\n
-
+\n
 THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS \`\`AS IS\'\' AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -38,7 +41,7 @@ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
 LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGE.
-
+\n
 The name "JpsTrack" is a trademark and may not be used to refer to
 another application.
 </string>
