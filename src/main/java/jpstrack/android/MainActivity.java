@@ -86,8 +86,6 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 	private String osmHostProd = "api.openstreetmap.org";
 	private String osmHostTest = "api06.dev.openstreetmap.org";
 	
-	private ButtonSnazzler snazzler;
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		Log.d(TAG, "onCreate()");
@@ -147,14 +145,11 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 		latOutput = (TextView) findViewById(R.id.lat_output);
 		longOutput = (TextView) findViewById(R.id.lon_output);
 		startButton = findViewById(R.id.start_button);
-		startButton.setOnTouchListener(snazzler);
 		startButton.setOnClickListener(this);
 		pauseButton = findViewById(R.id.pause_button);
-		pauseButton.setOnTouchListener(snazzler);
 		pauseButton.setOnClickListener(this);
 		pauseButton.setEnabled(false);
 		saveButton = findViewById(R.id.stop_button);
-		saveButton.setOnTouchListener(snazzler);
 		saveButton.setOnClickListener(this);
 		saveButton.setEnabled(false);
 		fileNameLabel = (TextView) findViewById(R.id.filename_label);
