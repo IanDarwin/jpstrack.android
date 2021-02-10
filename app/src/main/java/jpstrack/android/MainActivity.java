@@ -70,7 +70,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 	private LocationManager mgr;
 	private static File dataDir;
 	private TextView output;
-	private TextView latOutput, longOutput;
+	private TextView latOutput, longOutput, altOutput;
 	private TextView fileNameLabel;
 	private GPSFileSaver trackerIO;
 	private View startButton, pauseButton, saveButton;
@@ -105,6 +105,8 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 		if (!SettingsActivity.hasSeenWelcome(this)) {
 			startActivity(new Intent(this, OnboardingActivity.class));
 		}
+
+		LayoutMainBinding binding = LayoutMainBinding.inflate(layoutInflater);
 
 		setContentView(R.layout.main);
 		
@@ -144,6 +146,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 		// THE GUI
 		latOutput = (TextView) findViewById(R.id.lat_output);
 		longOutput = (TextView) findViewById(R.id.lon_output);
+		altOutput = (TextView) findViewById(R.id.alt_output);
 		startButton = findViewById(R.id.start_button);
 		startButton.setOnClickListener(this);
 		pauseButton = findViewById(R.id.pause_button);
@@ -486,9 +489,11 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 		
 		final double latitude = location.getLatitude();
 		final double longitude = location.getLongitude();
+		final double altitude = location.getAltitude();
 		logToScreen("Location: " + latitude + "," + longitude);
 		latOutput.setText(Double.toString(latitude));
 		longOutput.setText(Double.toString(longitude));
+		altOutput.setText(altitude > 0 ? Double.toString(longitude) : "N/A");
 		if (saving && !paused) {
 			ThreadUtils.executeAndWait(new Runnable() {
 				public void run() {	
