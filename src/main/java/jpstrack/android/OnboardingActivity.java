@@ -18,7 +18,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 public class OnboardingActivity extends Activity implements OnClickListener {
-	private static String TAG = MainActivity.TAG + ".Onboarding";
+	private final static String TAG = MainActivity.TAG + ".Onboarding";
+	private final String VIDEO_TUTORIAL_URL = "http://darwinsys.com/jpstrack/tutorialvideo-url.txt";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -66,8 +67,6 @@ public class OnboardingActivity extends Activity implements OnClickListener {
 			// 2) Start an activity to view whatever it points to.
 			// This gives me maximal flexibility to change the video, something
 			// YouTube would never do (you can not remove or replace on YouTube).
-			final String urlString = "http://darwinsys.com/jpstrack/tutorialvideo-url.txt";
-
 			// Open the URL and get a Reader from it. Do in a thread.
 			Thread t = new Thread(new Runnable() {
 				@Override
@@ -75,7 +74,7 @@ public class OnboardingActivity extends Activity implements OnClickListener {
 					try {
 						final BufferedReader is = 
 								new BufferedReader(new InputStreamReader(
-										new URL(urlString).openStream()));
+										new URL(VIDEO_TUTORIAL_URL).openStream()));
 						String line = is.readLine();
 						is.close();
 						Log.d(TAG, "Video URL is: " + line);
@@ -83,7 +82,7 @@ public class OnboardingActivity extends Activity implements OnClickListener {
 						try {
 							startActivity(new Intent(Intent.ACTION_VIEW, uri));
 						} catch (ActivityNotFoundException e) {
-							Toast.makeText(OnboardingActivity.this, "Can't start a browser for this URI: " + uri, Toast.LENGTH_LONG).show();
+							Toast.makeText(OnboardingActivity.this, "Can't start activity for this URI: " + uri, Toast.LENGTH_LONG).show();
 						}
 					} catch (final IOException e) {
 						Log.e(TAG, "Failure", e);
