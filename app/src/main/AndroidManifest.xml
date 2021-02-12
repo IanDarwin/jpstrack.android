@@ -4,9 +4,7 @@
 	android:versionCode="012"
 	android:versionName="1.0.2">
 	
-    <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="22" />
-
-	<uses-feature android:name="android.hardware.location.gps" android:required="true" />
+    <uses-feature android:name="android.hardware.location.gps" android:required="true" />
 	
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
@@ -37,7 +35,6 @@
 		</activity>
 		<activity android:name=".OnboardingActivity" android:label="@string/welcome_name"/>
 		<activity android:name=".ShowWelcomePage" android:label="@string/welcome_name"/>
-		<activity android:name=".ShowWelcomeVideo" android:label="@string/welcome_name"/>
 		<activity android:name=".SettingsActivity" android:label="@string/settings_name"/>
 		<activity android:name=".VoiceNoteActivity" android:label="@string/voicenote_name"/>
 		<activity android:name=".TextNoteActivity" android:label="@string/textnote_name"/>
