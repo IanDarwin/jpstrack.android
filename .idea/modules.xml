@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/jpstrack.android.iml" filepath="$PROJECT_DIR$/jpstrack.android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/jpstrack.android.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/jpstrack.android.app.iml" />
     </modules>
   </component>
 </project>

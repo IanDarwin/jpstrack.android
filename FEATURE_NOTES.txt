@@ -21,5 +21,6 @@ All are saved, along with the GPX files, in
 This is early release software, please see the Release Notes
 before you decide it's buggy; we know about most of the bugs that
 are in this version and will fix them as we have time...
-
-$Id$
+It's an open source application; if you are a coder, please
+visit https://github.com/IanDarwin/jpstrack.android,
+clone the repo, fix the issue, and file a pull request!
