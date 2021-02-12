@@ -11,6 +11,8 @@ import jpstrack.fileio.GPSFileSaver;
 import jpstrack.net.NetResult;
 import jpstrack.upload.TraceVisibility;
 import jpstrack.upload.Upload;
+
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -20,6 +22,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.location.GpsStatus;
 import android.location.Location;
@@ -43,28 +46,30 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.core.app.ActivityCompat;
+
 /** The main class for the Android version of JPSTrack
  */
 public class MainActivity extends Activity implements GpsStatus.Listener, LocationListener, OnClickListener {
 
 	static final String TAG = "jpstrack";
-	
+
 	private static final int ACTION_TAKE_PICTURE = 1;
 	private static final int ACTION_TAKE_SOUNDBITE = 2;
-	
+
 	private static final int DIALOG_EULA = 0;
 	private static final int DIALOG_ABOUT = 1;
 	private static final int DIALOG_TURN_ON_GPS = 2;
 	private static final int DIALOG_OSM_PASSWORD_AND_UPLOAD = 3;
-	
+
 	private static final int MIN_METRES = 1;
 	private static final int MIN_SECONDS = 5;
 	private final String PROVIDER = LocationManager.GPS_PROVIDER;
-	private static final String[] PROVIDER_STATUS_VALUES = { 
-		"out of service",
-		"down temporarily", 
-		"available" };
-	
+	private static final String[] PROVIDER_STATUS_VALUES = {
+			"out of service",
+			"down temporarily",
+			"available"};
+
 	public static final String SKIP_SKIP = "DONT_SHOW_SKIP";
 
 	private LocationManager mgr;
@@ -82,10 +87,11 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 	private BroadcastReceiver extStorageRcvr;
 
 	private String OUR_BUGSENSE_API_KEY;
+
 	private String osmPassword;
 	private String osmHostProd = "api.openstreetmap.org";
 	private String osmHostTest = "api06.dev.openstreetmap.org";
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		Log.d(TAG, "onCreate()");
@@ -93,26 +99,24 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 		if (isDebug()) {
 			setStrictMode();
 		}
-		
+
 		// Show the EULA if they've not yet agreed to it it.
 		if (!SettingsActivity.hasSeenEula(this)) {
 			showDialog(DIALOG_EULA);
 			// We don't build the rest of the UI until the EULA is accepted.
 			return;
 		}
-				
+
 		// Start the welcome page or video if they haven't seen it yet.
 		if (!SettingsActivity.hasSeenWelcome(this)) {
 			startActivity(new Intent(this, OnboardingActivity.class));
 		}
 
-		LayoutMainBinding binding = LayoutMainBinding.inflate(layoutInflater);
-
 		setContentView(R.layout.main);
-		
+
 		View main = findViewById(R.id.mainView);
 		main.getBackground().setAlpha(70);
-		
+
 		// set up BugSense bug tracking
 		loadKeys();
 		if (OUR_BUGSENSE_API_KEY != null) {
@@ -121,13 +125,13 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 
 		saving = false;
 		paused = false;
-		
+
 		// Filesystem setup
 		checkSdPresent(); // run it manually first, then on change as per BroadcastReceiver:
-		if (!sdWritable)  {
+		if (!sdWritable) {
 			Toast.makeText(this, "Warning, external storage not available", Toast.LENGTH_LONG).show();
 		}
-		extStorageRcvr = new BroadcastReceiver() {			
+		extStorageRcvr = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				Log.d(TAG, "BroadcastReceiver got: " + intent);
@@ -140,9 +144,9 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 		registerReceiver(extStorageRcvr, iFilter);
 
 		ThreadUtils.executeAndWait(setupSaveDirLocation);
-		
+
 		output = (TextView) findViewById(R.id.output);
-		
+
 		// THE GUI
 		latOutput = (TextView) findViewById(R.id.lat_output);
 		longOutput = (TextView) findViewById(R.id.lon_output);
@@ -165,17 +169,28 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 		voiceNoteButton.setOnClickListener(this);
 		View takePictureButton = findViewById(R.id.takepicture_button);
 		takePictureButton.setOnClickListener(this);
-		
+
 		// GPS setup - do after GUI, of course...
 		mgr = (LocationManager) getSystemService(LOCATION_SERVICE);
 		if (!mgr.isProviderEnabled(PROVIDER)) {
 			showDialog(DIALOG_TURN_ON_GPS);
 		}
+		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
+				PackageManager.PERMISSION_GRANTED) {
+			// TODO: Consider calling
+			//    ActivityCompat#requestPermissions
+			// here to request the missing permissions, and then overriding
+			//   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+			//                                          int[] grantResults)
+			// to handle the case where the user grants the permission. See the documentation
+			// for ActivityCompat#requestPermissions for more details.
+			return;
+		}
 		mgr.addGpsStatusListener(this);
 		Location last = mgr.getLastKnownLocation(PROVIDER);
 		onLocationChanged(last);
 		startReceiving();
-		
+
 		// Now see if we just got interrupted by e.g., rotation
 		MainActivity old = (MainActivity) getLastNonConfigurationInstance();
 		if (old != null) {
@@ -188,40 +203,38 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 			syncPauseButtonToState();
 			saveButton.setEnabled(saving);
 			// this is the most important line: keep saving to same file!
-			trackerIO = old.trackerIO;			
+			trackerIO = old.trackerIO;
 			if (saving) {
 				fileNameLabel.setText(trackerIO.getFileName());
 			}
-		} else {		
+		} else {
 			// I/O Helper
 			trackerIO = new GPSFileSaver(dataDir, FileNameUtils.getNextFilename());
 		}
 	}
-	
+
 	/** Set up the save location (gpx files, text notes, etc.) */
-	Runnable setupSaveDirLocation = new Runnable() {
-		@Override
-		public void run() {				
+	Runnable setupSaveDirLocation = () -> {
 			String preferredSaveLocation =
 					PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getString(SettingsActivity.OPTION_DIR, null);
 			if (preferredSaveLocation != null && !"".equals(preferredSaveLocation)) {
 				// We've been run before
 				dataDir = new File(preferredSaveLocation);
 			} else {
-				// First run on this device, probably.
+				// First run on this device, probably. Use "external storage" so user can
+				// access without rooting device.
 				final File externalStorageDirectory = Environment.getExternalStorageDirectory();
 				Log.d(TAG, "ExternalStorageDirectory = " + externalStorageDirectory);
 				dataDir = new File(externalStorageDirectory, SettingsActivity.DIRECTORY_NAME);
 			}
-			Log.d(TAG, "Using Data Directory " + dataDir);
-			dataDir.mkdirs();	// just in case
-			if (!dataDir.exists()) {
+			Log.d(TAG, "Trying to use Data Directory " + dataDir);
+			dataDir.mkdirs();    // Be sure dir exists. Doc says OK to ignore return & test with isDirectory()
+			if (!dataDir.isDirectory()) {
 				final String message = "Warning: Directory " + dataDir + " not created";
 				Log.d(TAG, message);
 				Looper.prepare();
 				Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
 			}
-		}
 	};
 
 	/**
@@ -234,7 +247,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 			if (resources == null) {
 				throw new ExceptionInInitializerError("getResources() returned null");
 			}
-			
+
 			// This is only needed for BugSense bug tracking.
 			// If this line won't compile, create an empty file
 			// with the exact (but stupid) name res/raw/keys_props.properties 
@@ -262,13 +275,14 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 				try {
 					is.close();
 				} catch (IOException e) {
-					System.err.println("What a useless exception: " + e);
+					Log.e(TAG, "Useless close() exception: " + e, e);
 				}
 			}
 		}
 	}
-	
+
 	NetResult<String> response;
+
 	/**
 	 * UPLOAD A FILE TO OSM
 	 */
@@ -276,138 +290,135 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 		final String description = "Map Track created by JPSTrack";
 		final TraceVisibility visibility = TraceVisibility.IDENTIFIABLE;
 		final File gpxFile = trackerIO.getFile();
-		Runnable r = new Runnable() {
-			@Override
-			public void run() {
-				try {
-					final String encodedPostBody = 
-							Upload.encodePostBody(description, visibility, gpxFile);
-					String host = SettingsActivity.useSandbox(MainActivity.this) ? osmHostTest : osmHostProd;
-					final String userName = SettingsActivity.getOSMUserName(MainActivity.this);
-					if (TextUtils.isEmpty(userName)) {
-						startActivity(new Intent(MainActivity.this, SettingsActivity.class));
-					}
-					response = Upload.converse(host, 80,
-							userName, osmPassword,
-							encodedPostBody);
-				} catch (IOException e) {
-					Log.e(TAG, "Upload caught " + e, e);
-					response = new NetResult<>();
-					response.setStatus(599);
+		Runnable r = () -> {
+			try {
+				final String encodedPostBody =
+						Upload.encodePostBody(description, visibility, gpxFile);
+				String host = SettingsActivity.useSandbox(MainActivity.this) ? osmHostTest : osmHostProd;
+				final String userName = SettingsActivity.getOSMUserName(MainActivity.this);
+				if (TextUtils.isEmpty(userName)) {
+					startActivity(new Intent(MainActivity.this, SettingsActivity.class));
 				}
+				response = Upload.converse(host, 80,
+						userName, osmPassword,
+						encodedPostBody);
+			} catch (IOException e) {
+				Log.e(TAG, "Upload caught " + e, e);
+				response = new NetResult<>();
+				response.setStatus(599);
 			}
 		};
 		ThreadUtils.executeAndWait(r);
 		int ret = response.getStatus();
-		switch(ret) {
-		case 200:
-			final long gpxId = Long.parseLong(response.getPayload());
-			Toast.makeText(this, "Created GPX " + gpxId, Toast.LENGTH_LONG).show();
-			break;
-		case 401: case 403: // auth probs
-			Toast.makeText(this, "Login failed", Toast.LENGTH_LONG).show();
-			break;
-		default:
-			Toast.makeText(this, "Unexpected upload status " + ret, Toast.LENGTH_LONG).show();
-			break;
+		switch (ret) {
+			case 200:
+				final long gpxId = Long.parseLong(response.getPayload());
+				Toast.makeText(this, "Created GPX " + gpxId, Toast.LENGTH_LONG).show();
+				break;
+			case 401:
+			case 403: // auth probs
+				Toast.makeText(this, "Login failed", Toast.LENGTH_LONG).show();
+				break;
+			default:
+				Toast.makeText(this, "Unexpected upload status " + ret, Toast.LENGTH_LONG).show();
+				break;
 		}
 	}
 
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		switch (id) {
-		case DIALOG_EULA:
-			final AlertDialog alertDialog = new AlertDialog.Builder(this)
-			.setCancelable(false)
-			.setTitle(R.string.terms)
-			.setMessage(R.string.eula)
-			.setPositiveButton(R.string.accept_eula,
-					new AlertDialog.OnClickListener() {
-						public void onClick(DialogInterface dialog,
-								int which) {
-							Log.d(TAG, "User accepted EULA!");
-							SettingsActivity.setSeenEula(MainActivity.this, true);
-							// Trigger a restart!
-							startActivity(new Intent(MainActivity.this, MainActivity.class));
-						}
-					})
-			.setNegativeButton(R.string.reject_eula,
-					new AlertDialog.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							Log.d(TAG, "User REJECTED EULA!");	
-							System.exit(-1);
-						}
-					})
-			.create();
-			return alertDialog;
-		case DIALOG_ABOUT:
-			final AlertDialog aboutDialog = new AlertDialog.Builder(this)
-			.setCancelable(true)
-			.setTitle(R.string.about_name)
-			.setMessage(R.string.about_text)
-			.setPositiveButton(R.string.about_done_button_label,
-					new AlertDialog.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							// Nothing to do?
-						}
-			}).create();
-			return aboutDialog;
-		case DIALOG_TURN_ON_GPS:
-			final AlertDialog gpsOffDialog = new AlertDialog.Builder(this)
-			.setCancelable(true)
-			.setTitle(R.string.gps_dialog_name)
-			.setMessage(R.string.gps_dialog_text)
-			.setPositiveButton(R.string.gps_dialog_dismiss_label,
-				new android.content.DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						// nothing to do?
-					}
-			})
-			.setNeutralButton(R.string.gps_dialog_settings_label,
-				new android.content.DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						Intent settings = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-						startActivity(settings);
-					}
-			}).create();
-			return gpsOffDialog;
-		case DIALOG_OSM_PASSWORD_AND_UPLOAD:
-			final EditText passwordText = new EditText(this);
-			final AlertDialog osmPasswordDialog = new AlertDialog.Builder(this)
-			.setCancelable(true)
-			.setMessage("OSM Password").setPositiveButton("Upload", new android.content.DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					MainActivity.this.osmPassword = passwordText.getText().toString();
-					doUpload();
-				}
-				
-			})
-			.setNegativeButton("Cancel", new android.content.DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					// nothing to do?
-				}
-			}).create();
-			osmPasswordDialog.setView(passwordText);
-			return osmPasswordDialog;
-		default:
-			return null;
+			case DIALOG_EULA:
+				return new AlertDialog.Builder(this)
+						.setCancelable(false)
+						.setTitle(R.string.terms)
+						.setMessage(R.string.eula)
+						.setPositiveButton(R.string.accept_eula,
+								new AlertDialog.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+														int which) {
+										Log.d(TAG, "User accepted EULA!");
+										SettingsActivity.setSeenEula(MainActivity.this, true);
+										// Trigger a restart!
+										startActivity(new Intent(MainActivity.this, MainActivity.class));
+									}
+								})
+						.setNegativeButton(R.string.reject_eula,
+								new AlertDialog.OnClickListener() {
+									public void onClick(DialogInterface dialog, int which) {
+										Log.d(TAG, "User REJECTED EULA!");
+										System.exit(-1);
+									}
+								})
+						.create();
+			case DIALOG_ABOUT:
+				final AlertDialog aboutDialog = new AlertDialog.Builder(this)
+						.setCancelable(true)
+						.setTitle(R.string.about_name)
+						.setMessage(R.string.about_text)
+						.setPositiveButton(R.string.about_done_button_label,
+								new AlertDialog.OnClickListener() {
+									public void onClick(DialogInterface dialog, int which) {
+										// Nothing to do?
+									}
+								}).create();
+				return aboutDialog;
+			case DIALOG_TURN_ON_GPS:
+				final AlertDialog gpsOffDialog = new AlertDialog.Builder(this)
+						.setCancelable(true)
+						.setTitle(R.string.gps_dialog_name)
+						.setMessage(R.string.gps_dialog_text)
+						.setPositiveButton(R.string.gps_dialog_dismiss_label,
+								new android.content.DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+										// nothing to do?
+									}
+								})
+						.setNeutralButton(R.string.gps_dialog_settings_label,
+								new android.content.DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+										Intent settings = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+										startActivity(settings);
+									}
+								}).create();
+				return gpsOffDialog;
+			case DIALOG_OSM_PASSWORD_AND_UPLOAD:
+				final EditText passwordText = new EditText(this);
+				final AlertDialog osmPasswordDialog = new AlertDialog.Builder(this)
+						.setCancelable(true)
+						.setMessage("OSM Password").setPositiveButton("Upload", new android.content.DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								MainActivity.this.osmPassword = passwordText.getText().toString();
+								doUpload();
+							}
+
+						})
+						.setNegativeButton("Cancel", new android.content.DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								// nothing to do?
+							}
+						}).create();
+				osmPasswordDialog.setView(passwordText);
+				return osmPasswordDialog;
+			default:
+				return null;
 		}
 	}
 
 	private boolean isDebug() {
 		return true;
 	}
-	
+
 	public void setStrictMode() {
 		// StrictMode.enableDefaults();
 		try {
 			Class<?> c = Class.forName("android.os.StrictMode");
-			Method m = c.getMethod("enableDefaults", (Class<?>[])null);
-			m.invoke(null, (Object[])null);
+			Method m = c.getMethod("enableDefaults", (Class<?>[]) null);
+			m.invoke(null, (Object[]) null);
 		} catch (Exception e) {
 			Log.d(TAG, "Unable to set StrictMode: " + e);
 		}
@@ -423,12 +434,12 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 			// Don't care; interrupted onCreate()
 		}
 	}
-	
+
 	private void checkSdPresent() {
 		String sdState = Environment.getExternalStorageState();
 		sdWritable = Environment.MEDIA_MOUNTED.equals(sdState);
 	}
-	
+
 	/** Returns arbitrary single token object to keep alive across
 	 * the destruction and re-creation of the entire Enterprise.
 	 */
@@ -444,10 +455,21 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 		if (mgr == null) {
 			throw new NullPointerException("mgr == null in startReceiving()");
 		}
-		mgr.requestLocationUpdates(PROVIDER, 
-			MIN_SECONDS * 1000,
-			MIN_METRES,
-			this);
+		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
+				PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+			// TODO: Consider calling
+			//    ActivityCompat#requestPermissions
+			// here to request the missing permissions, and then overriding
+			//   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+			//                                          int[] grantResults)
+			// to handle the case where the user grants the permission. See the documentation
+			// for ActivityCompat#requestPermissions for more details.
+			return;
+		}
+		mgr.requestLocationUpdates(PROVIDER,
+				MIN_SECONDS * 1000,
+				MIN_METRES,
+				this);
 	}
 	
 	private void stopReceiving() {
@@ -523,13 +545,16 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 					final String message = "External storage not available; can't record";
 					Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 					logToScreen(message);
+					Log.w(TAG, message);
 					return;
 				}
 				fileNameLabel.setText(savingFile.getName());
 				startReceiving();		// Disk IO is done on the service's thread.
 				logToScreen("Starting File Updates");
 			} catch (RuntimeException e) {
-				Toast.makeText(this, "Could not save: " + e, Toast.LENGTH_LONG).show();
+				final String message = "Could not save: " + e;
+				Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+				Log.w(TAG, message);
 				startButton.setEnabled(true);
 				return;
 			}
