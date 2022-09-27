@@ -1,35 +1,23 @@
-== jpstrack.android
+= jpstrack.android
 
 The widely-used version of JPSTrack, as found on Android devices everywhere.
 
 JPSTrack is a map-making tool for OpenStreetMap.
 
-=== You don't want the source
+== You don't want the source
 
 Look, if you just want to run this app, go and
 link:$$https://play.google.com/store/apps/details?id=jpstrack.android$$[get it for free
 from Google's Play Store].
 Just because it's "open source" does *not* mean you have to build it from source to use it!
 
-=== Build Pre-req
+== Build Pre-req
 
-You must have the AppCompatv7 library project installed to build with Eclipse.
+Android Studio.
 
-Note that building under Eclipse currently builds an APK missing some main .class files :-(
-
-=== HowTo Build - Maven or Eclipse
-
-Finally, before you can build this from source, you must copy one sample file, in res/raw.
+before you can build this from source, you must copy one sample file, in res/raw.
 Directions are contained in the sample file in that directory.
 
-Once that's done, it should compile under either Eclipse or Maven,
-assuming you have the Android SDK installed.
+== Status
 
-=== HowNotTo Build - Android Studio
-
-Please don't ask me to help you with moving it to Android Studio. If their import wizard
-cannot handle a simple project like this, oh well. I cannot anyway, because I don't use Android Studio unless forced to;
-it is a poor excuse for an IDE. I am staying with Eclipse and the "andmore" plugin - the Eclipse Foundation 
-has picked up maintenance of the old ADT and added a bunch of new stuff in. 
-See https://projects.eclipse.org/projects/tools.andmore
-
+In process of modernization. Lots of updating still needed.

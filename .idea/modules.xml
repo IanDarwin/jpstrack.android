@@ -2,8 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/jpstrack.android.iml" filepath="$PROJECT_DIR$/jpstrack.android.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/jpstrack.android.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/jpstrack.android.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/TemplateApplication.iml" filepath="$PROJECT_DIR$/.idea/modules/TemplateApplication.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/TemplateApplication.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/TemplateApplication.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/TemplateApplication.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/TemplateApplication.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/TemplateApplication.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/TemplateApplication.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/TemplateApplication.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/TemplateApplication.app.unitTest.iml" />
     </modules>
   </component>
 </project>

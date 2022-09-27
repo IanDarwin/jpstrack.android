@@ -31,7 +31,6 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.text.TextUtils;
@@ -46,11 +45,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 /** The main class for the Android version of JPSTrack
  */
-public class MainActivity extends Activity implements GpsStatus.Listener, LocationListener, OnClickListener {
+public class MainActivity extends AppCompatActivity implements GpsStatus.Listener, LocationListener, OnClickListener {
 
 	static final String TAG = "jpstrack";
 
@@ -89,8 +89,8 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 	private String OUR_BUGSENSE_API_KEY;
 
 	private String osmPassword;
-	private String osmHostProd = "api.openstreetmap.org";
-	private String osmHostTest = "api06.dev.openstreetmap.org";
+	private final String osmHostProd = "api.openstreetmap.org";
+	private final String osmHostTest = "api06.dev.openstreetmap.org";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -117,11 +117,8 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 		View main = findViewById(R.id.mainView);
 		main.getBackground().setAlpha(70);
 
-		// set up BugSense bug tracking
+		// No longer using BugSense bug tracking, load keys (may be empty)
 		loadKeys();
-		if (OUR_BUGSENSE_API_KEY != null) {
-			// Mint.initAndStartSession(this, OUR_BUGSENSE_API_KEY);
-		}
 
 		saving = false;
 		paused = false;
@@ -232,7 +229,6 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 			if (!dataDir.isDirectory()) {
 				final String message = "Warning: Directory " + dataDir + " not created";
 				Log.d(TAG, message);
-				Looper.prepare();
 				Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
 			}
 	};
@@ -334,21 +330,16 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 						.setTitle(R.string.terms)
 						.setMessage(R.string.eula)
 						.setPositiveButton(R.string.accept_eula,
-								new AlertDialog.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-														int which) {
-										Log.d(TAG, "User accepted EULA!");
-										SettingsActivity.setSeenEula(MainActivity.this, true);
-										// Trigger a restart!
-										startActivity(new Intent(MainActivity.this, MainActivity.class));
-									}
+								(dialog, which) -> {
+									Log.d(TAG, "User accepted EULA!");
+									SettingsActivity.setSeenEula(MainActivity.this, true);
+									// Trigger a restart!
+									startActivity(new Intent(MainActivity.this, MainActivity.class));
 								})
 						.setNegativeButton(R.string.reject_eula,
-								new AlertDialog.OnClickListener() {
-									public void onClick(DialogInterface dialog, int which) {
-										Log.d(TAG, "User REJECTED EULA!");
-										System.exit(-1);
-									}
+								(dialog, which) -> {
+									Log.d(TAG, "User REJECTED EULA!");
+									System.exit(-1);
 								})
 						.create();
 			case DIALOG_ABOUT:
@@ -357,10 +348,8 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 						.setTitle(R.string.about_name)
 						.setMessage(R.string.about_text)
 						.setPositiveButton(R.string.about_done_button_label,
-								new AlertDialog.OnClickListener() {
-									public void onClick(DialogInterface dialog, int which) {
-										// Nothing to do?
-									}
+								(dialog, which) -> {
+									// Nothing to do?
 								}).create();
 				return aboutDialog;
 			case DIALOG_TURN_ON_GPS:
@@ -369,38 +358,26 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 						.setTitle(R.string.gps_dialog_name)
 						.setMessage(R.string.gps_dialog_text)
 						.setPositiveButton(R.string.gps_dialog_dismiss_label,
-								new android.content.DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog, int which) {
-										// nothing to do?
-									}
+								(dialog, which) -> {
+									// nothing to do?
 								})
 						.setNeutralButton(R.string.gps_dialog_settings_label,
-								new android.content.DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog, int which) {
-										Intent settings = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-										startActivity(settings);
-									}
+								(dialog, which) -> {
+									Intent settings = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+									startActivity(settings);
 								}).create();
 				return gpsOffDialog;
 			case DIALOG_OSM_PASSWORD_AND_UPLOAD:
 				final EditText passwordText = new EditText(this);
 				final AlertDialog osmPasswordDialog = new AlertDialog.Builder(this)
 						.setCancelable(true)
-						.setMessage("OSM Password").setPositiveButton("Upload", new android.content.DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								MainActivity.this.osmPassword = passwordText.getText().toString();
-								doUpload();
-							}
-
-						})
-						.setNegativeButton("Cancel", new android.content.DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								// nothing to do?
-							}
+						.setMessage("OSM Password").setPositiveButton("Upload",
+								(dialog, which) -> {
+									MainActivity.this.osmPassword = passwordText.getText().toString();
+									doUpload();
+								})
+						.setNegativeButton("Cancel", (dialog, which) -> {
+							// nothing to do?
 						}).create();
 				osmPasswordDialog.setView(passwordText);
 				return osmPasswordDialog;
@@ -443,8 +420,8 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 	/** Returns arbitrary single token object to keep alive across
 	 * the destruction and re-creation of the entire Enterprise.
 	 */
-	@Override
-	public Object onRetainNonConfigurationInstance() {
+	// XXX @Override
+	public Object XXXonRetainNonConfigurationInstance() {
 		Log.i(TAG, "Remember: 3");
 		return this;
 	}
@@ -639,6 +616,7 @@ public class MainActivity extends Activity implements GpsStatus.Listener, Locati
 	/** Called when an Activity we started for Result is complete */
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
 		switch (requestCode) {
 		case ACTION_TAKE_PICTURE:
 			switch (resultCode) {
