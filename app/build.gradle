@@ -32,6 +32,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.4.2'
     implementation 'com.google.android.material:material:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation "androidx.startup:startup-runtime:1.1.1"
 
     // Own stuff
     implementation fileTree(dir: 'libs', include: ['*.jar'])

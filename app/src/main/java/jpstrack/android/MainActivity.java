@@ -1,17 +1,5 @@
 package jpstrack.android;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Method;
-import java.util.Properties;
-
-import jpstrack.fileio.FileNameUtils;
-import jpstrack.fileio.GPSFileSaver;
-import jpstrack.net.NetResult;
-import jpstrack.upload.TraceVisibility;
-import jpstrack.upload.Upload;
-
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -19,7 +7,6 @@ import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -31,6 +18,8 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Looper;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.text.TextUtils;
@@ -48,9 +37,20 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
+import jpstrack.fileio.FileNameUtils;
+import jpstrack.fileio.GPSFileSaver;
+import jpstrack.net.NetResult;
+import jpstrack.upload.TraceVisibility;
+import jpstrack.upload.Upload;
+
 /** The main class for the Android version of JPSTrack
  */
-public class MainActivity extends AppCompatActivity implements GpsStatus.Listener, LocationListener, OnClickListener {
+public class MainActivity extends AppCompatActivity implements GpsStatus.Listener, LocationListener {
 
 	static final String TAG = "jpstrack";
 
@@ -149,29 +149,38 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 		longOutput = (TextView) findViewById(R.id.lon_output);
 		altOutput = (TextView) findViewById(R.id.alt_output);
 		startButton = findViewById(R.id.start_button);
-		startButton.setOnClickListener(this);
+		startButton.setOnClickListener(startButtonAction);
 		pauseButton = findViewById(R.id.pause_button);
-		pauseButton.setOnClickListener(this);
+		pauseButton.setOnClickListener(v -> {
+			// Don't call stopReceiving() here, so the display
+			// will still update. Maybe make this a preference?
+			paused = !paused;
+			syncPauseButtonToState();
+		});
 		pauseButton.setEnabled(false);
 		saveButton = findViewById(R.id.stop_button);
-		saveButton.setOnClickListener(this);
+		saveButton.setOnClickListener(stopButtonAction);
 		saveButton.setEnabled(false);
 		fileNameLabel = (TextView) findViewById(R.id.filename_label);
 		fileNameLabel.setText(FileNameUtils.getDefaultFilenameFormatWithExt());
 
 		// third row - note Buttons
 		View textNoteButton = findViewById(R.id.textnote_button);
-		textNoteButton.setOnClickListener(this);
+		textNoteButton.setOnClickListener(textNoteButtonAction);
 		View voiceNoteButton = findViewById(R.id.voicenote_button);
-		voiceNoteButton.setOnClickListener(this);
+		voiceNoteButton.setOnClickListener(voiceNoteButtonAction);
 		View takePictureButton = findViewById(R.id.takepicture_button);
-		takePictureButton.setOnClickListener(this);
+		takePictureButton.setOnClickListener(takePictureButtonAction);
 
 		// GPS setup - do after GUI, of course...
 		mgr = (LocationManager) getSystemService(LOCATION_SERVICE);
 		if (!mgr.isProviderEnabled(PROVIDER)) {
 			showDialog(DIALOG_TURN_ON_GPS);
 		}
+
+		// Set up I/O Helper
+		trackerIO = new GPSFileSaver(dataDir, FileNameUtils.getNextFilename());
+
 		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
 				PackageManager.PERMISSION_GRANTED) {
 			// TODO: Consider calling
@@ -204,10 +213,9 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 			if (saving) {
 				fileNameLabel.setText(trackerIO.getFileName());
 			}
-		} else {
-			// I/O Helper
-			trackerIO = new GPSFileSaver(dataDir, FileNameUtils.getNextFilename());
 		}
+
+
 	}
 
 	/** Set up the save location (gpx files, text notes, etc.) */
@@ -220,15 +228,17 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 			} else {
 				// First run on this device, probably. Use "external storage" so user can
 				// access without rooting device.
-				final File externalStorageDirectory = Environment.getExternalStorageDirectory();
-				Log.d(TAG, "ExternalStorageDirectory = " + externalStorageDirectory);
-				dataDir = new File(externalStorageDirectory, SettingsActivity.DIRECTORY_NAME);
+				final File externalStorageDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+				dataDir = new File(externalStorageDirectory,  SettingsActivity.DIRECTORY_NAME);
 			}
 			Log.d(TAG, "Trying to use Data Directory " + dataDir);
 			dataDir.mkdirs();    // Be sure dir exists. Doc says OK to ignore return & test with isDirectory()
 			if (!dataDir.isDirectory()) {
 				final String message = "Warning: Directory " + dataDir + " not created";
 				Log.d(TAG, message);
+				if (Looper.myLooper() == null) {
+					Looper.prepare();
+				}
 				Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
 			}
 	};
@@ -249,10 +259,6 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 			// with the exact (but stupid) name res/raw/keys_props.properties 
 			// And do Project->Clean, all the usual stuff...
 			is = resources.openRawResource(R.raw.keys_props);
-			if (is == null) {
-				Log.w(TAG, "loadKeys: getResources().openRawResource() returned null");
-				return;
-			}
 			Properties p = new Properties();
 			p.load(is);
 			OUR_BUGSENSE_API_KEY = p.getProperty("BUGSENSE_API_KEY");
@@ -343,7 +349,7 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 								})
 						.create();
 			case DIALOG_ABOUT:
-				final AlertDialog aboutDialog = new AlertDialog.Builder(this)
+				return new AlertDialog.Builder(this)
 						.setCancelable(true)
 						.setTitle(R.string.about_name)
 						.setMessage(R.string.about_text)
@@ -351,22 +357,20 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 								(dialog, which) -> {
 									// Nothing to do?
 								}).create();
-				return aboutDialog;
 			case DIALOG_TURN_ON_GPS:
-				final AlertDialog gpsOffDialog = new AlertDialog.Builder(this)
+				return new AlertDialog.Builder(this)
 						.setCancelable(true)
 						.setTitle(R.string.gps_dialog_name)
 						.setMessage(R.string.gps_dialog_text)
 						.setPositiveButton(R.string.gps_dialog_dismiss_label,
-								(dialog, which) -> {
+								(dialog1, which1) -> {
 									// nothing to do?
 								})
 						.setNeutralButton(R.string.gps_dialog_settings_label,
-								(dialog, which) -> {
+								(dialog1, which1) -> {
 									Intent settings = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 									startActivity(settings);
 								}).create();
-				return gpsOffDialog;
 			case DIALOG_OSM_PASSWORD_AND_UPLOAD:
 				final EditText passwordText = new EditText(this);
 				final AlertDialog osmPasswordDialog = new AlertDialog.Builder(this)
@@ -391,14 +395,7 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 	}
 
 	public void setStrictMode() {
-		// StrictMode.enableDefaults();
-		try {
-			Class<?> c = Class.forName("android.os.StrictMode");
-			Method m = c.getMethod("enableDefaults", (Class<?>[]) null);
-			m.invoke(null, (Object[]) null);
-		} catch (Exception e) {
-			Log.d(TAG, "Unable to set StrictMode: " + e);
-		}
+		StrictMode.enableDefaults();
 	}
 
 	@Override
@@ -415,15 +412,6 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 	private void checkSdPresent() {
 		String sdState = Environment.getExternalStorageState();
 		sdWritable = Environment.MEDIA_MOUNTED.equals(sdState);
-	}
-
-	/** Returns arbitrary single token object to keep alive across
-	 * the destruction and re-creation of the entire Enterprise.
-	 */
-	// XXX @Override
-	public Object XXXonRetainNonConfigurationInstance() {
-		Log.i(TAG, "Remember: 3");
-		return this;
 	}
 
 	/** start receiving GPS data... */
@@ -457,8 +445,7 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 
 	/**
 	 * Called by Android when we get paused; if not saving,
-	 * turn off getting GPS updates, in the (documented)
-	 * hopes this will save battery life.
+	 * turn off getting GPS updates, to save battery life.
 	 */
 	@Override
 	protected void onPause() {
@@ -502,116 +489,107 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 		}
 	}
 
-	/** Remember - do not block the GUI thread, kiddies! */
-	@Override
-	public void onClick(View v) {
-		switch (v.getId()) {
-		case R.id.start_button:
-			startButton.setEnabled(false);
-			try {
-				// New filename each time we start recording.
-				ThreadUtils.executeAndWait(setupSaveDirLocation);
-				trackerIO.setFileName(FileNameUtils.getNextFilename());
-				if (sdWritable) {
+	OnClickListener startButtonAction = v -> {
+		startButton.setEnabled(false);
+		try {
+			// New filename each time we start recording.
+			// Re-do setupSaveDirLocations in case user changed it in prefs
+			ThreadUtils.executeAndWait(setupSaveDirLocation);
+
+			trackerIO.setFileName(FileNameUtils.getNextFilename());
+			if (sdWritable) {
 				ThreadUtils.executeAndWait(new Runnable() {
 					public void run() {
 						savingFile = trackerIO.startFile();
 					}
 				});
-				} else {
-					final String message = "External storage not available; can't record";
-					Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-					logToScreen(message);
-					Log.w(TAG, message);
-					return;
-				}
-				fileNameLabel.setText(savingFile.getName());
-				startReceiving();		// Disk IO is done on the service's thread.
-				logToScreen("Starting File Updates");
-			} catch (RuntimeException e) {
-				final String message = "Could not save: " + e;
+			} else {
+				final String message = "External storage not available; can't record";
 				Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+				logToScreen(message);
 				Log.w(TAG, message);
-				startButton.setEnabled(true);
 				return;
 			}
-			saving = true;
-			paused = false;
-			syncPauseButtonToState();
-			saveButton.setEnabled(true);
-			break;
-		case R.id.pause_button:
-			// Don't call stopReceiving() here, so the display
-			// will still update. Maybe make this a preference?
-			paused = !paused;
-			syncPauseButtonToState();
-			break;
-		case R.id.stop_button:
-			stopReceiving();
-			saving = false;
-			paused = false;
-			syncPauseButtonToState();
-			saveButton.setEnabled(false);
-			ThreadUtils.executeAndWait(new Runnable() {
-				public void run() {	
-					trackerIO.endFile();
-				}
-			});
-			String mesg = "Saved as " + savingFile.getAbsolutePath();
-			logToScreen("Stopping file updates; " + mesg);
-			Toast.makeText(this, mesg, Toast.LENGTH_LONG).show();
-			if (SettingsActivity.isAlwaysUpload(this)) {
-				// Show even if we have a password, it's confirmation to upload
-				showDialog(DIALOG_OSM_PASSWORD_AND_UPLOAD);
-			}
-			fileNameLabel.setText(FileNameUtils.getDefaultFilenameFormatWithExt());
+			fileNameLabel.setText(savingFile.getName());
+			startReceiving();        // Disk IO is done on the service's thread.
+			logToScreen("Starting File Updates");
+		} catch (RuntimeException e) {
+			final String message = "Could not save: " + e;
+			Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+			Log.w(TAG, message);
 			startButton.setEnabled(true);
-			break;
-		case R.id.voicenote_button:
-			logToScreen("Starting Voice Recording");
-			// Use an Intent to get the Voice Record app going.
-			// Intent soundIntent = new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
-			// GRRR, standard Sound Recorder doesn't accept MediaStore.EXTRA_OUTPUT)
-			Intent soundIntent = new Intent(this, VoiceNoteActivity.class);
-			// Set up file to save image into.
-			soundFile = new File(MainActivity.getDataDirectory(), FileNameUtils
-					.getNextFilename("mp3"));
-			soundIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(soundFile));
-			// And away we go!
-			startActivityForResult(soundIntent, ACTION_TAKE_SOUNDBITE);
-			break;
-		case R.id.textnote_button:
-			logToScreen("Starting Text Entry");
-			try {
-				startActivity(new Intent(this, TextNoteActivity.class));
-			} catch (Exception e) {
-				Toast.makeText(this, getString(R.string.cant_start_activity) + ": " + e, Toast.LENGTH_LONG).show();
+			return;
+		}
+		saving = true;
+		paused = false;
+		syncPauseButtonToState();
+		saveButton.setEnabled(true);
+	};
+
+	OnClickListener stopButtonAction = v -> {
+		stopReceiving();
+		saving = false;
+		paused = false;
+		syncPauseButtonToState();
+		saveButton.setEnabled(false);
+		ThreadUtils.executeAndWait(new Runnable() {
+			public void run() {
+				trackerIO.endFile();
 			}
-			break;
-		case R.id.takepicture_button:
-			logToScreen("Starting Camera Activity");
-			try {
-				// Use an Intent to get the Camera app going.
-				Intent imageIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-				// Set up file to save image into.
-				imageFile = new File(MainActivity.getDataDirectory(),
+		});
+		String mesg = "Saved as " + savingFile.getAbsolutePath();
+		logToScreen("Stopping file updates; " + mesg);
+		Toast.makeText(this, mesg, Toast.LENGTH_LONG).show();
+		if (SettingsActivity.isAlwaysUpload(this)) {
+			// Show even if we have a password, it's confirmation to upload
+			showDialog(DIALOG_OSM_PASSWORD_AND_UPLOAD);
+		}
+		fileNameLabel.setText(FileNameUtils.getDefaultFilenameFormatWithExt());
+		startButton.setEnabled(true);
+	};
+
+	OnClickListener voiceNoteButtonAction = v -> {
+		logToScreen("Starting Voice Recording");
+		// Use an Intent to get the Voice Record app going.
+		// Intent soundIntent = new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
+		// GRRR, standard Sound Recorder doesn't accept MediaStore.EXTRA_OUTPUT)
+		Intent soundIntent = new Intent(this, VoiceNoteActivity.class);
+		// Set up file to save image into.
+		soundFile = new File(MainActivity.getDataDirectory(), FileNameUtils
+				.getNextFilename("mp3"));
+		soundIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(soundFile));
+		// And away we go!
+		startActivityForResult(soundIntent, ACTION_TAKE_SOUNDBITE);
+	};
+
+	OnClickListener textNoteButtonAction = v -> {
+		logToScreen("Starting Text Entry");
+		try {
+			startActivity(new Intent(this, TextNoteActivity.class));
+		} catch (Exception e) {
+			Toast.makeText(this, getString(R.string.cant_start_activity) + ": " + e, Toast.LENGTH_LONG).show();
+		}
+	};
+
+	OnClickListener takePictureButtonAction = v -> {
+		logToScreen("Starting Camera Activity");
+		try {
+			// Use an Intent to get the Camera app going.
+			Intent imageIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+			// Set up file to save image into.
+			imageFile = new File(MainActivity.getDataDirectory(),
 					FileNameUtils.getNextFilename("jpg"));
-				imageIntent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
-				imageIntent.putExtra(MediaStore.EXTRA_OUTPUT, 
+			imageIntent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+			imageIntent.putExtra(MediaStore.EXTRA_OUTPUT,
 					Uri.fromFile(imageFile));
-				// And away we go!
-				startActivityForResult(imageIntent, ACTION_TAKE_PICTURE);
-			} catch (Exception e) {
-				Toast.makeText(this,
+			// And away we go!
+			startActivityForResult(imageIntent, ACTION_TAKE_PICTURE);
+		} catch (Exception e) {
+			Toast.makeText(this,
 					getString(R.string.cant_start_activity) + ": " + e,
 					Toast.LENGTH_LONG).show();
-			}
-			break;
-		default:
-			logToScreen("Unexpected Click from " + v.getId());
-			break;
 		}
-	}
+	};
 
 	/** Called when an Activity we started for Result is complete */
 	@Override

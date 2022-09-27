@@ -1,5 +1,6 @@
 package jpstrack.android;
 
+import android.os.Looper;
 import android.util.Log;
 
 import java.util.concurrent.ExecutionException;
@@ -15,7 +16,7 @@ public class ThreadUtils {
 	public static void execute(final Runnable r) {
 		threadpool.execute(r);
 	}
-	
+
 	static void executeAndWait(final Runnable r) {
 		try {
 			Future<?> submission = threadpool.submit(r);
