@@ -228,7 +228,8 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 			} else {
 				// First run on this device, probably. Use "external storage" so user can
 				// access without rooting device.
-				final File externalStorageDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+				final File externalStorageDirectory =
+						Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
 				dataDir = new File(externalStorageDirectory,  SettingsActivity.DIRECTORY_NAME);
 			}
 			Log.d(TAG, "Trying to use Data Directory " + dataDir);
