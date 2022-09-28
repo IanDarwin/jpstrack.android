@@ -10,8 +10,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -43,9 +41,6 @@ import androidx.core.app.ActivityCompat;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -60,7 +55,7 @@ import jpstrack.upload.Upload;
  * Probably does too much and is too big.
  */
 @RequiresApi(api = Build.VERSION_CODES.M)
-public class MainActivity extends AppCompatActivity implements GpsStatus.Listener, LocationListener {
+public class MainActivity extends AppCompatActivity implements LocationListener {
 
 	static final String TAG = "jpstrack";
 
@@ -70,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 	private static final int DIALOG_EULA = 0;
 	private static final int DIALOG_ABOUT = 1;
 	private static final int DIALOG_TURN_ON_GPS = 2;
-	private static final int DIALOG_OSM_PASSWORD_AND_UPLOAD = 3;
+	private static final int DIALOG_OSM_CONFIRM_UPLOAD = 3;
 
 	private static final int MIN_METRES = 1;
 	private static final int MIN_SECONDS = 5;
@@ -95,8 +90,6 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 
 	private File imageFile, soundFile;
 	private BroadcastReceiver extStorageRcvr;
-
-	private String OUR_BUGSENSE_API_KEY;
 
 	private String osmPassword;
 	private final String osmHostProd = "api.openstreetmap.org";
@@ -129,13 +122,10 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 		View main = findViewById(R.id.mainView);
 		main.getBackground().setAlpha(70);
 
-		// No longer using BugSense bug tracking, load keys (may be empty)
-		loadKeys();
-
 		saving = false;
 		paused = false;
 
-		// Filesystem setup
+		// Filesystem setup; Broadcast Receiver to watch for changes
 		checkSdPresent(); // run it manually first, then on change as per BroadcastReceiver:
 		if (!sdWritable) {
 			Toast.makeText(this, "Warning, external storage not available", Toast.LENGTH_LONG).show();
@@ -193,27 +183,27 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 		// Set up I/O Helper
 		trackerIO = new GPSFileSaver(dataDir, FileNameUtils.getNextFilename());
 
-		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
-				PackageManager.PERMISSION_GRANTED) {
-			// TODO: Consider calling
-			//    ActivityCompat#requestPermissions
-			// here to request the missing permissions, and then overriding
-			//   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-			//                                          int[] grantResults)
-			// to handle the case where the user grants the permission. See the documentation
-			// for ActivityCompat#requestPermissions for more details.
-			return;
+		if (ActivityCompat.checkSelfPermission(this,
+				Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+			// We can use the API that requires the permission.
+			Location last = mgr.getLastKnownLocation(PROVIDER);
+			onLocationChanged(last);
+			startReceiving();
+		} else if (shouldShowRequestPermissionRationale(
+				Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+			// Say why we need it!
+			Toast.makeText(this, "Need permission to use the GPS for this program to work!", Toast.LENGTH_LONG).show();
+		} else {
+			// Ask for the permission.
+			// The registered ActivityResultCallback gets the result of this request.
+			storagePermissionLauncher.launch(
+					Manifest.permission.ACCESS_FINE_LOCATION);
 		}
-		mgr.addGpsStatusListener(this);
-		Location last = mgr.getLastKnownLocation(PROVIDER);
-		onLocationChanged(last);
-		startReceiving();
 
 		// Now see if we just got interrupted by e.g., rotation
 		MainActivity old = (MainActivity) getLastNonConfigurationInstance();
 		if (old != null) {
 			// Do NOT refer to any GUI components in the old object
-			mgr.removeGpsStatusListener(old); // prevent accidents
 			saving = old.saving;
 			savingFile = old.savingFile;
 			paused = old.paused;
@@ -228,10 +218,22 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 		}
 	}
 
+	// Register the GPS permissions callback, which handles the user's response to the
+	// system permissions dialog. Save the return value, an instance of
+	// ActivityResultLauncher, as an instance variable.
+	private ActivityResultLauncher<String> gpsPermissionLauncher =
+			registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+				if (isGranted) {
+					setupSaveDirectoryInternal();
+				} else {
+					Toast.makeText(this, "You've disabled permissions so this action will be unusable", Toast.LENGTH_LONG).show();
+				}
+			});
+
 	// Register the permissions callback, which handles the user's response to the
 	// system permissions dialog. Save the return value, an instance of
 	// ActivityResultLauncher, as an instance variable.
-	private ActivityResultLauncher<String> requestPermissionLauncher =
+	private ActivityResultLauncher<String> storagePermissionLauncher =
 			registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
 				if (isGranted) {
 					setupSaveDirectoryInternal();
@@ -254,18 +256,17 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 			if (this.checkSelfPermission(
 					Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
 					PackageManager.PERMISSION_GRANTED) {
-				// You can use the API that requires the permission.
+				// We can use the API that requires the permission.
 				setupSaveDirectoryInternal();
 			} else if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-				// In an educational UI, explain to the user why your app requires this
-				// permission for a specific feature to behave as expected. In this UI,
-				// include a "cancel" or "no thanks" button that allows the user to
-				// continue using your app without granting the permission.
-				Toast.makeText(this, "Need permission to write to /sdcard to you can access your files easily", Toast.LENGTH_LONG).show();
+				// Tell user why we need this!
+				Toast.makeText(this,
+					"Need permission to write to /sdcard to you can access your files easily",
+					Toast.LENGTH_LONG).show();
 			} else {
-				// You can directly ask for the permission.
+				// Ask user for the permission.
 				// The registered ActivityResultCallback gets the result of this request.
-				requestPermissionLauncher.launch(
+				storagePermissionLauncher.launch(
 						Manifest.permission.WRITE_EXTERNAL_STORAGE);
 			}
 		}
@@ -290,46 +291,6 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 		});
 	}
 
-	/**
-	 *  Load a Props file from the APK zipped filesystem, extract our app key from that.
-	 */
-	public void loadKeys() {
-		InputStream is = null;
-		try {
-			Resources resources = getResources();
-			if (resources == null) {
-				throw new ExceptionInInitializerError("getResources() returned null");
-			}
-
-			// This is only needed for BugSense bug tracking.
-			// If this line won't compile, create an empty file
-			// with the exact (but stupid) name res/raw/keys_props.properties 
-			// And do Project->Clean, all the usual stuff...
-			is = resources.openRawResource(R.raw.keys_props);
-			Properties p = new Properties();
-			p.load(is);
-			OUR_BUGSENSE_API_KEY = p.getProperty("BUGSENSE_API_KEY");
-			if (OUR_BUGSENSE_API_KEY == null) {
-				String message = "Could not find BUGSENSE_API_KEY in props";
-				Log.w(TAG, message);
-				return;
-			}
-			Log.d(TAG, "BUGSENSE_API_KEY loaded OK");
-		} catch (Exception e) {
-			String message = "Error loading properties: " + e;
-			Log.d(TAG, message);
-			throw new ExceptionInInitializerError(message);
-		} finally {
-			if (is != null) {
-				try {
-					is.close();
-				} catch (IOException e) {
-					Log.e(TAG, "Useless close() exception: " + e, e);
-				}
-			}
-		}
-	}
-
 	NetResult<String> response;
 
 	/**
@@ -344,6 +305,7 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 				try {
 					final String encodedPostBody =
 							Upload.encodePostBody(description, visibility, gpxFile);
+					// Log.d(TAG, "Post Body " + encodedPostBody);
 					String host = SettingsActivity.useSandbox(this) ? osmHostTest : osmHostProd;
 					final String userName = SettingsActivity.getOSMUserName(this);
 					if (TextUtils.isEmpty(userName)) {
@@ -423,7 +385,7 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 									Intent settings = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 									startActivity(settings);
 								}).create();
-			case DIALOG_OSM_PASSWORD_AND_UPLOAD:
+			case DIALOG_OSM_CONFIRM_UPLOAD:
 				final EditText passwordText = new EditText(this);
 				final AlertDialog osmPasswordDialog = new AlertDialog.Builder(this)
 						.setCancelable(true)
@@ -474,15 +436,10 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 		if (mgr == null) {
 			throw new NullPointerException("mgr == null in startReceiving()");
 		}
-		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
-				PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-			// TODO: Consider calling
-			//    ActivityCompat#requestPermissions
-			// here to request the missing permissions, and then overriding
-			//   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-			//                                          int[] grantResults)
-			// to handle the case where the user grants the permission. See the documentation
-			// for ActivityCompat#requestPermissions for more details.
+		if (ActivityCompat.checkSelfPermission(this,
+				Manifest.permission.ACCESS_FINE_LOCATION) !=
+				PackageManager.PERMISSION_GRANTED) {
+			Toast.makeText(this, "Location Permissions denied, not obtaining", Toast.LENGTH_LONG).show();
 			return;
 		}
 		mgr.requestLocationUpdates(PROVIDER,
@@ -533,13 +490,9 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 		logToScreen("Location: " + latitude + "," + longitude);
 		latOutput.setText(Double.toString(latitude));
 		longOutput.setText(Double.toString(longitude));
-		altOutput.setText(altitude > 0 ? Double.toString(longitude) : "N/A");
+		altOutput.setText(altitude > 0 ? Double.toString(altitude) : "N/A");
 		if (saving && !paused) {
-			ThreadUtils.executeAndWait(new Runnable() {
-				public void run() {	
-					trackerIO.write(location.getTime(), latitude, longitude);
-				}
-			});
+			threadPool.submit(() -> trackerIO.write(location.getTime(), latitude, longitude));
 		}
 	}
 
@@ -596,7 +549,7 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 		Toast.makeText(this, mesg, Toast.LENGTH_LONG).show();
 		if (SettingsActivity.isAlwaysUpload(this)) {
 			// Show even if we have a password, it's confirmation to upload
-			showDialog(DIALOG_OSM_PASSWORD_AND_UPLOAD);
+			showDialog(DIALOG_OSM_CONFIRM_UPLOAD);
 		}
 		fileNameLabel.setText(FileNameUtils.getDefaultFilenameFormatWithExt());
 		startButton.setEnabled(true);
@@ -772,22 +725,6 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 		String mesg = String.format("Provider %s status %s", provider, PROVIDER_STATUS_VALUES[status]);
 		Log.d(TAG, mesg);
 		logToScreen(mesg);
-	}
-	
-	/** From GpsStatus.Listener */
-	@Override
-	public void onGpsStatusChanged(int event) {
-		switch (event) {
-		case GpsStatus.GPS_EVENT_FIRST_FIX:
-			Log.d(TAG, "GPS Status: GotaFix");	
-			break;
-		case GpsStatus.GPS_EVENT_STARTED:
-			Log.d(TAG, "GPS Status: Started!");	
-			break;
-		case GpsStatus.GPS_EVENT_STOPPED:
-			Log.d(TAG, "GPS Status: Stopped");	
-			break;
-		}
 	}
 
 	public static File getDataDirectory() {

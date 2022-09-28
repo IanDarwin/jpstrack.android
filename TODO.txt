@@ -1,4 +1,6 @@
-jpstrack.android
+= jpstrack.android TODO
+
+Check submission against https://wiki.openstreetmap.org/wiki/API_v0.6#Create:_POST_/api/0.6/gpx/create
 
 Make MainActivity code smaller - modernize code, split.
 
