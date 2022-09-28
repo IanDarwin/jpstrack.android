@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
 	private String osmPassword;
 	private final String osmHostProd = "api.openstreetmap.org";
-	private final String osmHostTest = "api06.dev.openstreetmap.org";
+	private final String osmHostTest = "master.apis.dev.openstreetmap.org";
 
 	ExecutorService threadPool = Executors.newSingleThreadExecutor();
 
