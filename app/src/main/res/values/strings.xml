@@ -52,7 +52,7 @@
 
     <!-- Menu -->
     <string name="settings_label">Settings…</string>
-    <string name="settings_name">JPSTrack Settings</string>
+    <string name="settings_name">Settings</string>
     <string name="settings_shortname">Settings</string>
     <string name="settings_accel">s</string>
     <string name="suggest">Suggest Improvement</string>

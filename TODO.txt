@@ -1,6 +1,6 @@
 jpstrack.android
 
-Make MainActivity smaller - modernize code, split.
+Make MainActivity code smaller - modernize code, split.
 
 Fix ALL the things noted in the RELEASE_NOTES file.
 

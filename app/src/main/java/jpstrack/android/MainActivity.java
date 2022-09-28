@@ -45,6 +45,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -54,7 +55,9 @@ import jpstrack.net.NetResult;
 import jpstrack.upload.TraceVisibility;
 import jpstrack.upload.Upload;
 
-/** The main class for the Android version of JPSTrack
+/** 
+ * The main Activity class for the Android version of JPSTrack
+ * Probably does too much and is too big.
  */
 @RequiresApi(api = Build.VERSION_CODES.M)
 public class MainActivity extends AppCompatActivity implements GpsStatus.Listener, LocationListener {
@@ -336,39 +339,44 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 		final String description = "Map Track created by JPSTrack";
 		final TraceVisibility visibility = TraceVisibility.IDENTIFIABLE;
 		final File gpxFile = trackerIO.getFile();
-		Runnable r = () -> {
-			try {
-				final String encodedPostBody =
-						Upload.encodePostBody(description, visibility, gpxFile);
-				String host = SettingsActivity.useSandbox(MainActivity.this) ? osmHostTest : osmHostProd;
-				final String userName = SettingsActivity.getOSMUserName(MainActivity.this);
-				if (TextUtils.isEmpty(userName)) {
-					startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+
+			threadPool.submit(() -> {
+				try {
+					final String encodedPostBody =
+							Upload.encodePostBody(description, visibility, gpxFile);
+					String host = SettingsActivity.useSandbox(this) ? osmHostTest : osmHostProd;
+					final String userName = SettingsActivity.getOSMUserName(this);
+					if (TextUtils.isEmpty(userName)) {
+						startActivity(new Intent(this, SettingsActivity.class));
+					}
+					response = Upload.converse(host, 443,
+							userName, osmPassword,
+							encodedPostBody);
+
+					// Doing Toast from a bg thread needs loopiness
+					if (Looper.myLooper() == null) {
+						Looper.prepare();
+					}
+					int ret = response.getStatus();
+					switch (ret) {
+						case 200:
+							final long gpxId = Long.parseLong(response.getPayload());
+							Toast.makeText(this, "Created GPX " + gpxId, Toast.LENGTH_LONG).show();
+							break;
+						case 401:
+						case 403: // auth probs
+							Toast.makeText(this, "Login failed", Toast.LENGTH_LONG).show();
+							break;
+						default:
+							Toast.makeText(this, "Unexpected upload status " + ret, Toast.LENGTH_LONG).show();
+							break;
+					}
+				} catch (IOException e) {
+					Log.e(TAG, "Upload caught " + e, e);
+					response = new NetResult<>();
+					response.setStatus(599);
 				}
-				response = Upload.converse(host, 443,
-						userName, osmPassword,
-						encodedPostBody);
-			} catch (IOException e) {
-				Log.e(TAG, "Upload caught " + e, e);
-				response = new NetResult<>();
-				response.setStatus(599);
-			}
-		};
-		ThreadUtils.executeAndWait(r);
-		int ret = response.getStatus();
-		switch (ret) {
-			case 200:
-				final long gpxId = Long.parseLong(response.getPayload());
-				Toast.makeText(this, "Created GPX " + gpxId, Toast.LENGTH_LONG).show();
-				break;
-			case 401:
-			case 403: // auth probs
-				Toast.makeText(this, "Login failed", Toast.LENGTH_LONG).show();
-				break;
-			default:
-				Toast.makeText(this, "Unexpected upload status " + ret, Toast.LENGTH_LONG).show();
-				break;
-		}
+		});
 	}
 
 	@Override
@@ -419,10 +427,12 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 				final EditText passwordText = new EditText(this);
 				final AlertDialog osmPasswordDialog = new AlertDialog.Builder(this)
 						.setCancelable(true)
-						.setMessage("OSM Password").setPositiveButton("Upload",
+						.setMessage("OSM Password")
+						.setPositiveButton("Upload",
 								(dialog, which) -> {
 									MainActivity.this.osmPassword = passwordText.getText().toString();
 									doUpload();
+									dialog.cancel();
 								})
 						.setNegativeButton("Cancel", (dialog, which) -> {
 							// nothing to do?
@@ -722,7 +732,7 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 			startActivity(onboardIntent);
 			return true;
 		case R.id.suggest:
-			startUrl("https://darwinsys.com/contact.jsp?subject='Software: Free Software Feedback'");
+			startUrl("https://darwinsys.com/contact?subject='Software: Free Software Feedback'");
 			return true;
 		case R.id.privacy:
 			startUrl("https://darwinsys.com/jpstrack/privacy.html");
