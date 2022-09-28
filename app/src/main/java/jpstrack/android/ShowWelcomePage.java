@@ -9,7 +9,7 @@ import android.widget.Button;
 
 public class ShowWelcomePage extends Activity {
 	private static final String WEB_TUTORIAL_URL =
-			"http://darwinsys.com/jpstrack/tutorial.html";
+			"https://darwinsys.com/jpstrack/tutorial.html";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

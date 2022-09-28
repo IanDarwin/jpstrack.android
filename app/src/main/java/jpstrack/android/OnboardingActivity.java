@@ -19,7 +19,7 @@ import android.widget.Toast;
 
 public class OnboardingActivity extends Activity implements OnClickListener {
 	private final static String TAG = MainActivity.TAG + ".Onboarding";
-	private final String VIDEO_TUTORIAL_URL = "http://darwinsys.com/jpstrack/tutorialvideo-url.txt";
+	private final String VIDEO_TUTORIAL_URL = "https://darwinsys.com/jpstrack/tutorialvideo-url.txt";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

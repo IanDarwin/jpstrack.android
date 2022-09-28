@@ -16,6 +16,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Looper;
@@ -34,6 +35,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -41,6 +45,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import jpstrack.fileio.FileNameUtils;
 import jpstrack.fileio.GPSFileSaver;
@@ -50,6 +56,7 @@ import jpstrack.upload.Upload;
 
 /** The main class for the Android version of JPSTrack
  */
+@RequiresApi(api = Build.VERSION_CODES.M)
 public class MainActivity extends AppCompatActivity implements GpsStatus.Listener, LocationListener {
 
 	static final String TAG = "jpstrack";
@@ -91,6 +98,8 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 	private String osmPassword;
 	private final String osmHostProd = "api.openstreetmap.org";
 	private final String osmHostTest = "api06.dev.openstreetmap.org";
+
+	ExecutorService threadPool = Executors.newSingleThreadExecutor();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -214,24 +223,57 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 				fileNameLabel.setText(trackerIO.getFileName());
 			}
 		}
-
-
 	}
+
+	// Register the permissions callback, which handles the user's response to the
+	// system permissions dialog. Save the return value, an instance of
+	// ActivityResultLauncher, as an instance variable.
+	private ActivityResultLauncher<String> requestPermissionLauncher =
+			registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+				if (isGranted) {
+					setupSaveDirectoryInternal();
+				} else {
+					Toast.makeText(this, "You've disabled permissions so this action will be unusable", Toast.LENGTH_LONG).show();
+				}
+			});
+
 
 	/** Set up the save location (gpx files, text notes, etc.) */
 	Runnable setupSaveDirLocation = () -> {
-			String preferredSaveLocation =
-					PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getString(SettingsActivity.OPTION_DIR, null);
-			if (preferredSaveLocation != null && !"".equals(preferredSaveLocation)) {
-				// We've been run before
-				dataDir = new File(preferredSaveLocation);
+		String preferredSaveLocation =
+				PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getString(SettingsActivity.OPTION_DIR, null);
+		if (preferredSaveLocation != null && !"".equals(preferredSaveLocation)) {
+			// We've been run before
+			dataDir = new File(preferredSaveLocation);
+		} else {
+			// First run on this device, probably. Use "external storage" so user can
+			// access own files without rooting device.
+			if (this.checkSelfPermission(
+					Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+					PackageManager.PERMISSION_GRANTED) {
+				// You can use the API that requires the permission.
+				setupSaveDirectoryInternal();
+			} else if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+				// In an educational UI, explain to the user why your app requires this
+				// permission for a specific feature to behave as expected. In this UI,
+				// include a "cancel" or "no thanks" button that allows the user to
+				// continue using your app without granting the permission.
+				Toast.makeText(this, "Need permission to write to /sdcard to you can access your files easily", Toast.LENGTH_LONG).show();
 			} else {
-				// First run on this device, probably. Use "external storage" so user can
-				// access without rooting device.
-				final File externalStorageDirectory =
-						Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-				dataDir = new File(externalStorageDirectory,  SettingsActivity.DIRECTORY_NAME);
+				// You can directly ask for the permission.
+				// The registered ActivityResultCallback gets the result of this request.
+				requestPermissionLauncher.launch(
+						Manifest.permission.WRITE_EXTERNAL_STORAGE);
 			}
+		}
+	};
+
+	void setupSaveDirectoryInternal() {
+		threadPool.submit( () -> {
+			final File externalStorageDirectory =
+					Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+			dataDir = new File(externalStorageDirectory, SettingsActivity.DIRECTORY_NAME);
+
 			Log.d(TAG, "Trying to use Data Directory " + dataDir);
 			dataDir.mkdirs();    // Be sure dir exists. Doc says OK to ignore return & test with isDirectory()
 			if (!dataDir.isDirectory()) {
@@ -242,7 +284,8 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 				}
 				Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
 			}
-	};
+		});
+	}
 
 	/**
 	 *  Load a Props file from the APK zipped filesystem, extract our app key from that.
@@ -302,7 +345,7 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 				if (TextUtils.isEmpty(userName)) {
 					startActivity(new Intent(MainActivity.this, SettingsActivity.class));
 				}
-				response = Upload.converse(host, 80,
+				response = Upload.converse(host, 443,
 						userName, osmPassword,
 						encodedPostBody);
 			} catch (IOException e) {
@@ -679,10 +722,10 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 			startActivity(onboardIntent);
 			return true;
 		case R.id.suggest:
-			startUrl("http://darwinsys.com/contact.jsp?subject='Software: Free Software Feedback'");
+			startUrl("https://darwinsys.com/contact.jsp?subject='Software: Free Software Feedback'");
 			return true;
 		case R.id.privacy:
-			startUrl("http://darwinsys.com/jpstrack/privacy.html");
+			startUrl("https://darwinsys.com/jpstrack/privacy.html");
 			return true;
 		case R.id.about:
 			showDialog(DIALOG_ABOUT);
