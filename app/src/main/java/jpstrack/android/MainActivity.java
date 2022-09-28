@@ -144,12 +144,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
 		ThreadUtils.executeAndWait(setupSaveDirLocation);
 
-		output = (TextView) findViewById(R.id.output);
+		output = findViewById(R.id.output);
 
 		// THE GUI
-		latOutput = (TextView) findViewById(R.id.lat_output);
-		longOutput = (TextView) findViewById(R.id.lon_output);
-		altOutput = (TextView) findViewById(R.id.alt_output);
+		latOutput = findViewById(R.id.lat_output);
+		longOutput = findViewById(R.id.lon_output);
+		altOutput = findViewById(R.id.alt_output);
 		startButton = findViewById(R.id.start_button);
 		startButton.setOnClickListener(startButtonAction);
 		pauseButton = findViewById(R.id.pause_button);
@@ -221,7 +221,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 	// Register the GPS permissions callback, which handles the user's response to the
 	// system permissions dialog. Save the return value, an instance of
 	// ActivityResultLauncher, as an instance variable.
-	private ActivityResultLauncher<String> gpsPermissionLauncher =
+	private final ActivityResultLauncher<String> gpsPermissionLauncher =
 			registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
 				if (isGranted) {
 					setupSaveDirectoryInternal();
@@ -329,10 +329,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 						case 403: // auth probs
 							Toast.makeText(this, "Login failed", Toast.LENGTH_LONG).show();
 							break;
+						case 404:
+							Toast.makeText(this, "Internal error: Bad URL", Toast.LENGTH_LONG).show();
+							break;
 						default:
 							Toast.makeText(this, "Unexpected upload status " + ret, Toast.LENGTH_LONG).show();
 							break;
 					}
+					MainActivity.this.runOnUiThread(() ->
+							logToScreen("Upload completed with status " + ret));
 				} catch (IOException e) {
 					Log.e(TAG, "Upload caught " + e, e);
 					response = new NetResult<>();
