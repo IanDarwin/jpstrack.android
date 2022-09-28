@@ -1,5 +1,9 @@
 jpstrack.android
 
+Make MainActivity smaller - modernize code, split.
+
+SettingsActivity - replace with modern version.
+
 Fix ALL the things noted in the RELEASE_NOTES file.
 
 Fix ALL the bugs in the bugs database.

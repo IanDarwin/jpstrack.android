@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 	private View startButton, pauseButton, saveButton;
 	private boolean saving, paused;
 	private File savingFile;
-	private static boolean sdWritable;
+	protected static boolean sdWritable;
 
 	private File imageFile, soundFile;
 	private BroadcastReceiver extStorageRcvr;
@@ -747,10 +747,5 @@ public class MainActivity extends AppCompatActivity implements GpsStatus.Listene
 			return;
 		}
 		output.append(string + "\n");
-	}
-	
-	// Plain accessors
-	public static boolean isSdWritable() {
-		return sdWritable;
 	}
 }
