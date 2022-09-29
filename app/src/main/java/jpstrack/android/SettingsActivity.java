@@ -61,7 +61,11 @@ public class SettingsActivity extends PreferenceActivity {
 	
 	/** No set method, it is set by our PreferencesActivity subclass */
 	public static boolean isAlwaysUpload(Context context) {
-		return  getSharedPrefs(context).getBoolean(OPTION_ALWAYS_UPLOAD, false);
+		try {
+			return tPool.submit(() -> getSharedPrefs(context).getBoolean(OPTION_ALWAYS_UPLOAD, false)).get();
+		} catch (ExecutionException | InterruptedException e) {
+			throw new RuntimeException();
+		}
 	}
 
 	public static void setSeenEula(final Context context, final boolean seenValue) {

@@ -35,6 +35,7 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -46,6 +47,7 @@ import java.util.concurrent.Executors;
 
 import jpstrack.fileio.FileNameUtils;
 import jpstrack.fileio.GPSFileSaver;
+import jpstrack.model.Reading;
 import jpstrack.net.NetResult;
 import jpstrack.upload.TraceVisibility;
 import jpstrack.upload.Upload;
@@ -83,9 +85,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 	private TextView latOutput, longOutput, altOutput;
 	private TextView fileNameLabel;
 	private GPSFileSaver trackerIO;
-	private View startButton, pauseButton, saveButton;
+	private View startButton, pauseButton, stopButton;
 	private boolean saving, paused;
-	private File savingFile;
 	protected static boolean sdWritable;
 
 	private File imageFile, soundFile;
@@ -160,9 +161,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 			syncPauseButtonToState();
 		});
 		pauseButton.setEnabled(false);
-		saveButton = findViewById(R.id.stop_button);
-		saveButton.setOnClickListener(stopButtonAction);
-		saveButton.setEnabled(false);
+		stopButton = findViewById(R.id.stop_button);
+		stopButton.setOnClickListener(stopButtonAction);
+		stopButton.setEnabled(false);
 		fileNameLabel = (TextView) findViewById(R.id.filename_label);
 		fileNameLabel.setText(FileNameUtils.getDefaultFilenameFormatWithExt());
 
@@ -175,6 +176,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 		takePictureButton.setOnClickListener(takePictureButtonAction);
 
 		// GPS setup - do after GUI, of course...
+		// XXX Permissions goo here.
 		mgr = (LocationManager) getSystemService(LOCATION_SERVICE);
 		if (!mgr.isProviderEnabled(PROVIDER)) {
 			showDialog(DIALOG_TURN_ON_GPS);
@@ -201,21 +203,33 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 		}
 
 		// Now see if we just got interrupted by e.g., rotation
-		MainActivity old = (MainActivity) getLastNonConfigurationInstance();
+		MainActivity old = (MainActivity) getLastCustomNonConfigurationInstance();
+		Log.d(TAG, "getLastNonConfigurationInstance() = " + old);
 		if (old != null) {
-			// Do NOT refer to any GUI components in the old object
+			// Do NOT refer to any GUI components from the old object
 			saving = old.saving;
-			savingFile = old.savingFile;
 			paused = old.paused;
 			startButton.setEnabled(!saving);
 			syncPauseButtonToState();
-			saveButton.setEnabled(saving);
+			stopButton.setEnabled(saving);
 			// this is the most important line: keep saving to same file!
 			trackerIO = old.trackerIO;
-			if (saving) {
-				fileNameLabel.setText(trackerIO.getFileName());
-			}
 		}
+
+		if (((ApplicationSingleton)getApplication()).fileInProgress != null) {
+			saving = true;
+			startButton.setEnabled(false);
+			fileNameLabel.setText(((ApplicationSingleton)getApplication()).fileInProgress.getName());
+			stopButton.setEnabled(true);
+		}
+		if (saving) {
+			fileNameLabel.setText(trackerIO.getFileName());
+		}
+	}
+
+	// Apps can no longer implement onConfigurationInstance as it's now final in superclass.
+	public Object onRetainCustomNonConfigurationInstance() {
+		return this;
 	}
 
 	// Register the GPS permissions callback, which handles the user's response to the
@@ -224,6 +238,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 	private final ActivityResultLauncher<String> gpsPermissionLauncher =
 			registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
 				if (isGranted) {
+					// XXX ???
 					setupSaveDirectoryInternal();
 				} else {
 					Toast.makeText(this, "You've disabled permissions so this action will be unusable", Toast.LENGTH_LONG).show();
@@ -301,7 +316,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 		final TraceVisibility visibility = TraceVisibility.IDENTIFIABLE;
 		final File gpxFile = trackerIO.getFile();
 
-			threadPool.submit(() -> {
+		threadPool.submit(() -> {
 				try {
 					final String encodedPostBody =
 							Upload.encodePostBody(description, visibility, gpxFile);
@@ -488,16 +503,18 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 		if (location == null) {
 			return;
 		}
-		
-		final double latitude = location.getLatitude();
-		final double longitude = location.getLongitude();
-		final double altitude = location.getAltitude();
-		logToScreen("Location: " + latitude + "," + longitude);
-		latOutput.setText(Double.toString(latitude));
-		longOutput.setText(Double.toString(longitude));
-		altOutput.setText(altitude > 0 ? Double.toString(altitude) : "N/A");
+
 		if (saving && !paused) {
-			threadPool.submit(() -> trackerIO.write(location.getTime(), latitude, longitude));
+			// Convert from Android location object to app-specific one.
+			final double latitude = location.getLatitude();
+			final double longitude = location.getLongitude();
+			final double altitude = location.getAltitude();
+			logToScreen("Location: " + latitude + "," + longitude);
+			latOutput.setText(Double.toString(latitude));
+			longOutput.setText(Double.toString(longitude));
+			altOutput.setText(altitude > 0 ? Double.toString(altitude) : "N/A");
+			Reading reading = new Reading(latitude, longitude, altitude, location.getTime());
+			threadPool.submit(() -> trackerIO.write(reading));
 		}
 	}
 
@@ -508,11 +525,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 			// Re-do setupSaveDirLocations in case user changed it in prefs
 			ThreadUtils.executeAndWait(setupSaveDirLocation);
 
-			trackerIO.setFileName(FileNameUtils.getNextFilename());
 			if (sdWritable) {
+				trackerIO.setFileName(FileNameUtils.getNextFilename());
 				ThreadUtils.executeAndWait(new Runnable() {
 					public void run() {
-						savingFile = trackerIO.startFile();
+						((ApplicationSingleton)getApplication()).fileInProgress = trackerIO.startFile();
 					}
 				});
 			} else {
@@ -522,7 +539,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 				Log.w(TAG, message);
 				return;
 			}
-			fileNameLabel.setText(savingFile.getName());
+			fileNameLabel.setText(((ApplicationSingleton)getApplication()).fileInProgress.getName());
 			startReceiving();        // Disk IO is done on the service's thread.
 			logToScreen("Starting File Updates");
 		} catch (RuntimeException e) {
@@ -535,7 +552,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 		saving = true;
 		paused = false;
 		syncPauseButtonToState();
-		saveButton.setEnabled(true);
+		stopButton.setEnabled(true);
 	};
 
 	OnClickListener stopButtonAction = v -> {
@@ -543,17 +560,18 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 		saving = false;
 		paused = false;
 		syncPauseButtonToState();
-		saveButton.setEnabled(false);
+		stopButton.setEnabled(false);
 		ThreadUtils.executeAndWait(new Runnable() {
 			public void run() {
 				trackerIO.endFile();
 			}
 		});
-		String mesg = "Saved as " + savingFile.getAbsolutePath();
+		String mesg = "Saved as " + trackerIO.getFile().getAbsolutePath();
 		logToScreen("Stopping file updates; " + mesg);
 		Toast.makeText(this, mesg, Toast.LENGTH_LONG).show();
+		((ApplicationSingleton)getApplication()).fileInProgress = null;
 		if (SettingsActivity.isAlwaysUpload(this)) {
-			// Show even if we have a password, it's confirmation to upload
+			// Show even if we have a password, it's a confirmation to upload
 			showDialog(DIALOG_OSM_CONFIRM_UPLOAD);
 		}
 		fileNameLabel.setText(FileNameUtils.getDefaultFilenameFormatWithExt());
@@ -743,4 +761,5 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 		}
 		output.append(string + "\n");
 	}
+
 }
