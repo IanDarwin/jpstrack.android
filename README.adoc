@@ -10,13 +10,11 @@ Look, if you just want to run this app, go and
 link:$$https://play.google.com/store/apps/details?id=jpstrack.android$$[get it for free
 from Google's Play Store].
 Just because it's "open source" does *not* mean you have to build it from source to use it!
+But you can, if you really want to. Read on.
 
 == Build Pre-req
 
 Android Studio.
-
-before you can build this from source, you must copy one sample file, in res/raw.
-Directions are contained in the sample file in that directory.
 
 == Status
 
