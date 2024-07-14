@@ -51,7 +51,7 @@ public class SettingsActivity extends PreferenceActivity {
 
 	/** No set method, it is set by our PreferencesActivity subclass */
 	public static String getDirectory(Context context) {
-		return getSharedPrefs(context).getString(OPTION_DIR, MainActivity.dataDir().getAbsolutePath());
+		return getSharedPrefs(context).getString(OPTION_DIR, MainActivity.dataDir.getAbsolutePath());
 	}
 	
 	/** No set method, it is set by our PreferencesActivity subclass */
