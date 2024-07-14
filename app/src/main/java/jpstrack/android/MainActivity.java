@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 	public static final String SKIP_SKIP = "DONT_SHOW_SKIP";
 
 	private LocationManager mgr;
-	private static File dataDir = new File("/sdcard/Download/jpstrack");
+	static File dataDir = new File("/sdcard/Download/jpstrack");
 	private TextView output;
 	private TextView latOutput, longOutput, altOutput;
 	private TextView fileNameLabel;
