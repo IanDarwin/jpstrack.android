@@ -262,8 +262,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
 	/** Set up the save location (gpx files, text notes, etc.) */
 	Runnable setupSaveDirLocation = () -> {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
 		String preferredSaveLocation =
-				PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getString(SettingsActivity.OPTION_DIR, null);
+				prefs.getString(SettingsActivity.OPTION_DIR, null);
 		if (preferredSaveLocation != null && !"".equals(preferredSaveLocation)) {
 			// We've been run before
 			dataDir = new File(preferredSaveLocation);
@@ -275,6 +276,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 					PackageManager.PERMISSION_GRANTED) {
 				// We can use the API that requires the permission.
 				setupSaveDirectoryInternal();
+				prefs.put(SettingsActivity.OPTION_DIR, dataDir.getAbsolutePath());
 			} else if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 				// Tell user why we need this!
 				Toast.makeText(this,
