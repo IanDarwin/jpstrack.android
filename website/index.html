@@ -1,0 +1,131 @@
+<html>
+<head>
+	<title>JPSTrack: Free OSM Tracker for Android</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<meta name='viewport' content='width=device-width, initial-scale=1'/>
+	<link rel="stylesheet" type="text/css" href="/css/darwinsys.css" title="style"/>
+	<script src="/js/jquery-1.11.0.min.js" type="text/javascript"></script>
+	<script>
+		$(document).ready(function () {
+			$("div[data-includeFile]").each(function () {                
+				$(this).load($(this).attr("data-includeFile"));
+			});
+		});
+	</script>
+</head>
+
+<body>
+<br/> 
+<table class="MainTable">
+<tr>
+<td class="TableNav">
+<div data-includeFile="/tablenav.html">Nav Loading...</div>
+</td>
+
+<!-- Little column in blue for separator -->
+<td width="2" bgcolor="blue">
+&nbsp;
+</td>
+
+<td valign="top">
+<!-- The Main Page -->
+
+<img src="icon.png" align="right" alt="Logo"/>
+
+<h3>JPSTrack: Android OSM Tracker</h3>
+
+<h4>What?</h4>
+<p>
+This program collects data for inclusion into 
+<a href="https://www.openstreetmap.org/">OpenStreetMap</a>,
+the free, editable map of the world. This is NOT a Navigation
+application (there are many of those in the Market already).
+It is different from the "Vespucci" app in that, unlike Vespucci,
+it does NOT try to be an OSM editor. In the author's experience,
+most current Android devices do not have the I/O capability to do this
+job well. I recommend uploading the files (from /sdcard/jpstrack)
+to a desktop PC and runnnig the JOSM editor or even using the
+web-based editor on the OSM site.
+</p>
+<p>JPSTrack differs from Google's own My Tracks in that it is
+much more narrowly focused: it only records GPX tracks for OSM.
+It allows you to upload GPX tracks directly to OSM.
+</p>
+<p>
+The program collects data once you press the Start button, and
+goes until you PAUSE or SAVE. PAUSE can be resumed with the 
+RESUME button. The SAVE button ends a run and closes the file.
+</p>
+<p>
+There is also voice notes, text notes, and pictures.
+All are saved, along with the GPX files, in your device's
+external storage, commonly /sdcard/jpstrack.android (and
+changeable in Preferences).
+</p>
+<p>
+The name is historical; the program was originally written in
+<a href='/java'>Java</a>, and the name 'gpstrack' was already in use
+by another program.
+</p>
+
+<h4>Feedback/Support</h4>
+<p>Always welcome. Please use
+<a href='https://darwinsys.com/contact?subject=Jpstrack'>this contact form</a>.
+</p>
+<p>
+JpsTrack is made for Android releases as old as Android 1.6+, so it runs on just 
+about every device out there (we still test it on 2.x physical devices). 
+</p>
+<p>
+<font color='red'>This is an early release of the software</font>;
+please see the <a href="RELEASE_NOTES.txt">Release Notes</a>
+before you decide it's buggy; we know about most of the bugs that
+are in this version and will fix them as we have time...
+</p>
+
+<h4>Where?</h4>
+<p>You can get the current stable version from
+<a href='https://play.google.com/store/apps/details?id=jpstrack.android'>Google Play</a>.
+</p>
+<p>You can often <a href='jpstrack.android.apk'>find a beta version here</a>.
+</p>
+<p>
+You can also find a stable version repackaged in
+<a href="https://appworld.blackberry.com/webstore/content/88480/?lang=en">
+BlackBerry App World</a> (Playbook and BB10, not for BB5/6/7 since RIM abandoned
+developers on those platforms in moving to BB10).
+</p>
+
+<h4>OSM Wiki</h4>
+<p>There is also a JPSTrack page at the 
+<a href="https://wiki.openstreetmap.org/wiki/Jpstrack">OpenStreetMap Wiki</a>.
+</p>
+
+<h4>Source Code?</h4>
+<p>
+This is a free and open source application.
+Source is provided for most uses, but you may not distribute
+the app back to Google Play Store or other market, as that would
+lead to fragmentation.
+Code is at https://github.com/IanDarwin; you need the two
+repos <i>jpstrack</i> and <i>jpstrack.android</i>.
+</p>
+<p>
+<b>Why two modules?</b>
+Each module is an Eclipse project.
+The code is based on an earlier JavaSE version of jpstrack.
+Since you can't really have both a JavaSE and an Android project
+in the same Eclipse project, 
+and since I refuse to copy-and-paste entire files,
+I left the original and just refer to it.
+The Android Eclipse plug-in used to be smart enough to include the needed
+files from the referenced program when it runs "dx" (.class to .dex converter)
+and include them in the generated APK package.
+Now it doesn't do so, hence there is a Maven pom.xml in jpstrack to produce the
+required jar file.
+</p>
+</td>
+</tr>
+</table>
+</body>
+</html>

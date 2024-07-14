@@ -1,0 +1,4 @@
+https://www.darwinsys.com/jpstrack/NoJpsTrackmovYet.html
+https://www.darwinsys.com/jpstrack/JpsTrack.mov
+
+# Only the FIRST line gets read by the app.

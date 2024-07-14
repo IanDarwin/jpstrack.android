@@ -1,0 +1,79 @@
+---
+title: JPSTrack - Android OSM Tracker
+date: 2018-01-01
+tags: [openstreetmap,foss,gis]
+---
+
+== What?
+
+This program collects data for inclusion into
+https://www.openstreetmap.org/[OpenStreetMap], the free, editable map of
+the world. 
+The data can also be used in any other app which imports GPX-format track data.
+
+This is NOT a Navigation application (there are many of those
+in the Market already). 
+Also, it does NOT try to be an OSM editor. In the author's
+experience, most current Android devices do not have the I/O capability
+to do this job well. I recommend uploading the files (from
+/sdcard/jpstrack) to a desktop PC and runnnig the JOSM editor or
+using the web-based editor on the OSM site.
+
+JPSTrack differs from Google's own My Tracks in that it is much more
+narrowly focused: it only records GPX tracks for OSM. It allows you to
+upload GPX tracks directly to OSM.
+
+The program collects data once you press the Start button, and goes
+until you PAUSE or SAVE. PAUSE can be resumed with the RESUME button.
+The SAVE button ends a run and closes the file.
+
+There is also voice notes, text notes, and pictures. All are saved,
+along with the GPX files, in your device's external storage, commonly
+/sdcard/jpstrack.android (and changeable in Preferences).
+
+The name is historical; the program was originally written in
+link:/java[Java], and the name 'gpstrack' was already in use by another
+program.
+
+== Feedback/Support
+
+Always welcome. Please email jpstrack-feedback@darwinsys.com.
+
+JpsTrack is made for Android releases as old as Android 5+, so it runs
+on just about every device out there.
+
+This is an early release of the software; please see the
+link:RELEASE_NOTES.txt[Release Notes] before you decide it's buggy; we
+know about most of the bugs that are in this version and will fix them
+as we have time...
+
+== Where?
+
+You can get the current stable version from
+https://play.google.com/store/apps/details?id=jpstrack.android[Google Play].
+
+You can occasionally link:jpstrack.android.apk[find a beta version here].
+
+== OSM Wiki
+
+There is also a JPSTrack page at the
+https://wiki.openstreetmap.org/wiki/Jpstrack[OpenStreetMap Wiki].
+
+== Source Code?
+
+This is a free and open source application. Source is provided for most
+uses, but you may not distribute the app back to Google Play Store or
+other market, as that would lead to fragmentation. Code is at
+https://github.com/IanDarwin; you need the two repos _jpstrack_ and
+_jpstrack.android_.
+
+*Why two source modules?* Each module is a separate project. The code is based
+on an earlier JavaSE version of jpstrack. Since (prior to the move to IntelliJ/Android Studio)
+you couldn't really have
+both a JavaSE and an Android project in the same project, and
+since I refuse to copy-and-paste entire files, I left the original and
+just refer to it.
+The _jpstrack_ module contains the code for saving in GPX format.
+There is a Maven _pom.xml_ file in jpstrack to produce the required jar file.
+Since this isn't worth the trouble of publishing on Maven Central, just copy
+the jar file into the lib folder of the jpstrack.android project.
