@@ -1,0 +1,31 @@
+= jpstrack Test Plan
+
+== Testing with canned data
+
+Untried. Feed a GPX file into the Emulator settings.
+
+== Testing with real data
+
+Load the app onto a real device (needs GPS, d'oh!).
+
+Go outside where the device can see the sky. When it sees enough satellites,
+it will show the lat/long/alt in the main window.
+
+Press the Start button.
+
+Move at least 10 feet in one direction. A changed reading should appear.
+
+Press Pause: it should stop. Press Resume: it should continue.
+
+Press Voice Note. It should let you dictate.
+
+Press Text Note. Type "Hello JpsTrack" or something in the top, and save.
+
+Press Take Picture. It should show a camera preview. Take a picture of
+something (anything), and it should ask you to OK it, and it will save.
+
+Tap the Save button. It should give you a saved filename.
+
+Plug the phone into a computer.  Connect to it via `ADB -d shell` and
+ensure that /sdcard/Download/jpstrack contains a GPX file, a text file, a sound
+file, and an image, all with current timestamps.
