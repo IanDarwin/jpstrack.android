@@ -1,5 +1,21 @@
-Version 1.0.0 - 2014-04-15
------------------------------------
+= jpstrack, the Open Streetmap and GPX data collector
+
+== Version 1.1.0 - 2024-07-15
+
+No significant changes, but MINSDK is now 21 (Android 5!)
+Release primarily to address new Android versions.
+
+This version is still written in Java for the Android SDK.
+A future version may be written in Flutter, which would allow
+the app to also appear on the Apple App Store. 
+Such a version will remain compatible at the user level.
+
+You can submit errata, bug fixes, pull requests etc on the
+https://github.com/IanDarwin/jpstrack.android[project's github].
+
+== Version 1.0.4 - early 2020s, not released.
+
+== Version 1.0.0 - 2014-04-15
 
 UI updated with Android ActionBar. I still support phones as far back as API
 Level 7 (had to move up from 6 to get the support library for the ActionBar;
@@ -25,8 +41,7 @@ Releases are only being released for Android due to an "issue" with our password
 for BlackBerry. Hope to have this resolved soon. You can always load the APK
 directly from http://darwinsys.com/jpstrack and current BB10 will install it.
 
-Version 0.8 - 2014-01-27
-------------------------
+== Version 0.8 - 2014-01-27
 
 Minor bug fix and enhancements.
 
@@ -71,6 +86,4 @@ This is a Beta release. Please note the following:
 
 If you find any new ways to crash it, please email or use this:
 
-http://darwinsys.com/contact.jsp
-
-$Id$
+http://darwinsys.com/contact
