@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -35,7 +36,6 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 	private final String osmHostProd = "api.openstreetmap.org";
 	private final String osmHostTest = "master.apis.dev.openstreetmap.org";
 
-	ExecutorService threadPool = Executors.newSingleThreadExecutor();
+	static ExecutorService threadPool = Executors.newFixedThreadPool(5);
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -240,7 +240,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 	private final ActivityResultLauncher<String> gpsPermissionLauncher =
 			registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
 				if (isGranted) {
-					// XXX ???
 					setupSaveDirectoryInternal();
 				} else {
 					Toast.makeText(this, "You've disabled permissions so this action will be unusable", Toast.LENGTH_LONG).show();
@@ -264,10 +263,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 	Runnable setupSaveDirLocation = () -> {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
 		String preferredSaveLocation =
-				prefs.getString(SettingsActivity.OPTION_DIR, null);
+				prefs.getString(SettingsActivity.OPTION_DIR, dataDir.getAbsolutePath());
 		if (preferredSaveLocation != null && !"".equals(preferredSaveLocation)) {
 			// We've been run before
 			dataDir = new File(preferredSaveLocation);
+			prefs.edit().putString(SettingsActivity.OPTION_DIR, dataDir.getAbsolutePath()).commit();
 		} else {
 			// First run on this device, probably. Use "external storage" so user can
 			// access own files without rooting device.
@@ -276,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 					PackageManager.PERMISSION_GRANTED) {
 				// We can use the API that requires the permission.
 				setupSaveDirectoryInternal();
-				prefs.put(SettingsActivity.OPTION_DIR, dataDir.getAbsolutePath());
+				prefs.edit().putString(SettingsActivity.OPTION_DIR, dataDir.getAbsolutePath()).commit();
 			} else if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 				// Tell user why we need this!
 				Toast.makeText(this,

@@ -16,12 +16,14 @@ import jpstrack.fileio.FileNameUtils;
 
 public class TextNoteActivity extends Activity implements OnClickListener {
 
+	final static String TAG = TextNoteActivity.class.getSimpleName();
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
 		if (!MainActivity.sdWritable) {
-			Toast.makeText(this, "SD Card is not writable", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, TAG + ": SD Card is not writable", Toast.LENGTH_LONG).show();
 			finish();
 			return;
 		}
@@ -38,30 +40,38 @@ public class TextNoteActivity extends Activity implements OnClickListener {
 		int source = v.getId();
 		switch(source) {
 		case R.id.textnote_save_button:
+			Log.d(TAG, "save");
 			doSave();
 			finish();
 			break;
 		case R.id.textnote_discard_button:
+			Log.d(TAG, "discard");
 			finish();
 			break;
 		default:
+			Log.d(TAG, "Unexpected onClick from id " + source);
 			break;
 		}
 	}
 
+	/** Save the text file. Run in a thread pool */
 	private void doSave() {
+		Log.d(TAG, "in doSave");
 		EditText tv = (EditText) findViewById(R.id.textnote_text);
 		File f = new File(MainActivity.dataDir, FileNameUtils.getNextFilename("txt"));
-		try {
-			PrintWriter out = new PrintWriter(f);
-			out.print(tv.getText().toString());
-			out.close();
-			Toast.makeText(this, "Saved text note into " + f, Toast.LENGTH_SHORT).show();
-		} catch (IOException e) {
-			final String message = "Can't create text file " + f + "(" + e + ")";
-			Log.e(MainActivity.TAG, message);
-			Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-			// Don't finish! Let them try later
-		}
+		MainActivity.threadPool.submit( () -> {
+			try {
+				PrintWriter out = new PrintWriter(f);
+				out.print(tv.getText().toString());
+				out.close();
+			} catch (IOException e) {
+				final String message = "Can't create text file " + f + "(" + e + ")";
+				Log.e(MainActivity.TAG, message);
+				Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+				return;
+			}
+		});
+		Toast.makeText(TextNoteActivity.this,
+				"Saved text note into " + f, Toast.LENGTH_SHORT).show();
 	}
 }

@@ -23,6 +23,7 @@ import android.widget.Toast;
  * @author Ian Darwin
  */
 public class VoiceNoteActivity extends Activity implements OnClickListener {
+	private static String TAG = VoiceNoteActivity.class.getSimpleName();
 	MediaRecorder recorder  = null;
 	private String soundFile;
 	private boolean recording;
@@ -88,14 +89,18 @@ public class VoiceNoteActivity extends Activity implements OnClickListener {
 
 	protected void startRecording() {
 		recorder = new MediaRecorder();
-		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-		recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+		try {
+			recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+			recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+			recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+		} catch(Exception ex) {
+			Log.d(TAG, "Failed to setup sound channel", ex);
+		}
 		try {
 			Uri soundUri = getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT);			
 			soundFile = soundUri.getPath();
 			recorder.setOutputFile(soundFile);
-			Log.d(MainActivity.TAG, "outputting to " + soundUri.getPath());
+			Log.d(TAG, "outputting to " + soundUri.getPath());
 			recorder.prepare();
 			recorder.start();
 			recording = true;
