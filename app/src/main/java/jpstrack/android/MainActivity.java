@@ -39,6 +39,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
 
 import java.io.File;
 import java.io.IOException;
@@ -80,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 	public static final String SKIP_SKIP = "DONT_SHOW_SKIP";
 
 	private LocationManager mgr;
-	private static File dataDir;
+	private static File dataDir = new File("/sdcard/Download/jpstrack");
 	private TextView output;
 	private TextView latOutput, longOutput, altOutput;
 	private TextView fileNameLabel;
@@ -183,6 +184,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 		}
 
 		// Set up I/O Helper
+		threadPool.submit(() -> dataDir.mkdir());
 		trackerIO = new GPSFileSaver(dataDir, FileNameUtils.getNextFilename());
 
 		if (ActivityCompat.checkSelfPermission(this,
@@ -611,13 +613,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 					FileNameUtils.getNextFilename("jpg"));
 			imageIntent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
 			imageIntent.putExtra(MediaStore.EXTRA_OUTPUT,
-					Uri.fromFile(imageFile));
+					FileProvider.getUriForFile(this,
+							this.getApplicationContext().getPackageName() + ".provider",imageFile));
+			imageIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 			// And away we go!
 			startActivityForResult(imageIntent, ACTION_TAKE_PICTURE);
 		} catch (Exception e) {
 			Toast.makeText(this,
 					getString(R.string.cant_start_activity) + ": " + e,
 					Toast.LENGTH_LONG).show();
+			Log.wtf(TAG, e);
 		}
 	};
 

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    android:versionCode="014"
-	android:versionName="1.0.4">
+	xmlns:tools="http://schemas.android.com/tools"
+	package="jpstrack.android"
+    android:versionCode="110"
+	android:versionName="1.1.0">
 	
     <uses-feature android:name="android.hardware.location.gps" android:required="true" />
 	
@@ -16,9 +18,7 @@
                   android:smallScreens="true"
                   android:normalScreens="true" 
                   android:largeScreens="true"/>
-				<!-- 
-                  android:xlargeScreens="true"/>
-				 -->
+
 	<application
 		android:name=".ApplicationSingleton"
 	    android:icon="@drawable/icon"
@@ -38,5 +38,19 @@
 		<activity android:name=".SettingsActivity" android:label="@string/settings_name"/>
 		<activity android:name=".VoiceNoteActivity" android:label="@string/voicenote_name"/>
 		<activity android:name=".TextNoteActivity" android:label="@string/textnote_name"/>
+
+		<provider
+			android:name="androidx.core.content.FileProvider"
+			android:authorities="jpstrack.android.provider"
+			android:exported="false"
+			android:grantUriPermissions="true"
+			tools:replace="android:authorities">
+			<meta-data
+				android:name="android.support.FILE_PROVIDER_PATHS"
+				android:resource="@xml/provider_paths"
+				tools:replace="android:resource" />
+		</provider>
+
 	</application>
+
 </manifest> 
