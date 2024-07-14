@@ -1,0 +1,16 @@
+= jpstrack Release Plan
+
+At least annually:
+
+* Update versioncode/name in AndroidManifest
+* Update the Release Notes:
+** cd $DOSWEB/content/jpstrack
+** vi ReleaseNotes.adoc
+** make
+** Check 'em!
+** git commit, push
+** On $SERVER, cd to $dosweb, make install
+* Android Studio: run on emulator, or real device
+* Follow the steps in TestPlan.
+* Android Studio: Build Menu -> Generate Signed App Bundle...
+* Deploy App via Google Play Developer Console.
