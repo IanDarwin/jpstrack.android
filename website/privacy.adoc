@@ -1,4 +1,4 @@
-== JpsTrack.Android: Privacy Policy
+== JpsTrack Privacy Policy
 
 === Summary
 
@@ -11,6 +11,20 @@ information. By using the Upload feature, you consent to your location
 information being transmitted to OpenStreetMap.org (OSM), where their
 privacy policy applies. You consented to this policy when you created
 your OpenStreetMap account."
+
+=== Data Details
+
+Note that the mobile application saves some of this data onto your
+device, but we do not capture ANY of it to our web service. We do save
+your OpenStreetMap account name onto your device. We do not save your
+OSM password, out of an abundance of caution. The application is open
+source so you can verify this yourself, by looking at
+https://github.com/IanDarwin/jpstrack.android[the github repo.]
+
+The only time we upload identifiable stuff is to OpenStreetMap. In that
+case, you are covered by OpenStreetMap's own privacy policy, which we
+have no control over and which you must have consented to when creating
+your OSM account.
 
 === Permissions Used
 
@@ -36,21 +50,8 @@ provide an account and password, and for uploading anonymous crash
 reporting info.
 |===
 
-=== Data Details
-
-Note that the mobile application saves some of this data onto your
-device, but we do not capture ANY of it to our web service. We do save
-your OpenStreetMap account name onto your device. We do not save your
-OSM password, out of an abundance of caution. The application is open
-source so you can verify this yourself, by looking at
-https://github.com/IanDarwin/jpstrack.android[the github repo.]
-
-The only time we upload identifiable stuff is to OpenStreetMap. In that
-case, you are covered by OpenStreetMap's own privacy policy, which we
-have no control over.
-
 === Contact
 
 If you need to contact us, please email jpstrack-feedback@darwinsys.com.
 
-Thank you for using jpsTrack!
+Thank you for using JpsTrack!
