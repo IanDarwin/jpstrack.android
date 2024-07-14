@@ -589,7 +589,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 		// Set up file to save image into.
 		soundFile = new File(MainActivity.getDataDirectory(), FileNameUtils
 				.getNextFilename("mp3"));
-		soundIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(soundFile));
+		soundIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+				FileProvider.getUriForFile(MainActivity.this,
+						getApplicationContext().getPackageName() + ".provider",
+						soundFile));
 		// And away we go!
 		startActivityForResult(soundIntent, ACTION_TAKE_SOUNDBITE);
 	};
@@ -612,12 +615,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 			imageFile = new File(MainActivity.getDataDirectory(),
 					FileNameUtils.getNextFilename("jpg"));
 			imageIntent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+
 			imageIntent.putExtra(MediaStore.EXTRA_OUTPUT,
 					FileProvider.getUriForFile(this,
-							this.getApplicationContext().getPackageName() + ".provider",imageFile));
+							this.getApplicationContext().getPackageName() + ".provider",
+							imageFile));
 			imageIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 			// And away we go!
 			startActivityForResult(imageIntent, ACTION_TAKE_PICTURE);
+			logToScreen("Done with Camera Activity");
 		} catch (Exception e) {
 			Toast.makeText(this,
 					getString(R.string.cant_start_activity) + ": " + e,
@@ -629,6 +635,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 	/** Called when an Activity we started for Result is complete */
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		logToScreen("In onActivityResult");
 		super.onActivityResult(requestCode, resultCode, data);
 		switch (requestCode) {
 		case ACTION_TAKE_PICTURE:
@@ -648,7 +655,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 				}
 				break;
 			case Activity.RESULT_CANCELED:
-				logToScreen("Done");
+				logToScreen("Pix Canceled!");
 				break;
 			default:
 				Toast.makeText(this, "Unexpected resultCode: " + resultCode, Toast.LENGTH_LONG).show();
@@ -672,7 +679,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 				}
 				break;
 			case Activity.RESULT_CANCELED:
-				logToScreen("Done");
+				logToScreen("Vox annuli!");
 				break;
 			default:
 				Toast.makeText(this, "Unexpected resultCode: " + resultCode, Toast.LENGTH_LONG).show();
