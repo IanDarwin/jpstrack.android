@@ -18,4 +18,5 @@ Android Studio.
 
 == Status
 
-In process of modernization. Lots of updating still needed.
+This is the older Android-only version. A Flutter version is in preparation that will
+someday run on both Android and iOS. For now, though, this is it.
