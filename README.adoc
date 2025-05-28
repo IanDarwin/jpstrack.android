@@ -1,6 +1,8 @@
 = jpstrack.android
 
-The widely-used version of JPSTrack, as found on Android devices everywhere.
+** Obsolete ** JPSTrack is now maintained in the _jpstrack_ repository.
+It has been completely rewritten in Flutter, for portability to systems
+other than Android.
 
 JPSTrack is a map-making tool for OpenStreetMap.
 
