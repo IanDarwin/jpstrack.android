@@ -1,6 +1,6 @@
 = jpstrack.android
 
-** Obsolete ** JPSTrack is now maintained in the _jpstrack_ repository.
+* Obsolete * JPSTrack is now maintained in the _jpstrack_ repository.
 It has been completely rewritten in Flutter, for portability to systems
 other than Android.
 
